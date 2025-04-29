@@ -18,7 +18,7 @@ jobs:
   # versions of Python.
   #
   unit-tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       max-parallel: 3
       matrix:
@@ -44,7 +44,7 @@ jobs:
           tox -e py
 
   mot-metrics:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
 
@@ -66,7 +66,7 @@ jobs:
           tox -e mot-py39
 
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
 
@@ -94,7 +94,7 @@ jobs:
 
   install:
     needs: [build]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       max-parallel: 3
       matrix:
@@ -123,7 +123,7 @@ jobs:
   # Executed only if GitHub release is "published".
   #
   release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [unit-tests, mot-metrics]
     if: github.event_name == 'release'
     env:
@@ -148,7 +148,7 @@ jobs:
 
 
   deploy-doc:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: [release]
     if: github.event_name == 'release'
     env:
