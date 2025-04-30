@@ -38,6 +38,8 @@ jobs:
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
+        with:
+          version: 1.5.1 # to support Python 3.8
 
       - name: Run tests
         run: |
@@ -138,6 +140,8 @@ jobs:
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
+        with:
+          version: 1.5.1 # to support Python 3.8
 
       - name: Release to PyPI
         env:
@@ -163,6 +167,8 @@ jobs:
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
+        with:
+          version: 1.5.1 # to support Python 3.8
 
       - name: Install dependencies
         run: pip install -r docs/requirements.txt
