@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "norfair"
-version = "2.2.0"
+version = "2.3.0"
 description = "Lightweight Python library for adding real-time multi-object tracking to any detector."
 license = "BSD-3-Clause"
 authors = ["Tryolabs <hello@tryolabs.com>"]
@@ -36,7 +36,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
-rich = ">=9.10.0, <13.0.0"
+rich = ">=9.10.0, <15.0.0"
 scipy = ">=1.5.4"
 numpy = [
     {version = "^1.19.0", python = "<3.8"},
