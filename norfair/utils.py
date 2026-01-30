@@ -1,7 +1,7 @@
 import os
 from collections.abc import Sequence
 from functools import cache
-from logging import warn
+from logging import warning
 
 import numpy as np
 from rich import print
@@ -91,4 +91,4 @@ def warn_once(message):
     """
     Write a warning message only once.
     """
-    warn(message)
+    warning(message)
