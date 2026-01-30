@@ -723,10 +723,10 @@ class TrackedObject:
         TrackedObject, while maintaining them distributed uniformly through the object's
         lifetime.
         """
+        detection.age = self.age
         if self.past_detections_length == 0:
             return
         if len(self.past_detections) < self.past_detections_length:
-            detection.age = self.age
             self.past_detections.append(detection)
         else:
             first_detection_age = self.past_detections[0].age
@@ -735,7 +735,6 @@ class TrackedObject:
                 and self.age >= first_detection_age * self.past_detections_length
             ):
                 self.past_detections.pop(0)
-                detection.age = self.age
                 self.past_detections.append(detection)
 
     def merge(self, tracked_object):
