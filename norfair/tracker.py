@@ -8,6 +8,7 @@ from norfair.camera_motion import CoordinatesTransformation
 
 from .distances import (
     AVAILABLE_VECTORIZED_DISTANCES,
+    Distance,
     ScalarDistance,
     get_distance_by_name,
 )
@@ -93,23 +94,25 @@ class Tracker:
         reid_distance_threshold: float = 0,
         reid_hit_counter_max: int | None = None,
     ):
-        self.tracked_objects: Sequence[TrackedObject] = []
+        self.tracked_objects: list[TrackedObject] = []
 
+        # Convert distance_function to Distance object
+        distance_obj: Distance
         if isinstance(distance_function, str):
-            distance_function = get_distance_by_name(distance_function)
+            distance_obj = get_distance_by_name(distance_function)
         elif isinstance(distance_function, Callable):
             warning(
                 "You are using a scalar distance function. If you want to speed up the"
                 " tracking process please consider using a vectorized distance"
                 f" function such as {AVAILABLE_VECTORIZED_DISTANCES}."
             )
-            distance_function = ScalarDistance(distance_function)
+            distance_obj = ScalarDistance(distance_function)
         else:
             raise ValueError(
                 "Argument `distance_function` should be a string or function but is"
                 f" {type(distance_function)} instead."
             )
-        self.distance_function = distance_function
+        self.distance_function = distance_obj
 
         self.hit_counter_max = hit_counter_max
         self.reid_hit_counter_max = reid_hit_counter_max
@@ -522,9 +525,9 @@ class TrackedObject:
         initial_detection.age = self.age
         self.past_detections_length = past_detections_length
         if past_detections_length > 0:
-            self.past_detections: Sequence[Detection] = [initial_detection]
+            self.past_detections: list[Detection] = [initial_detection]
         else:
-            self.past_detections: Sequence[Detection] = []
+            self.past_detections: list[Detection] = []
 
         # Create Kalman Filter
         self.filter = filter_factory.create_filter(initial_detection.absolute_points)

@@ -12,11 +12,11 @@ from .utils import _build_text
 
 def draw_points(
     frame: np.ndarray,
-    drawables: Sequence[Detection] | Sequence[TrackedObject] = None,
+    drawables: Sequence[Detection] | Sequence[TrackedObject] | None = None,
     radius: int | None = None,
     thickness: int | None = None,
     color: ColorLike = "by_id",
-    color_by_label: bool = None,  # deprecated
+    color_by_label: bool | None = None,  # deprecated
     draw_labels: bool = True,
     text_size: int | None = None,
     draw_ids: bool = True,
@@ -24,7 +24,7 @@ def draw_points(
     text_thickness: int | None = None,
     text_color: ColorLike | None = None,
     hide_dead_points: bool = True,
-    detections: Sequence["Detection"] = None,  # deprecated
+    detections: Sequence["Detection"] | None = None,  # deprecated
     label_size: int | None = None,  # deprecated
     draw_scores: bool = False,
 ) -> np.ndarray:
@@ -113,7 +113,7 @@ def draw_points(
     # end
 
     if drawables is None:
-        return
+        return frame
 
     if text_color is not None:
         text_color = parse_color(text_color)
@@ -213,16 +213,28 @@ def draw_tracked_objects(
     if label_size is None:
         label_size = int(max(frame_scale / 100, 1))
 
+    # Determine color - default to "by_id" if None
+    selected_color: ColorLike = (
+        "by_label" if color_by_label else (color if color is not None else "by_id")
+    )
+
+    # Convert id_size to int if it's a float
+    text_size_value: int | None = None
+    if label_size is not None:
+        text_size_value = label_size
+    elif id_size is not None:
+        text_size_value = int(id_size)
+
     _draw_points_alias(
         frame=frame,
         drawables=objects,
-        color="by_label" if color_by_label else color,
+        color=selected_color,
         radius=radius,
         thickness=None,
         draw_labels=draw_labels,
         draw_ids=id_size is not None and id_size > 0,
         draw_points=draw_points,
-        text_size=label_size or id_size,
+        text_size=text_size_value,
         text_thickness=id_thickness,
         text_color=None,
         hide_dead_points=True,

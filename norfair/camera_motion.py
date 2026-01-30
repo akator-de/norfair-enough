@@ -49,7 +49,7 @@ class TransformationGetter(ABC):
     @abstractmethod
     def __call__(
         self, curr_pts: np.ndarray, prev_pts: np.ndarray
-    ) -> tuple[bool, CoordinatesTransformation]:
+    ) -> tuple[bool, CoordinatesTransformation | None]:
         pass
 
 
@@ -243,31 +243,52 @@ class HomographyTransformationGetter(TransformationGetter):
 
         update_prvs = proportion_points_used < self.proportion_points_used_threshold
 
-        with contextlib.suppress(TypeError, ValueError):
-            homography_matrix = homography_matrix @ self.data
+        if self.data is not None:
+            with contextlib.suppress(TypeError, ValueError):
+                homography_matrix = homography_matrix @ self.data
 
         if update_prvs:
             self.data = homography_matrix
 
-        return update_prvs, HomographyTransformation(homography_matrix)
+        return bool(update_prvs), HomographyTransformation(homography_matrix)
 
 
 #
 # Motion estimation
 #
+def _calc_optical_flow(
+    prev_img: np.ndarray,
+    next_img: np.ndarray,
+    prev_pts: np.ndarray,
+) -> tuple[np.ndarray | None, np.ndarray | None]:
+    """
+    Wrapper for cv2.calcOpticalFlowPyrLK with proper type handling.
+
+    OpenCV's calcOpticalFlowPyrLK can auto-initialize nextPts when it's empty.
+    We create an empty array of the correct type to satisfy the type checker
+    while maintaining the auto-initialization behavior.
+    """
+    # Create an empty array for nextPts; OpenCV will auto-initialize it
+    next_pts_init: np.ndarray = np.array([], dtype=np.float32).reshape(0, 1, 2)
+    result = cv2.calcOpticalFlowPyrLK(prev_img, next_img, prev_pts, next_pts_init)
+    if result is None or len(result) < 2:
+        return None, None
+    return result[0], result[1]
+
+
 def _get_sparse_flow(
-    gray_next,
-    gray_prvs,
-    prev_pts=None,
-    max_points=300,
-    min_distance=15,
-    block_size=3,
-    mask=None,
-    quality_level=0.01,
-):
+    gray_next: np.ndarray,
+    gray_prvs: np.ndarray,
+    prev_pts: np.ndarray | None = None,
+    max_points: int = 300,
+    min_distance: int = 15,
+    block_size: int = 3,
+    mask: np.ndarray | None = None,
+    quality_level: float = 0.01,
+) -> tuple[np.ndarray, np.ndarray]:
     if prev_pts is None:
         # get points
-        prev_pts = cv2.goodFeaturesToTrack(
+        prev_pts_result = cv2.goodFeaturesToTrack(
             gray_prvs,
             maxCorners=max_points,
             qualityLevel=quality_level,
@@ -275,16 +296,22 @@ def _get_sparse_flow(
             blockSize=block_size,
             mask=mask,
         )
+        if prev_pts_result is None:
+            # Return empty arrays if no features found
+            return np.array([]).reshape(0, 2), np.array([]).reshape(0, 2)
+        prev_pts = prev_pts_result
 
     # compute optical flow
-    curr_pts, status, err = cv2.calcOpticalFlowPyrLK(
-        gray_prvs, gray_next, prev_pts, None
-    )
+    curr_pts_result, status = _calc_optical_flow(gray_prvs, gray_next, prev_pts)
+
     # filter valid points
+    if curr_pts_result is None or status is None:
+        return np.array([]).reshape(0, 2), np.array([]).reshape(0, 2)
+
     idx = np.where(status == 1)[0]
-    prev_pts = prev_pts[idx].reshape((-1, 2))
-    curr_pts = curr_pts[idx].reshape((-1, 2))
-    return curr_pts, prev_pts
+    prev_pts_filtered = prev_pts[idx].reshape((-1, 2))
+    curr_pts_filtered = curr_pts_result[idx].reshape((-1, 2))
+    return curr_pts_filtered, prev_pts_filtered
 
 
 class MotionEstimator:
@@ -334,7 +361,7 @@ class MotionEstimator:
         max_points: int = 200,
         min_distance: int = 15,
         block_size: int = 3,
-        transformations_getter: TransformationGetter = None,
+        transformations_getter: TransformationGetter | None = None,
         draw_flow: bool = False,
         flow_color: tuple[int, int, int] | None = None,
         quality_level: float = 0.01,
@@ -345,7 +372,7 @@ class MotionEstimator:
 
         self.draw_flow = draw_flow
         if self.draw_flow and flow_color is None:
-            flow_color = [0, 0, 100]
+            flow_color = (0, 0, 100)
         self.flow_color = flow_color
 
         self.gray_prvs = None
@@ -361,7 +388,7 @@ class MotionEstimator:
         self.quality_level = quality_level
 
     def update(
-        self, frame: np.ndarray, mask: np.ndarray = None
+        self, frame: np.ndarray, mask: np.ndarray | None = None
     ) -> CoordinatesTransformation | None:
         """
         Estimate camera motion for each frame
@@ -405,7 +432,7 @@ class MotionEstimator:
                 self.prev_mask,
                 quality_level=self.quality_level,
             )
-            if self.draw_flow:
+            if self.draw_flow and self.flow_color is not None:
                 for curr, prev in zip(curr_pts, prev_pts):
                     c = tuple(curr.astype(int).ravel())
                     p = tuple(prev.astype(int).ravel())
@@ -415,16 +442,17 @@ class MotionEstimator:
             warning(e)
 
         update_prvs, coord_transformations = True, None
-        try:
-            update_prvs, coord_transformations = self.transformations_getter(
-                curr_pts, prev_pts
-            )
-        except Exception as e:
-            warning(e)
-            del self.transformations_getter
-            self.transformations_getter = copy.deepcopy(
-                self.transformations_getter_copy
-            )
+        if curr_pts is not None and prev_pts is not None:
+            try:
+                update_prvs, coord_transformations = self.transformations_getter(
+                    curr_pts, prev_pts
+                )
+            except Exception as e:
+                warning(e)
+                del self.transformations_getter
+                self.transformations_getter = copy.deepcopy(
+                    self.transformations_getter_copy
+                )
 
         if update_prvs:
             self.gray_prvs = self.gray_next
