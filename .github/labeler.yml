@@ -1,0 +1,29 @@
+ci:
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "docs/**"
+          - "mkdocs.yml"
+          - "*.md"
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file: "tests/**"
+
+drawing:
+  - changed-files:
+      - any-glob-to-any-file: "norfair/drawing/**"
+
+tracker:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "norfair/tracker.py"
+          - "norfair/filter.py"
+          - "norfair/distances.py"
+
+video:
+  - changed-files:
+      - any-glob-to-any-file: "norfair/video.py"
