@@ -146,23 +146,34 @@ class HomographyTransformation(CoordinatesTransformation):
         self.inverse_homography_matrix = np.linalg.inv(homography_matrix)
 
     def abs_to_rel(self, points: np.ndarray):
+        single_point = points.ndim == 1
+        if single_point:
+            points = points.reshape(1, -1)
         ones = np.ones((len(points), 1))
         points_with_ones = np.hstack((points, ones))
         points_transformed = points_with_ones @ self.homography_matrix.T
         last_column = points_transformed[:, -1]
         last_column[last_column == 0] = 0.0000001
         points_transformed = points_transformed / last_column.reshape(-1, 1)
-        new_points_transformed = points_transformed[:, :2]
-        return new_points_transformed
+        result = points_transformed[:, :2]
+        if single_point:
+            return result.flatten()
+        return result
 
     def rel_to_abs(self, points: np.ndarray):
+        single_point = points.ndim == 1
+        if single_point:
+            points = points.reshape(1, -1)
         ones = np.ones((len(points), 1))
         points_with_ones = np.hstack((points, ones))
         points_transformed = points_with_ones @ self.inverse_homography_matrix.T
         last_column = points_transformed[:, -1]
         last_column[last_column == 0] = 0.0000001
         points_transformed = points_transformed / last_column.reshape(-1, 1)
-        return points_transformed[:, :2]
+        result = points_transformed[:, :2]
+        if single_point:
+            return result.flatten()
+        return result
 
 
 class HomographyTransformationGetter(TransformationGetter):
