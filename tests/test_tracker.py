@@ -408,6 +408,49 @@ def test_reid_hit_counter_reset():
     assert tracked_objects[0].id == obj_id
 
 
+def test_detection_age_always_set():
+    """Test that detection.age is set even when past_detections_length=0."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        hit_counter_max=4,
+        initialization_delay=0,
+        past_detections_length=0,
+    )
+
+    tracked = tracker.update([Detection(points=np.array([[1, 1]]))])
+    assert len(tracked) == 1
+    # last_detection.age should be set even though past_detections_length=0
+    assert tracked[0].last_detection.age is not None
+    assert tracked[0].last_detection.age == tracked[0].age
+
+    # Feed more frames and check age stays consistent
+    tracked = tracker.update([Detection(points=np.array([[1, 1]]))])
+    assert tracked[0].last_detection.age is not None
+    assert tracked[0].last_detection.age == tracked[0].age
+
+
+def test_detection_age_set_when_buffer_full():
+    """Test that detection.age is set even when past_detections buffer is full and not replaced."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        hit_counter_max=10,
+        initialization_delay=0,
+        past_detections_length=2,
+    )
+
+    # Fill the past_detections buffer
+    tracked = tracker.update([Detection(points=np.array([[1, 1]]))])
+    tracked = tracker.update([Detection(points=np.array([[1, 1]]))])
+    tracked = tracker.update([Detection(points=np.array([[1, 1]]))])
+    assert len(tracked) == 1
+
+    # At this point buffer may be full; the detection's age should still be set
+    assert tracked[0].last_detection.age is not None
+    assert tracked[0].last_detection.age == tracked[0].age
+
+
 # TODO tests list:
 #   - detections with different labels
 #   - partial matches where some points are missing
