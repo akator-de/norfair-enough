@@ -797,7 +797,7 @@ class Detection:
         scores: float | int | np.ndarray | None = None,
         data: Any = None,
         label: Hashable = None,
-        embedding=None,
+        embedding: Any = None,
     ):
         self.points = validate_points(points)
 
