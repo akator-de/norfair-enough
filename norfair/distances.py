@@ -1,4 +1,5 @@
 """Predefined distances"""
+
 from abc import ABC, abstractmethod
 from functools import partial
 from logging import warning

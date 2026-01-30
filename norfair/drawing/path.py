@@ -169,7 +169,6 @@ class AbsolutePaths:
         radius: Optional[int] = None,
         max_history=20,
     ):
-
         if get_points_to_draw is None:
 
             def get_points_to_draw(points):

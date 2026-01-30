@@ -13,7 +13,6 @@ from trt_pose.parse_objects import ParseObjects
 
 from norfair import Detection
 from norfair.distances import (
-    create_keypoints_voting_distance,
     create_normalized_mean_euclidean_distance,
 )
 from norfair.filter import (
@@ -110,7 +109,6 @@ def get_distance_function(distance_function, video_width=None, video_height=None
 def get_model(
     model_weights, model_height, model_width, optimize_model=None, pose_decriptor=None
 ):
-
     if optimize_model is None:
         optimize_model = not model_weights.endswith("_trt.pth")
     if optimize_model:

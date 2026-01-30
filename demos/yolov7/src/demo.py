@@ -4,10 +4,9 @@ from typing import List, Optional, Union
 
 import numpy as np
 import torch
-import torchvision.ops.boxes as bops
 
 import norfair
-from norfair import Detection, Paths, Tracker, Video
+from norfair import Detection, Tracker, Video
 
 DISTANCE_THRESHOLD_BBOX: float = 0.7
 DISTANCE_THRESHOLD_CENTROID: int = 30
@@ -43,7 +42,6 @@ class YOLO:
         image_size: int = 720,
         classes: Optional[List[int]] = None,
     ) -> torch.tensor:
-
         self.model.conf = conf_threshold
         self.model.iou = iou_threshold
         if classes is not None:
@@ -57,7 +55,8 @@ def center(points):
 
 
 def yolo_detections_to_norfair_detections(
-    yolo_detections: torch.tensor, track_points: str = "centroid"  # bbox or centroid
+    yolo_detections: torch.tensor,
+    track_points: str = "centroid",  # bbox or centroid
 ) -> List[Detection]:
     """convert detections_as_xywh to norfair detections"""
     norfair_detections: List[Detection] = []

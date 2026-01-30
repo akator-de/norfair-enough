@@ -2,7 +2,6 @@ from logging import warning
 from typing import Any, Callable, Hashable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
-from rich import print
 
 from norfair.camera_motion import CoordinatesTransformation
 
@@ -318,7 +317,7 @@ class Tracker:
                 matched_objects = []
 
                 # Handle matched people/detections
-                for (match_cand_idx, match_obj_idx) in zip(
+                for match_cand_idx, match_obj_idx in zip(
                     matched_cand_indices, matched_obj_indices
                 ):
                     match_distance = distance_matrix[match_cand_idx, match_obj_idx]
@@ -789,9 +788,9 @@ class Detection:
         self.points = validate_points(points)
 
         if isinstance(scores, np.ndarray):
-            assert len(scores) == len(
-                self.points
-            ), "scores should be a np.ndarray with it's length being equal to the amount of points."
+            assert len(scores) == len(self.points), (
+                "scores should be a np.ndarray with it's length being equal to the amount of points."
+            )
         elif scores is not None:
             scores = np.zeros((len(points),)) + scores
         self.scores = scores

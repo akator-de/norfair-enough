@@ -16,24 +16,24 @@ Once you implement and test your feature or bug fix, please submit a Pull Reques
 
 1. Clone this repository `git clone git@github.com:akator-de/norfair-enough.git`.
 2. Set up Python 3.10+ (we test on 3.10, 3.11, 3.12, 3.13). Using [pyenv](https://github.com/pyenv/pyenv) is highly recommended.
-3. Install [poetry](https://python-poetry.org/docs/#installation) version 1.2 or above.
-4. Install dependencies `poetry install --all-extras`.
+3. Install [uv](https://docs.astral.sh/uv/getting-started/installation/).
+4. Install dependencies `uv sync --all-extras --all-groups`.
 
-In the following commands, we will include `poetry run <cmd>` when a command needs the virtual environment. This is not necessary if you activate it by running `poetry shell` once.
+In the following commands, we will include `uv run <cmd>` when a command needs the virtual environment. This is not necessary if you activate it by running `source .venv/bin/activate` once.
 
-## Formatting
+## Formatting & Linting
 
-We use [black](https://black.readthedocs.io/en/stable/) and [isort](https://pycqa.github.io/isort/) to automatically format our python code. It's recommended that you configure them on your editor of choice. If you don't, you'll likely get a linting error on the PR
+We use [ruff](https://docs.astral.sh/ruff/) for formatting and linting. It's recommended that you configure it in your editor of choice. If you don't, you'll likely get a linting error on the PR.
 
-For VSCode, follow the setup recommended [here](https://code.visualstudio.com/docs/python/editing).
+For VSCode, install the [Ruff extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff).
 
-Alternatively, make sure to run `poetry run black .` and `poetry run isort .` on the root directory before committing.
+Alternatively, make sure to run `uv run ruff format .` and `uv run ruff check --fix .` on the root directory before committing.
 
 ## Running tests locally
 
 The tests are automatically checked on each PR by a GitHub Action. For this reason, you are encouraged to skip this setup and send a PR without testing it locally first. Delaying this step until the tests fail on the GitHub Action if they ever do.
 
-Tests are run with tox using `poetry run tox`.
+Tests are run with tox using `uv run tox`.
 
 You will likely receive an error where tox is not able to find the python versions necessary, to solve this with pyenv:
 
@@ -49,8 +49,8 @@ Any suggestion on how to improve the documentation is welcome and don't feel obl
 
 Nevertheless, if you still want to test the change first and create the PR yourself, follow these steps:
 
-1. Install documentation dependencies `poetry run pip install -r docs/requirements.txt`.
-2. Start the debugging server `poetry run mkdocs serve` and open http://localhost:8000.
-3. The above version is useful for debugging but it doesn't include the versioning. Once you are happy with the result you can see the final result with run `poetry run mike deploy dev` and `poetry run mike serve`. Open the browser and switch to `dev` version.
+1. Install documentation dependencies `uv run pip install -r docs/requirements.txt`.
+2. Start the debugging server `uv run mkdocs serve` and open http://localhost:8000.
+3. The above version is useful for debugging but it doesn't include the versioning. Once you are happy with the result you can see the final result with run `uv run mike deploy dev` and `uv run mike serve`. Open the browser and switch to `dev` version.
 
 Our documentation follows [numpy style](https://numpydoc.readthedocs.io/en/latest/format.html) docstring format.

@@ -1,8 +1,11 @@
 """Script to deploy the latest version to github pages using mike"""
+
 import logging
 import subprocess
+from pathlib import Path
 from typing import List, Union
 
+import tomllib
 from packaging import version
 
 logger = logging.getLogger(__file__)
@@ -15,10 +18,10 @@ def run_cmd(cmd: str) -> List[str]:
 
 def get_current_version() -> version.Version:
     "Get current version specified in pyproject.toml."
-    for line in run_cmd("poetry version"):
-        if line.startswith("norfair"):
-            return version.parse(line.split()[-1])
-    raise Exception("Could not read current version from toml")
+    pyproject_path = Path(__file__).resolve().parent.parent / "pyproject.toml"
+    with open(pyproject_path, "rb") as f:
+        data = tomllib.load(f)
+    return version.parse(data["project"]["version"])
 
 
 def get_latest_version() -> Union[version.Version, None]:

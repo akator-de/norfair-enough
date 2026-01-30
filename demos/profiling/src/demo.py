@@ -33,7 +33,6 @@ def process_video(
     frame_skip_period=1,
     create_video=False,
 ):
-
     tracker_time_mean = 0
     detector_time_mean = 0
 
@@ -44,7 +43,6 @@ def process_video(
         total_frames += 1
 
         if frame_number % frame_skip_period == 0:
-
             start_frame_time = time.time()
             data = preprocesser(frame)
             cmap, paf = detector(data)
@@ -76,7 +74,6 @@ def process_video(
 
 
 if __name__ == "__main__":
-
     # Flags
     parser = argparse.ArgumentParser(
         description="profile various trackers and distance functions."

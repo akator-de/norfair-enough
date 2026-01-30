@@ -1,7 +1,6 @@
 import argparse
 
 import cv2
-import numpy as np
 from detectron2.config import get_cfg
 from detectron2.engine import DefaultPredictor
 

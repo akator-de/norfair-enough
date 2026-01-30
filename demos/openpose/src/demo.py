@@ -1,8 +1,6 @@
 import argparse
 import sys
 
-import numpy as np
-
 import norfair
 from norfair import Detection, Tracker, Video
 from norfair.distances import create_keypoints_voting_distance
@@ -27,6 +25,7 @@ DISTANCE_THRESHOLD = 0.4
 INITIALIZATION_DELAY = 4
 HIT_COUNTER_MAX = 30
 POINTWISE_HIT_COUNTER_MAX = 10
+
 
 # Wrapper implementation for OpenPose detector
 class OpenposeDetector:
@@ -60,7 +59,6 @@ class OpenposeDetector:
 
 
 if __name__ == "__main__":
-
     # CLI configuration
     parser = argparse.ArgumentParser(description="Track human poses in a video.")
     parser.add_argument("files", type=str, nargs="+", help="Video files to process")

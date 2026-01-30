@@ -13,6 +13,7 @@ if np.__version__.split(".")[0] >= "2":
     sys.exit(0)
 
 import pandas as pd
+
 from norfair import FilterPyKalmanFilterFactory, Tracker, metrics
 
 DATASET_PATH = "train/train"
@@ -93,9 +94,9 @@ def mot_metrics():
     )
 
     accumulator.print_metrics()
-    assert new_overall_mota >= previous_overall_mota * (
-        1 - MOTA_ERROR_THRESHOLD
-    ), f"New overall MOTA score: {new_overall_mota} is too low, previous overall MOTA score: {previous_overall_mota}"
+    assert new_overall_mota >= previous_overall_mota * (1 - MOTA_ERROR_THRESHOLD), (
+        f"New overall MOTA score: {new_overall_mota} is too low, previous overall MOTA score: {previous_overall_mota}"
+    )
 
 
 if __name__ == "__main__":

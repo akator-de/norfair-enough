@@ -1,4 +1,5 @@
 "Camera motion stimation module."
+
 import copy
 from abc import ABC, abstractmethod
 from logging import warning
@@ -216,7 +217,6 @@ class HomographyTransformationGetter(TransformationGetter):
     def __call__(
         self, curr_pts: np.ndarray, prev_pts: np.ndarray
     ) -> Tuple[bool, Optional[HomographyTransformation]]:
-
         if not (
             isinstance(prev_pts, np.ndarray)
             and prev_pts.shape[0] >= 4
@@ -343,7 +343,6 @@ class MotionEstimator:
         flow_color: Optional[Tuple[int, int, int]] = None,
         quality_level: float = 0.01,
     ):
-
         self.max_points = max_points
         self.min_distance = min_distance
         self.block_size = block_size
@@ -411,7 +410,7 @@ class MotionEstimator:
                 quality_level=self.quality_level,
             )
             if self.draw_flow:
-                for (curr, prev) in zip(curr_pts, prev_pts):
+                for curr, prev in zip(curr_pts, prev_pts):
                     c = tuple(curr.astype(int).ravel())
                     p = tuple(prev.astype(int).ravel())
                     cv2.line(frame, c, p, self.flow_color, 2)

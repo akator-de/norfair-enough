@@ -45,7 +45,6 @@ class PredictionsTextFile:
     """
 
     def __init__(self, input_path, save_path=".", information_file=None):
-
         file_name = os.path.split(input_path)[1]
 
         if information_file is None:

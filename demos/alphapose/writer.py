@@ -1,5 +1,4 @@
 import os
-import time
 from queue import Queue
 from threading import Thread
 
@@ -276,11 +275,11 @@ class DataWriter:
                     norfair.draw_tracked_objects(img, tracked_objects)
 
                     if hm_data.size()[1] == 49:
-                        from alphapose.utils.vis import vis_frame_dense as vis_frame
+                        pass
                     elif self.opt.vis_fast:
-                        from alphapose.utils.vis import vis_frame_fast as vis_frame
+                        pass
                     else:
-                        from alphapose.utils.vis import vis_frame
+                        pass
 
                     self.write_image(
                         img, im_name, stream=stream if self.save_video else None
