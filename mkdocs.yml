@@ -31,7 +31,7 @@ nav:
     - Video: reference/video.md
     - Distances: reference/distances.md
     - Camera Motion: reference/camera_motion.md
-    # - Metrics: reference/metrics.md
+    - Metrics: reference/metrics.md
     - Filter: reference/filter.md
     - Utils: reference/utils.md
 
@@ -69,11 +69,6 @@ markdown_extensions:
         alternate_style: true
     - admonition
     - pymdownx.details
-    - pymdownx.superfences:
-        custom_fences:
-          - name: mermaid
-            class: mermaid
-            format: !!python/name:pymdownx.superfences.fence_code_format
     - pymdownx.highlight:
         linenums: true
     - pymdownx.superfences:
