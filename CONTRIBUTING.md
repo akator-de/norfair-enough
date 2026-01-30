@@ -27,6 +27,13 @@ We use [ruff](https://docs.astral.sh/ruff/) for formatting and linting. It's rec
 
 For VSCode, install the [Ruff extension](https://marketplace.visualstudio.com/items?itemName=charliermarsh.ruff).
 
+We also provide a [pre-commit](https://pre-commit.com/) configuration that runs ruff automatically on every commit:
+
+```bash
+uv sync --group dev
+uv run pre-commit install
+```
+
 Alternatively, make sure to run `uv run ruff format .` and `uv run ruff check --fix .` on the root directory before committing.
 
 ## Running tests locally
