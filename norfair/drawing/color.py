@@ -255,8 +255,9 @@ def parse_color(color_like: ColorLike) -> ColorType:
             return hex_to_bgr(color_like)
         else:
             return getattr(Color, color_like)
-    # TODO: validate?
-    return tuple([int(v) for v in color_like])
+    # color_like is already a ColorType tuple at this point
+    # Ensure it's properly typed as tuple[int, int, int]
+    return (int(color_like[0]), int(color_like[1]), int(color_like[2]))
 
 
 PALETTES = {

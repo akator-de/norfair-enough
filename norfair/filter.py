@@ -1,8 +1,25 @@
 from abc import ABC, abstractmethod
+from typing import Protocol
 
 import numpy as np
 
 from .kalman_filter import KalmanFilter
+
+
+class Filter(Protocol):
+    """Protocol defining the interface for prediction filters."""
+
+    x: np.ndarray
+
+    def predict(self) -> None: ...
+
+    def update(
+        self,
+        __z: np.ndarray,
+        /,
+        R: np.ndarray | None = None,
+        H: np.ndarray | None = None,
+    ) -> None: ...
 
 
 class FilterFactory(ABC):
@@ -12,7 +29,7 @@ class FilterFactory(ABC):
     """
 
     @abstractmethod
-    def create_filter(self, initial_detection: np.ndarray):
+    def create_filter(self, initial_detection: np.ndarray) -> Filter:
         pass
 
 
@@ -148,13 +165,13 @@ class NoFilterFactory(FilterFactory):
 class OptimizedKalmanFilter:
     def __init__(
         self,
-        dim_x,
-        dim_z,
-        pos_variance=10,
-        pos_vel_covariance=0,
-        vel_variance=1,
-        q=0.1,
-        r=4,
+        dim_x: int,
+        dim_z: int,
+        pos_variance: float = 10.0,
+        pos_vel_covariance: float = 0.0,
+        vel_variance: float = 1.0,
+        q: float = 0.1,
+        r: float = 4.0,
     ):
         self.dim_z = dim_z
         self.x = np.zeros((dim_x, 1))

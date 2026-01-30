@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
 from functools import partial
 from logging import warning
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, overload
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -56,12 +56,26 @@ class ScalarDistance(Distance):
         and the second [TrackedObject][norfair.tracker.TrackedObject]. It has to return a `float` with the distance it calculates.
     """
 
+    @overload
+    def __init__(
+        self,
+        distance_function: Callable[["Detection", "TrackedObject"], float],
+    ): ...
+
+    @overload
+    def __init__(
+        self,
+        distance_function: Callable[["TrackedObject", "TrackedObject"], float],
+    ): ...
+
     def __init__(
         self,
         distance_function: Callable[["Detection", "TrackedObject"], float]
         | Callable[["TrackedObject", "TrackedObject"], float],
     ):
-        self.distance_function = distance_function
+        # Store the function; at runtime both signatures work since the actual types
+        # are compatible (duck typing)
+        self.distance_function: Callable = distance_function
 
     def get_distances(
         self,
@@ -84,13 +98,21 @@ class ScalarDistance(Distance):
         np.ndarray
             A matrix containing the distances between objects and candidates.
         """
+        if not objects or not candidates:
+            # Handle None or empty cases
+            num_candidates = len(candidates) if candidates is not None else 0
+            distance_matrix = np.full(
+                (num_candidates, len(objects)),
+                fill_value=np.inf,
+                dtype=np.float32,
+            )
+            return distance_matrix
+
         distance_matrix = np.full(
             (len(candidates), len(objects)),
             fill_value=np.inf,
             dtype=np.float32,
         )
-        if not objects or not candidates:
-            return distance_matrix
         for c, candidate in enumerate(candidates):
             for o, obj in enumerate(objects):
                 if candidate.label != obj.label:
@@ -143,13 +165,21 @@ class VectorizedDistance(Distance):
         np.ndarray
             A matrix containing the distances between objects and candidates.
         """
+        if not objects or not candidates:
+            # Handle None or empty cases
+            num_candidates = len(candidates) if candidates is not None else 0
+            distance_matrix = np.full(
+                (num_candidates, len(objects)),
+                fill_value=np.inf,
+                dtype=np.float32,
+            )
+            return distance_matrix
+
         distance_matrix = np.full(
             (len(candidates), len(objects)),
             fill_value=np.inf,
             dtype=np.float32,
         )
-        if not objects or not candidates:
-            return distance_matrix
 
         object_labels = np.array([o.label for o in objects]).astype(str)
         candidate_labels = np.array([c.label for c in candidates]).astype(str)
@@ -171,10 +201,16 @@ class VectorizedDistance(Distance):
             stacked_candidates = []
             for c in candidates:
                 if str(c.label) == label:
-                    if "Detection" in str(type(c)):
-                        stacked_candidates.append(c.points.ravel())
+                    # Detection objects have 'points', TrackedObject has 'estimate'
+                    # Use hasattr to determine which attribute to access
+                    if hasattr(c, "points"):
+                        # This is a Detection object
+                        c_points = c.points
+                        stacked_candidates.append(c_points.ravel())
                     else:
-                        stacked_candidates.append(c.estimate.ravel())
+                        # This is a TrackedObject
+                        c_estimate = c.estimate
+                        stacked_candidates.append(c_estimate.ravel())
             stacked_candidates = np.stack(stacked_candidates)
 
             # calculate the pairwise distances between objects and candidates with this label
@@ -261,7 +297,7 @@ def frobenius(detection: "Detection", tracked_object: "TrackedObject") -> float:
     --------
     [`np.linalg.norm`](https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html)
     """
-    return np.linalg.norm(detection.points - tracked_object.estimate)
+    return float(np.linalg.norm(detection.points - tracked_object.estimate))
 
 
 def mean_euclidean(detection: "Detection", tracked_object: "TrackedObject") -> float:

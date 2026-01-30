@@ -85,6 +85,8 @@ def test_simple(filter_factory):
                 assert obj.hit_counter == counter_max
 
             # check that counter goes down to 0 wen no detections
+            # Set age explicitly after previous loop (was counter_max + 2)
+            age = counter_max + 2
             for counter in range(counter_max - 1, -1, -1):
                 age += 1
                 tracked_objects = tracker.update()
@@ -306,7 +308,7 @@ def test_reid_hit_counter():
 
     # simple reid distance
     def dist(new_obj, tracked_obj):
-        return np.linalg.norm(new_obj.estimate - tracked_obj.estimate)
+        return float(np.linalg.norm(new_obj.estimate - tracked_obj.estimate))
 
     hit_counter_max = 2
     reid_hit_counter_max = 2
@@ -361,7 +363,7 @@ def test_reid_hit_counter_reset():
 
     # simple reid distance
     def dist(new_obj, tracked_obj):
-        return np.linalg.norm(new_obj.estimate - tracked_obj.estimate)
+        return float(np.linalg.norm(new_obj.estimate - tracked_obj.estimate))
 
     hit_counter_max = 2
     reid_hit_counter_max = 2

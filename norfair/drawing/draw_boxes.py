@@ -12,18 +12,18 @@ from .utils import _build_text
 
 def draw_boxes(
     frame: np.ndarray,
-    drawables: Sequence[Detection] | Sequence[TrackedObject] = None,
+    drawables: Sequence[Detection] | Sequence[TrackedObject] | None = None,
     color: ColorLike = "by_id",
     thickness: int | None = None,
-    random_color: bool = None,  # Deprecated
-    color_by_label: bool = None,  # Deprecated
+    random_color: bool | None = None,  # Deprecated
+    color_by_label: bool | None = None,  # Deprecated
     draw_labels: bool = False,
     text_size: float | None = None,
     draw_ids: bool = True,
     text_color: ColorLike | None = None,
     text_thickness: int | None = None,
     draw_box: bool = True,
-    detections: Sequence["Detection"] = None,  # Deprecated
+    detections: Sequence["Detection"] | None = None,  # Deprecated
     line_color: ColorLike | None = None,  # Deprecated
     line_width: int | None = None,  # Deprecated
     label_size: int | None = None,  # Deprecated´
@@ -193,13 +193,19 @@ def draw_tracked_boxes(
     draw_labels: bool = False,
     label_size: int | None = None,
     label_width: int | None = None,
-) -> np.array:
+) -> np.ndarray:
     "**Deprecated**. Use [`draw_box`][norfair.drawing.draw_boxes.draw_boxes]"
     warn_once("draw_tracked_boxes is deprecated, use draw_box instead")
+    # Determine color - default to "by_id" if border_colors is None
+    selected_color: ColorLike = (
+        "by_label"
+        if color_by_label
+        else (border_colors if border_colors is not None else "by_id")
+    )
     return draw_boxes(
         frame=frame,
         drawables=objects,
-        color="by_label" if color_by_label else border_colors,
+        color=selected_color,
         thickness=border_width,
         text_size=label_size or id_size,
         text_thickness=id_thickness or label_width,

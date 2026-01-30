@@ -1,4 +1,5 @@
 import os
+from collections import OrderedDict
 
 import numpy as np
 from rich import print
@@ -6,25 +7,26 @@ from rich.progress import track
 
 from norfair import Detection
 
+# MotMetrics and pandas are optional dependencies
 try:
     import motmetrics as mm
     import pandas as pd
 except ImportError:
     from .utils import DummyMOTMetricsImport
 
-    mm = DummyMOTMetricsImport()
-    pandas = DummyMOTMetricsImport()
-from collections import OrderedDict
+    mm = DummyMOTMetricsImport()  # type: ignore[assignment]
+    pd = DummyMOTMetricsImport()  # type: ignore[assignment]
 
 
 class InformationFile:
-    def __init__(self, file_path):
+    def __init__(self, file_path: str):
         self.path = file_path
         with open(file_path) as myfile:
             file = myfile.read()
         self.lines = file.splitlines()
 
-    def search(self, variable_name):
+    def search(self, variable_name: str) -> int | str:
+        result: str
         for line in self.lines:
             if line[: len(variable_name)] == variable_name:
                 result = line[len(variable_name) + 1 :]
@@ -44,14 +46,23 @@ class PredictionsTextFile:
     'information_file', is assumed there is one in the input_path folder).
     """
 
-    def __init__(self, input_path, save_path=".", information_file=None):
+    def __init__(
+        self,
+        input_path: str,
+        save_path: str = ".",
+        information_file: InformationFile | None = None,
+    ):
         file_name = os.path.split(input_path)[1]
 
         if information_file is None:
             seqinfo_path = os.path.join(input_path, "seqinfo.ini")
             information_file = InformationFile(file_path=seqinfo_path)
 
-        self.length = information_file.search(variable_name="seqLength")
+        seq_length = information_file.search(variable_name="seqLength")
+        # seqLength should always be an int
+        self.length: int = (
+            int(seq_length) if isinstance(seq_length, str) else seq_length
+        )
 
         predictions_folder = os.path.join(save_path, "predictions")
         if not os.path.exists(predictions_folder):
@@ -102,7 +113,9 @@ class PredictionsTextFile:
 class DetectionFileParser:
     """Get Norfair detections from MOTChallenge text files containing detections"""
 
-    def __init__(self, input_path, information_file=None):
+    def __init__(
+        self, input_path: str, information_file: InformationFile | None = None
+    ):
         self.frame_number = 1
 
         # Get detecions matrix data with rows corresponding to:
@@ -123,7 +136,12 @@ class DetectionFileParser:
         if information_file is None:
             seqinfo_path = os.path.join(input_path, "seqinfo.ini")
             information_file = InformationFile(file_path=seqinfo_path)
-        self.length = information_file.search(variable_name="seqLength")
+
+        seq_length = information_file.search(variable_name="seqLength")
+        # seqLength should always be an int
+        self.length: int = (
+            int(seq_length) if isinstance(seq_length, str) else seq_length
+        )
 
         self.sorted_by_frame = []
         for frame_number in range(1, self.length + 1):
@@ -181,30 +199,37 @@ class Accumulators:
         if information_file is None:
             seqinfo_path = os.path.join(input_path, "seqinfo.ini")
             information_file = InformationFile(file_path=seqinfo_path)
-        length = information_file.search(variable_name="seqLength")
-        self.progress_bar_iter = track(
-            range(length - 1), description=file_name, transient=False
+
+        seq_length = information_file.search(variable_name="seqLength")
+        # seqLength should always be an int
+        length_int: int = int(seq_length) if isinstance(seq_length, str) else seq_length
+
+        self.progress_bar_iter = iter(
+            track(range(length_int - 1), description=file_name, transient=False)
         )
 
     def update(self, predictions=None):
         # Get the tracked boxes from this frame in an array
-        for obj in predictions:
-            new_row = [
-                self.frame_number,
-                obj.id,
-                obj.estimate[0, 0],
-                obj.estimate[0, 1],
-                obj.estimate[1, 0] - obj.estimate[0, 0],
-                obj.estimate[1, 1] - obj.estimate[0, 1],
-                -1,
-                -1,
-                -1,
-                -1,
-            ]
-            if np.shape(self.matrix_predictions)[0] == 0:
-                self.matrix_predictions = new_row
-            else:
-                self.matrix_predictions = np.vstack((self.matrix_predictions, new_row))
+        if predictions is not None:
+            for obj in predictions:
+                new_row = [
+                    self.frame_number,
+                    obj.id,
+                    obj.estimate[0, 0],
+                    obj.estimate[0, 1],
+                    obj.estimate[1, 0] - obj.estimate[0, 0],
+                    obj.estimate[1, 1] - obj.estimate[0, 1],
+                    -1,
+                    -1,
+                    -1,
+                    -1,
+                ]
+                if np.shape(self.matrix_predictions)[0] == 0:
+                    self.matrix_predictions = new_row
+                else:
+                    self.matrix_predictions = np.vstack(
+                        (self.matrix_predictions, new_row)
+                    )
         self.frame_number += 1
         # Advance in progress bar
         try:
@@ -309,12 +334,15 @@ def compare_dataframes(gts, ts):
 
 
 def eval_motChallenge(matrixes_predictions, paths, metrics=None, generate_overall=True):
+    # motmetrics' loadtxt accepts "mot15-2D" as a valid format string
+    # The type stubs may be overly restrictive
+    fmt_string: str = "mot15-2D"
     gt = OrderedDict(
         [
             (
                 os.path.split(p)[1],
                 mm.io.loadtxt(
-                    os.path.join(p, "gt/gt.txt"), fmt="mot15-2D", min_confidence=1
+                    os.path.join(p, "gt/gt.txt"), fmt=fmt_string, min_confidence=1
                 ),
             )
             for p in paths
