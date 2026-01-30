@@ -137,6 +137,16 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+# IDEs
+.idea/
+.vscode/
+*.swp
+
+# MOT Challenge dataset
+MOT17Labels.zip
+test/
+train/
+
 # Claude Code
 .claude/
 CLAUDE.md
