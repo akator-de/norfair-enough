@@ -100,7 +100,6 @@ def make_cython_ext(name, module, sources):
 
 
 def make_cuda_ext(name, module, sources):
-
     return CUDAExtension(
         name="{}.{}".format(module, name),
         sources=[os.path.join(*module.split("."), p) for p in sources],

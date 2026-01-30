@@ -25,7 +25,6 @@ SOFTWARE.
 
 """
 
-
 import math
 import random
 
@@ -49,7 +48,6 @@ class Actor:
         det_err_sigma: float = 1.0,
         canvas_size: int = 400,
     ):
-
         self.max_omega = max_omega
         self.miss_prob = miss_prob
         self.det_err_sigma = det_err_sigma
@@ -126,7 +124,6 @@ def data_generator(
     miss_prob: float = 0.1,
     det_err_sigma: float = 1.0,
 ):
-
     actors = [
         Actor(
             max_omega=max_omega,

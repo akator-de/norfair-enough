@@ -327,7 +327,7 @@ def test_reid_hit_counter():
     # check that hit counters initialize correctly
     assert len(tracked_objects) == 1
     assert tracked_objects[0].hit_counter == 2
-    assert tracked_objects[0].reid_hit_counter == None
+    assert tracked_objects[0].reid_hit_counter is None
 
     # check that object is dead if it doesn't get matched to any detections
     obj_id = tracked_objects[0].id
@@ -340,7 +340,7 @@ def test_reid_hit_counter():
         tracked_objects = tracker.update([Detection(points=np.array([[2, 2]]))])
     assert len(tracked_objects) == 1
     assert tracked_objects[0].id == obj_id
-    assert tracked_objects[0].reid_hit_counter == None
+    assert tracked_objects[0].reid_hit_counter is None
     assert tracked_objects[0].hit_counter == hit_counter_max
 
     # check that previous object gets eliminated after hit_counter_max + reid_hit_counter_max + 1
@@ -381,7 +381,7 @@ def test_reid_hit_counter_reset():
     tracked_objects = tracker.update([Detection(points=np.array([[1, 1]]))])
     assert len(tracked_objects) == 1
     assert tracked_objects[0].hit_counter == 2
-    assert tracked_objects[0].reid_hit_counter == None
+    assert tracked_objects[0].reid_hit_counter is None
 
     # check that object is still alive when hit_counter goes to 0
     obj_id = tracked_objects[0].id

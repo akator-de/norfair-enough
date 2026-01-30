@@ -5,7 +5,6 @@ import numpy as np
 import torch
 from models import Yolov4
 from tool.torch_utils import do_detect
-from tool.utils import load_class_names, plot_boxes_cv2
 
 import norfair
 from norfair import Detection, Tracker, Video

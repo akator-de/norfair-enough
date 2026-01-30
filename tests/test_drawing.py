@@ -1,6 +1,3 @@
-import numpy as np
-import pytest
-
 from norfair.drawing.color import hex_to_bgr
 
 

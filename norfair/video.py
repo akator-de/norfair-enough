@@ -302,7 +302,6 @@ class VideoFromFrames:
     def __init__(
         self, input_path, save_path=".", information_file=None, make_video=True
     ):
-
         if information_file is None:
             information_file = metrics.InformationFile(
                 file_path=os.path.join(input_path, "seqinfo.ini")

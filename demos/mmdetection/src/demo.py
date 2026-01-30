@@ -1,6 +1,5 @@
 import argparse
 
-import numpy as np
 from mmdet.apis import inference_detector, init_detector
 from mmdet.core import get_classes
 
@@ -30,7 +29,6 @@ VEHICLE_CLASSES = [
 
 
 for input_path in args.files:
-
     tracker = Tracker(
         distance_function="euclidean", distance_threshold=20, detection_threshold=0.6
     )

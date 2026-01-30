@@ -1,10 +1,11 @@
 import argparse
 from typing import List, Optional, Union
 
-import norfair
 import numpy as np
 import super_gradients
 import torch
+
+import norfair
 from norfair import Detection, Tracker, Video
 
 DISTANCE_THRESHOLD_BBOX: float = 0.7
@@ -36,7 +37,6 @@ class YOLO_NAS:
         image_size: int = 720,
         classes: Optional[List[int]] = None,
     ) -> torch.tensor:
-
         if classes is not None:
             self.model.classes = classes
 
@@ -45,7 +45,8 @@ class YOLO_NAS:
 
 
 def yolo_detections_to_norfair_detections(
-    yolo_detections: torch.tensor, track_points: str = "centroid"  # bbox or centroid
+    yolo_detections: torch.tensor,
+    track_points: str = "centroid",  # bbox or centroid
 ) -> List[Detection]:
     """convert detections_as_xywh to norfair detections"""
     norfair_detections: List[Detection] = []
@@ -66,7 +67,6 @@ def yolo_detections_to_norfair_detections(
             )
 
     elif track_points == "bbox":
-
         # yolo_nas detections
         detections_as_xyxy = yolo_detections[0]
         class_names = detections_as_xyxy.class_names

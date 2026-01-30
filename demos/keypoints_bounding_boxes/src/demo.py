@@ -2,7 +2,6 @@ import argparse
 import sys
 from typing import List, Optional, Union
 
-import cv2
 import numpy as np
 import torch
 
@@ -31,6 +30,7 @@ INITIALIZATION_DELAY = 4
 POINTWISE_HIT_COUNTER_MAX = 10
 
 ############### OPENPOSE ##################
+
 
 # Wrapper implementation for OpenPose detector
 class OpenposeDetector:
@@ -89,7 +89,6 @@ class YOLO:
         image_size: int = 720,
         classes: Optional[List[int]] = None,
     ) -> torch.tensor:
-
         self.model.conf = conf_threshold
         self.model.iou = iou_threshold
         if classes is not None:
@@ -146,7 +145,6 @@ def keypoints_distance(detected_pose, tracked_pose):
 
 
 if __name__ == "__main__":
-
     # CLI configuration
     parser = argparse.ArgumentParser(description="Track objects in a video.")
     parser.add_argument("files", type=str, nargs="+", help="Video files to process")

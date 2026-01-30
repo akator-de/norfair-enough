@@ -91,9 +91,9 @@ def main(
             dtype=cv2_frame.dtype,
         )
         frame_with_border *= 254
-        frame_with_border[
-            border_size:-border_size, border_size:-border_size
-        ] = cv2_frame
+        frame_with_border[border_size:-border_size, border_size:-border_size] = (
+            cv2_frame
+        )
         video.write(frame_with_border)
 
 

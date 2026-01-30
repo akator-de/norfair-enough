@@ -22,7 +22,6 @@ from utils import (
 
 import norfair
 from norfair import Tracker, Video
-from norfair.distances import iou
 
 
 def make_parser():

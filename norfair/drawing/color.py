@@ -1,5 +1,5 @@
 import re
-from typing import Any, Hashable, Iterable, Tuple, Union
+from typing import Hashable, Iterable, Tuple, Union
 
 # types
 

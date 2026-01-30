@@ -54,7 +54,6 @@ with mp_objectron.Objectron(
     min_detection_confidence=args.conf_threshold,
     model_name=args.model_name,
 ) as objectron:
-
     for input_path in args.files:
         video = Video(input_path=input_path, output_path=args.output_path)
 

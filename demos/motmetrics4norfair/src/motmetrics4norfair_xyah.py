@@ -148,7 +148,6 @@ for input_path in sequences_paths:
     accumulator.create_accumulator(input_path=input_path, information_file=info_file)
 
     for frame_number, detections in enumerate(all_detections):
-
         # convert detections to ByteTrack format: (center_x, center_y, asp_ratio, height)
         xyah_detections = []
         for det in detections:

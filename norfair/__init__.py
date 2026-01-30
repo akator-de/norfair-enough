@@ -14,7 +14,8 @@ Examples
 >>>    draw_tracked_objects(frame, tracked_objects)
 >>>    video.write(frame)
 """
-import sys
+
+import importlib.metadata
 
 from .distances import *
 from .drawing import *
@@ -26,7 +27,5 @@ from .filter import (
 from .tracker import Detection, Tracker
 from .utils import get_cutout, print_objects_as_table
 from .video import Video
-
-import importlib.metadata
 
 __version__ = importlib.metadata.version("norfair-enough")

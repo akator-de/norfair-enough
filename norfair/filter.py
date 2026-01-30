@@ -172,7 +172,6 @@ class OptimizedKalmanFilter:
         self.x[: self.dim_z] += self.x[self.dim_z :]
 
     def update(self, detection_points_flatten, R=None, H=None):
-
         if H is not None:
             diagonal = np.diagonal(H).reshape((self.dim_z, 1))
             one_minus_diagonal = 1 - diagonal

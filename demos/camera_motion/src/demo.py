@@ -12,14 +12,12 @@ from norfair import (
     Video,
     draw_absolute_grid,
 )
-
 from norfair.camera_motion import (
     HomographyTransformationGetter,
     MotionEstimator,
     TranslationTransformationGetter,
 )
-
-from norfair.drawing import draw_points, draw_boxes
+from norfair.drawing import draw_boxes, draw_points
 
 
 def yolo_detections_to_norfair_detections(yolo_detections, track_boxes):
