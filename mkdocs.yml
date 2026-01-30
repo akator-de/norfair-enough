@@ -60,7 +60,7 @@ plugins:
 extra:
   version:
     provider: mike
-    default: latest
+    default: dev
 
 markdown_extensions:
     - toc:
