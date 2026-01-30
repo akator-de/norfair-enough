@@ -1,20 +1,18 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+name: Deploy docs to Pages
 
 on:
-  # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Allow one concurrent deployment
 concurrency:
   group: "docs"
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
     runs-on: ubuntu-24.04
     steps:
@@ -30,11 +28,11 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
-      - name: Setup a user for the commits
+      - name: Setup git user for mike
         run: |
           git config user.name ci-bot
           git config user.email ci-bot@users.noreply.github.com
       - name: Install dependencies
         run: uv sync --locked --group docs
-      - name: Updating "dev"
+      - name: Deploy dev docs
         run: uv run mike deploy --push dev
