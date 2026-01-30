@@ -32,7 +32,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
@@ -53,7 +53,7 @@ jobs:
           python-version: "3.13"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
@@ -74,12 +74,12 @@ jobs:
           python-version: "3.13"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync --group test
+        run: uv sync --locked --group test
 
       - name: Run tests with coverage
         run: uv run pytest tests/ --ignore=tests/mot_metrics.py --cov=norfair --cov-report=term-missing --cov-report=xml
@@ -101,7 +101,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
@@ -165,7 +165,7 @@ jobs:
           python-version: "${{ env.PYTHON_VERSION }}"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
@@ -192,12 +192,12 @@ jobs:
           python-version: "${{ env.PYTHON_VERSION }}"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync --group docs
+        run: uv sync --locked --group docs
 
       - name: Deploy docs
         run: uv run python docs/deploy_docs.py
