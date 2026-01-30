@@ -3,7 +3,6 @@
 import logging
 import subprocess
 from pathlib import Path
-from typing import List, Union
 
 import tomllib
 from packaging import version
@@ -11,7 +10,7 @@ from packaging import version
 logger = logging.getLogger(__file__)
 
 
-def run_cmd(cmd: str) -> List[str]:
+def run_cmd(cmd: str) -> list[str]:
     "Run a command in a subprocess."
     return subprocess.check_output(cmd.split()).decode("utf-8").splitlines()
 
@@ -24,7 +23,7 @@ def get_current_version() -> version.Version:
     return version.parse(data["project"]["version"])
 
 
-def get_latest_version() -> Union[version.Version, None]:
+def get_latest_version() -> version.Version | None:
     "Get the deployed version number tagged as `latest` in mike."
     for line in run_cmd("mike list"):
         if line.endswith("[latest]"):

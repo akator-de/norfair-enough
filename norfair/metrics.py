@@ -20,7 +20,7 @@ from collections import OrderedDict
 class InformationFile:
     def __init__(self, file_path):
         self.path = file_path
-        with open(file_path, "r") as myfile:
+        with open(file_path) as myfile:
             file = myfile.read()
         self.lines = file.splitlines()
 
@@ -72,10 +72,10 @@ class PredictionsTextFile:
         for obj in predictions:
             frame_str = str(int(frame_number))
             id_str = str(int(obj.id))
-            bb_left_str = str((obj.estimate[0, 0]))
-            bb_top_str = str((obj.estimate[0, 1]))  # [0,1]
-            bb_width_str = str((obj.estimate[1, 0] - obj.estimate[0, 0]))
-            bb_height_str = str((obj.estimate[1, 1] - obj.estimate[0, 1]))
+            bb_left_str = str(obj.estimate[0, 0])
+            bb_top_str = str(obj.estimate[0, 1])  # [0,1]
+            bb_width_str = str(obj.estimate[1, 0] - obj.estimate[0, 0])
+            bb_height_str = str(obj.estimate[1, 1] - obj.estimate[0, 1])
             row_text_out = (
                 frame_str
                 + ","
@@ -167,7 +167,7 @@ class Accumulators:
     def create_accumulator(self, input_path, information_file=None):
         # Check that motmetrics is installed here, so we don't have to process
         # the whole dataset before failing out if we don't.
-        mm.metrics
+        mm.metrics  # noqa: B018 — intentional attribute access to fail early if motmetrics not installed
 
         file_name = os.path.split(input_path)[1]
 

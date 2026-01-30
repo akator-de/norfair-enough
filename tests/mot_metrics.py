@@ -8,7 +8,8 @@ import numpy as np
 if np.__version__.split(".")[0] >= "2":
     warnings.warn(
         "MOT metrics tests are not compatible with NumPy 2.0+. "
-        "Skipping these tests. To run MOT metrics tests, use NumPy < 2.0."
+        "Skipping these tests. To run MOT metrics tests, use NumPy < 2.0.",
+        stacklevel=1,
     )
     sys.exit(0)
 

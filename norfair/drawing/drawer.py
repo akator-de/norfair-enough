@@ -1,4 +1,5 @@
-from typing import Any, Optional, Sequence, Tuple, Union
+from collections.abc import Sequence
+from typing import Any
 
 import numpy as np
 
@@ -25,9 +26,9 @@ class Drawer:
     def circle(
         cls,
         frame: np.ndarray,
-        position: Tuple[int, int],
-        radius: Optional[int] = None,
-        thickness: Optional[int] = None,
+        position: tuple[int, int],
+        radius: int | None = None,
+        thickness: int | None = None,
         color: ColorType = None,
     ) -> np.ndarray:
         """
@@ -69,10 +70,10 @@ class Drawer:
         cls,
         frame: np.ndarray,
         text: str,
-        position: Tuple[int, int],
-        size: Optional[float] = None,
-        color: Optional[ColorType] = None,
-        thickness: Optional[int] = None,
+        position: tuple[int, int],
+        size: float | None = None,
+        color: ColorType | None = None,
+        thickness: int | None = None,
         shadow: bool = True,
         shadow_color: ColorType = Color.black,
         shadow_offset: int = 1,
@@ -142,9 +143,9 @@ class Drawer:
     def rectangle(
         cls,
         frame: np.ndarray,
-        points: Sequence[Tuple[int, int]],
-        color: Optional[ColorType] = None,
-        thickness: Optional[int] = None,
+        points: Sequence[tuple[int, int]],
+        color: ColorType | None = None,
+        thickness: int | None = None,
     ) -> np.ndarray:
         """
         Draw a rectangle
@@ -178,7 +179,7 @@ class Drawer:
     def cross(
         cls,
         frame: np.ndarray,
-        center: Tuple[int, int],
+        center: tuple[int, int],
         radius: int,
         color: ColorType,
         thickness: int,
@@ -227,8 +228,8 @@ class Drawer:
     def line(
         cls,
         frame: np.ndarray,
-        start: Tuple[int, int],
-        end: Tuple[int, int],
+        start: tuple[int, int],
+        end: tuple[int, int],
         color: ColorType = Color.black,
         thickness: int = 1,
     ) -> np.ndarray:
@@ -267,7 +268,7 @@ class Drawer:
         frame1: np.ndarray,
         frame2: np.ndarray,
         alpha: float = 0.5,
-        beta: Optional[float] = None,
+        beta: float | None = None,
         gamma: float = 0,
     ) -> np.ndarray:
         """
@@ -327,7 +328,7 @@ class Drawable:
 
     def __init__(
         self,
-        obj: Union[Detection, TrackedObject] = None,
+        obj: Detection | TrackedObject = None,
         points: np.ndarray = None,
         id: Any = None,
         label: Any = None,

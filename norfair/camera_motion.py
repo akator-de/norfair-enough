@@ -1,9 +1,9 @@
 "Camera motion stimation module."
 
+import contextlib
 import copy
 from abc import ABC, abstractmethod
 from logging import warning
-from typing import Optional, Tuple
 
 import numpy as np
 
@@ -49,7 +49,7 @@ class TransformationGetter(ABC):
     @abstractmethod
     def __call__(
         self, curr_pts: np.ndarray, prev_pts: np.ndarray
-    ) -> Tuple[bool, CoordinatesTransformation]:
+    ) -> tuple[bool, CoordinatesTransformation]:
         pass
 
 
@@ -104,7 +104,7 @@ class TranslationTransformationGetter(TransformationGetter):
 
     def __call__(
         self, curr_pts: np.ndarray, prev_pts: np.ndarray
-    ) -> Tuple[bool, TranslationTransformation]:
+    ) -> tuple[bool, TranslationTransformation]:
         # get flow
         flow = curr_pts - prev_pts
 
@@ -119,10 +119,8 @@ class TranslationTransformationGetter(TransformationGetter):
 
         flow_mode = unique_flows[max_index]
 
-        try:
+        with contextlib.suppress(TypeError):
             flow_mode += self.data
-        except TypeError:
-            pass
 
         if update_prvs:
             self.data = flow_mode
@@ -199,7 +197,7 @@ class HomographyTransformationGetter(TransformationGetter):
 
     def __init__(
         self,
-        method: Optional[int] = None,
+        method: int | None = None,
         ransac_reproj_threshold: int = 3,
         max_iters: int = 2000,
         confidence: float = 0.995,
@@ -216,7 +214,7 @@ class HomographyTransformationGetter(TransformationGetter):
 
     def __call__(
         self, curr_pts: np.ndarray, prev_pts: np.ndarray
-    ) -> Tuple[bool, Optional[HomographyTransformation]]:
+    ) -> tuple[bool, HomographyTransformation | None]:
         if not (
             isinstance(prev_pts, np.ndarray)
             and prev_pts.shape[0] >= 4
@@ -245,10 +243,8 @@ class HomographyTransformationGetter(TransformationGetter):
 
         update_prvs = proportion_points_used < self.proportion_points_used_threshold
 
-        try:
+        with contextlib.suppress(TypeError, ValueError):
             homography_matrix = homography_matrix @ self.data
-        except (TypeError, ValueError):
-            pass
 
         if update_prvs:
             self.data = homography_matrix
@@ -340,7 +336,7 @@ class MotionEstimator:
         block_size: int = 3,
         transformations_getter: TransformationGetter = None,
         draw_flow: bool = False,
-        flow_color: Optional[Tuple[int, int, int]] = None,
+        flow_color: tuple[int, int, int] | None = None,
         quality_level: float = 0.01,
     ):
         self.max_points = max_points
@@ -366,7 +362,7 @@ class MotionEstimator:
 
     def update(
         self, frame: np.ndarray, mask: np.ndarray = None
-    ) -> Optional[CoordinatesTransformation]:
+    ) -> CoordinatesTransformation | None:
         """
         Estimate camera motion for each frame
 

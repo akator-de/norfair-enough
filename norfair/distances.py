@@ -1,9 +1,10 @@
 """Predefined distances"""
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable, Sequence
 from functools import partial
 from logging import warning
-from typing import TYPE_CHECKING, Callable, List, Optional, Sequence, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from scipy.spatial.distance import cdist
@@ -23,7 +24,7 @@ class Distance(ABC):
     def get_distances(
         self,
         objects: Sequence["TrackedObject"],
-        candidates: Optional[Union[List["Detection"], List["TrackedObject"]]],
+        candidates: list["Detection"] | list["TrackedObject"] | None,
     ) -> np.ndarray:
         """
         Method that calculates the distances between new candidates and objects.
@@ -57,17 +58,15 @@ class ScalarDistance(Distance):
 
     def __init__(
         self,
-        distance_function: Union[
-            Callable[["Detection", "TrackedObject"], float],
-            Callable[["TrackedObject", "TrackedObject"], float],
-        ],
+        distance_function: Callable[["Detection", "TrackedObject"], float]
+        | Callable[["TrackedObject", "TrackedObject"], float],
     ):
         self.distance_function = distance_function
 
     def get_distances(
         self,
         objects: Sequence["TrackedObject"],
-        candidates: Optional[Union[List["Detection"], List["TrackedObject"]]],
+        candidates: list["Detection"] | list["TrackedObject"] | None,
     ) -> np.ndarray:
         """
         Method that calculates the distances between new candidates and objects.
@@ -126,7 +125,7 @@ class VectorizedDistance(Distance):
     def get_distances(
         self,
         objects: Sequence["TrackedObject"],
-        candidates: Optional[Union[List["Detection"], List["TrackedObject"]]],
+        candidates: list["Detection"] | list["TrackedObject"] | None,
     ) -> np.ndarray:
         """
         Method that calculates the distances between new candidates and objects.

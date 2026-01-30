@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Callable, Optional, Sequence, Tuple
+from collections.abc import Callable, Sequence
 
 import numpy as np
 
@@ -45,10 +45,10 @@ class Paths:
 
     def __init__(
         self,
-        get_points_to_draw: Optional[Callable[[np.array], np.array]] = None,
-        thickness: Optional[int] = None,
-        color: Optional[Tuple[int, int, int]] = None,
-        radius: Optional[int] = None,
+        get_points_to_draw: Callable[[np.array], np.array] | None = None,
+        thickness: int | None = None,
+        color: tuple[int, int, int] | None = None,
+        radius: int | None = None,
         attenuation: float = 0.01,
     ):
         if get_points_to_draw is None:
@@ -163,10 +163,10 @@ class AbsolutePaths:
 
     def __init__(
         self,
-        get_points_to_draw: Optional[Callable[[np.array], np.array]] = None,
-        thickness: Optional[int] = None,
-        color: Optional[Tuple[int, int, int]] = None,
-        radius: Optional[int] = None,
+        get_points_to_draw: Callable[[np.array], np.array] | None = None,
+        thickness: int | None = None,
+        color: tuple[int, int, int] | None = None,
+        radius: int | None = None,
         max_history=20,
     ):
         if get_points_to_draw is None:

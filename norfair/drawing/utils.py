@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from .drawer import Drawable
 
 
-def _centroid(tracked_points: np.ndarray) -> Tuple[int, int]:
+def _centroid(tracked_points: np.ndarray) -> tuple[int, int]:
     num_points = tracked_points.shape[0]
     sum_x = np.sum(tracked_points[:, 0])
     sum_y = np.sum(tracked_points[:, 1])

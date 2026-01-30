@@ -1,7 +1,7 @@
 import os
-from functools import lru_cache
+from collections.abc import Sequence
+from functools import cache
 from logging import warn
-from typing import Sequence, Tuple
 
 import numpy as np
 from rich import print
@@ -47,7 +47,7 @@ def print_objects_as_table(tracked_objects: Sequence):
     console.print(table)
 
 
-def get_terminal_size(default: Tuple[int, int] = (80, 24)) -> Tuple[int, int]:
+def get_terminal_size(default: tuple[int, int] = (80, 24)) -> tuple[int, int]:
     columns, lines = default
     for fd in range(0, 3):  # First in order 0=Std In, 1=Std Out, 2=Std Error
         try:
@@ -86,7 +86,7 @@ Please, install Norfair with `pip install norfair\[metrics]`, or `pip install no
 
 
 # lru_cache will prevent re-run the function if the message is the same
-@lru_cache(maxsize=None)
+@cache
 def warn_once(message):
     """
     Write a warning message only once.

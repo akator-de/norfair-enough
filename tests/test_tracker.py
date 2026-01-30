@@ -59,7 +59,7 @@ def test_simple(filter_factory):
             detections = [Detection(points=np.array([[1, 1]]))]
 
             # test the delay
-            for age in range(delay):
+            for _age in range(delay):
                 assert len(tracker.update(detections)) == 0
 
             # build up hit_counter from delay+1 to counter_max
