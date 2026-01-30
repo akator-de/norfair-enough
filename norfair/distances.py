@@ -10,7 +10,11 @@ import numpy as np
 from scipy.spatial.distance import cdist
 
 if TYPE_CHECKING:
+    from typing import TypeAlias
+
     from .tracker import Detection, TrackedObject
+
+    Candidate: TypeAlias = "Detection | TrackedObject"
 
 
 class Distance(ABC):
@@ -24,7 +28,7 @@ class Distance(ABC):
     def get_distances(
         self,
         objects: Sequence["TrackedObject"],
-        candidates: list["Detection"] | list["TrackedObject"] | None,
+        candidates: Sequence["Candidate"] | None,
     ) -> np.ndarray:
         """
         Method that calculates the distances between new candidates and objects.
@@ -80,7 +84,7 @@ class ScalarDistance(Distance):
     def get_distances(
         self,
         objects: Sequence["TrackedObject"],
-        candidates: list["Detection"] | list["TrackedObject"] | None,
+        candidates: Sequence["Candidate"] | None,
     ) -> np.ndarray:
         """
         Method that calculates the distances between new candidates and objects.
@@ -147,7 +151,7 @@ class VectorizedDistance(Distance):
     def get_distances(
         self,
         objects: Sequence["TrackedObject"],
-        candidates: list["Detection"] | list["TrackedObject"] | None,
+        candidates: Sequence["Candidate"] | None,
     ) -> np.ndarray:
         """
         Method that calculates the distances between new candidates and objects.
@@ -209,6 +213,7 @@ class VectorizedDistance(Distance):
                         stacked_candidates.append(c_points.ravel())
                     else:
                         # This is a TrackedObject
+                        # pyrefly: ignore[missing-attribute]
                         c_estimate = c.estimate
                         stacked_candidates.append(c_estimate.ravel())
             stacked_candidates = np.stack(stacked_candidates)
@@ -473,21 +478,20 @@ def get_distance_by_name(name: str) -> Distance:
         The distance object.
     """
 
+    distance_function: Distance
     if name in _SCALAR_DISTANCE_FUNCTIONS:
         warning(
             "You are using a scalar distance function. If you want to speed up the"
             " tracking process please consider using a vectorized distance function"
             f" such as {AVAILABLE_VECTORIZED_DISTANCES}."
         )
-        distance = _SCALAR_DISTANCE_FUNCTIONS[name]
-        distance_function = ScalarDistance(distance)
+        distance_function = ScalarDistance(_SCALAR_DISTANCE_FUNCTIONS[name])
     elif name in _SCIPY_DISTANCE_FUNCTIONS:
         distance_function = ScipyDistance(name)
     elif name in _VECTORIZED_DISTANCE_FUNCTIONS:
         if name == "iou_opt":
             warning("iou_opt is deprecated, use iou instead")
-        distance = _VECTORIZED_DISTANCE_FUNCTIONS[name]
-        distance_function = VectorizedDistance(distance)
+        distance_function = VectorizedDistance(_VECTORIZED_DISTANCE_FUNCTIONS[name])
     else:
         raise ValueError(
             f"Invalid distance '{name}', expecting one of"
@@ -527,6 +531,8 @@ def create_keypoints_voting_distance(
     def keypoints_voting_distance(
         detection: "Detection", tracked_object: "TrackedObject"
     ) -> float:
+        if detection.scores is None or tracked_object.last_detection.scores is None:
+            return 1.0
         distances = np.linalg.norm(detection.points - tracked_object.estimate, axis=1)
         match_num = np.count_nonzero(
             (distances < keypoint_distance_threshold)

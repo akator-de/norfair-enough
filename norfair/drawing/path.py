@@ -58,12 +58,14 @@ class Paths:
 
             self.get_points_to_draw = default_get_points
         else:
-            self.get_points_to_draw = get_points_to_draw
+            self.get_points_to_draw = (
+                get_points_to_draw  # pyrefly: ignore[bad-assignment]
+            )
 
         self.radius = radius
         self.thickness = thickness
         self.color = color
-        self.mask = None
+        self.mask: np.ndarray | None = None
         self.attenuation_factor = 1 - attenuation
 
     def draw(
@@ -97,7 +99,7 @@ class Paths:
 
             self.mask = np.zeros(frame.shape, np.uint8)
 
-        self.mask = (self.mask * self.attenuation_factor).astype("uint8")
+        mask = (self.mask * self.attenuation_factor).astype("uint8")
 
         for obj in tracked_objects:
             if obj.abs_to_rel is not None:
@@ -113,15 +115,17 @@ class Paths:
             points_to_draw = self.get_points_to_draw(obj.estimate)
 
             for point in points_to_draw:
-                self.mask = Drawer.circle(
-                    self.mask,
+                mask = Drawer.circle(
+                    mask,
+                    # pyrefly: ignore[bad-argument-type]
                     position=tuple(point.astype(int)),
                     radius=self.radius,
                     color=color,
                     thickness=self.thickness,
                 )
 
-        return Drawer.alpha_blend(self.mask, frame, alpha=1, beta=1)
+        self.mask = mask
+        return Drawer.alpha_blend(mask, frame, alpha=1, beta=1)
 
 
 class AbsolutePaths:
@@ -178,12 +182,14 @@ class AbsolutePaths:
 
             self.get_points_to_draw = default_get_points
         else:
-            self.get_points_to_draw = get_points_to_draw
+            self.get_points_to_draw = (
+                get_points_to_draw  # pyrefly: ignore[bad-assignment]
+            )
 
         self.radius = radius
         self.thickness = thickness
         self.color = color
-        self.past_points = defaultdict(lambda: [])
+        self.past_points: defaultdict[int | None, list[np.ndarray]] = defaultdict(list)
         self.max_history = max_history
         self.alphas = np.linspace(0.99, 0.01, max_history)
 
@@ -215,6 +221,7 @@ class AbsolutePaths:
             for point in points_rel:
                 Drawer.circle(
                     frame,
+                    # pyrefly: ignore[bad-argument-type]
                     position=tuple(point.astype(int)),
                     radius=self.radius,
                     color=color,
@@ -237,8 +244,9 @@ class AbsolutePaths:
                 for j, point in enumerate(past_points_rel):
                     Drawer.line(
                         overlay,
+                        # pyrefly: ignore[bad-argument-type]
                         tuple(last_rel[j].astype(int)),
-                        tuple(point.astype(int)),
+                        tuple(point.astype(int)),  # pyrefly: ignore[bad-argument-type]
                         color=color,
                         thickness=self.thickness,
                     )
@@ -246,6 +254,7 @@ class AbsolutePaths:
 
                 alpha = self.alphas[i]
                 frame = Drawer.alpha_blend(overlay, frame, alpha=alpha)
+            # pyrefly: ignore[bad-argument-type]
             self.past_points[obj.id].insert(0, points_to_draw)
             self.past_points[obj.id] = self.past_points[obj.id][: self.max_history]
         return frame

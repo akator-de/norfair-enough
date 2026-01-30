@@ -191,6 +191,7 @@ class Accumulators:
 
         self.frame_number = 1
         # Save the path of this video in a list
+        # pyrefly: ignore[bad-assignment]
         self.paths = np.hstack((self.paths, input_path))
         # Initialize a matrix where we will save our predictions for this video (in the MOTChallenge format)
         self.matrix_predictions = []
@@ -227,8 +228,10 @@ class Accumulators:
                 if np.shape(self.matrix_predictions)[0] == 0:
                     self.matrix_predictions = new_row
                 else:
-                    self.matrix_predictions = np.vstack(
-                        (self.matrix_predictions, new_row)
+                    self.matrix_predictions = (
+                        np.vstack(  # pyrefly: ignore[bad-assignment]
+                            (self.matrix_predictions, new_row)
+                        )
                     )
         self.frame_number += 1
         # Advance in progress bar
