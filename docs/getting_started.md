@@ -26,7 +26,7 @@ The detections from the model will need to be wrapped in an instance of [Detecti
 
 Installing Norfair is extremely easy, simply run `pip install norfair-enough` to install the latest version from [PyPI](https://pypi.org/project/norfair-enough/).
 
-You can also install the latest version from the master branch using `pip install git+https://github.com/akator-de/norfair-enough.git@master#egg=norfair-enough`
+You can also install the latest version from the main branch using `pip install git+https://github.com/akator-de/norfair-enough.git@main#egg=norfair-enough`
 
 ## Video
 
