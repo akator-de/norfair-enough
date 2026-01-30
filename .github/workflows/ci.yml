@@ -22,24 +22,22 @@ jobs:
     strategy:
       max-parallel: 3
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Install tox
         run: |
           pip install --upgrade pip
           pip install --upgrade tox
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.5.1 # to support Python 3.8
 
       - name: Run tests
         run: |
@@ -48,45 +46,43 @@ jobs:
   mot-metrics:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: "3.13"
 
       - name: Install tox
         run: |
           pip install --upgrade pip
           pip install --upgrade tox
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-
       - name: Run tests
         run: |
-          tox -e mot-py39
+          tox -e mot-py313
 
   build:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: "3.12"
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Build package
-        run: poetry build -f sdist
+        run: uv build --sdist
 
       - name: Prepare package
         run: |
-          tar xvf "dist/norfair_enough-$(poetry version -s).tar.gz"
-          mv norfair_enough-$(poetry version -s) norfair-dist
+          VERSION=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          tar xvf "dist/norfair_enough-${VERSION}.tar.gz"
+          mv "norfair_enough-${VERSION}" norfair-dist
 
       - name: Save artifact
         uses: actions/upload-artifact@v4
@@ -100,10 +96,10 @@ jobs:
     strategy:
       max-parallel: 3
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -129,26 +125,24 @@ jobs:
     needs: [unit-tests, mot-metrics]
     if: github.event_name == 'release'
     env:
-      PYTHON_VERSION: 3.8
+      PYTHON_VERSION: "3.12"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.5.1 # to support Python 3.8
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
       - name: Release to PyPI
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-          poetry config -n pypi-token.pypi "$PYPI_TOKEN"
-          poetry publish --build -n
+          uv build
+          uv publish --token "$PYPI_TOKEN"
 
 
   deploy-doc:
@@ -156,22 +150,17 @@ jobs:
     needs: [release]
     if: github.event_name == 'release'
     env:
-      PYTHON_VERSION: 3.8
+      PYTHON_VERSION: "3.12"
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          version: 1.5.1 # to support Python 3.8
 
       - name: Install dependencies
         run: pip install -r docs/requirements.txt
 
-      - name: Install dependencies
+      - name: Deploy docs
         run: python docs/deploy_docs.py

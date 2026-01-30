@@ -19,19 +19,18 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v4
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: "3.12"
       - name: Setup a user for the commits
         run: |
-          git config user.name ci-bot 
-          git config user.email ci-bot@tryolabs.com
+          git config user.name ci-bot
+          git config user.email ci-bot@users.noreply.github.com
       - name: Installing dependencies
         run: pip install -r docs/requirements.txt
       - name: Updating "dev"
         run: mike deploy --push dev
-      
