@@ -79,8 +79,5 @@ ignore = [
     "B905",    # zip() strict= is noisy for existing code
 ]
 
-[tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401", "F403"]
-
 [tool.ruff.lint.isort]
 force-single-line = false
