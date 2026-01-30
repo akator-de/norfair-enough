@@ -181,10 +181,14 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [release]
     if: github.event_name == 'release'
+    permissions:
+      contents: write
     env:
       PYTHON_VERSION: "3.12"
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v6
@@ -195,6 +199,11 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
+
+      - name: Setup git user for mike
+        run: |
+          git config user.name ci-bot
+          git config user.email ci-bot@users.noreply.github.com
 
       - name: Install dependencies
         run: uv sync --locked --group docs
