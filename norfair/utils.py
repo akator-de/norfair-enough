@@ -22,7 +22,7 @@ def raise_detection_error_message(points):
     message = "\n[red]INPUT ERROR:[/red]\n"
     message += f"Each `Detection` object should have a property `points` of shape (n_points, n_dimensions), not {points.shape}. Check your `Detection` list creation code.\n"
     message += "You can read the documentation for the `Detection` class here:\n"
-    message += "https://tryolabs.github.io/norfair/reference/tracker/#norfair.tracker.Detection\n"
+    message += "https://akator-de.github.io/norfair-enough/latest/reference/tracker/#norfair.tracker.Detection\n"
     raise ValueError(message)
 
 
@@ -72,7 +72,7 @@ class DummyOpenCVImport:
         raise ImportError(
             r"""[bold red]Missing dependency:[/bold red] You are trying to use Norfair's video features. However, OpenCV is not installed.
 
-Please, make sure there is an existing installation of OpenCV or install Norfair with `pip install norfair\[video]`."""
+Please, make sure there is an existing installation of OpenCV or install Norfair with `pip install norfair-enough\[video]`."""
         )
 
 
@@ -81,7 +81,7 @@ class DummyMOTMetricsImport:
         raise ImportError(
             r"""[bold red]Missing dependency:[/bold red] You are trying to use Norfair's metrics features without the required dependencies.
 
-Please, install Norfair with `pip install norfair\[metrics]`, or `pip install norfair\[metrics,video]` if you also want video features."""
+Please, install Norfair with `pip install norfair-enough\[metrics]`, or `pip install norfair-enough\[metrics,video]` if you also want video features."""
         )
 
 

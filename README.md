@@ -46,9 +46,9 @@ Norfair was originally built by [Tryolabs](https://tryolabs.com).
 
 ## Documentation
 
-[Getting started guide](https://tryolabs.github.io/norfair/latest/getting_started/).
+[Getting started guide](https://akator-de.github.io/norfair-enough/latest/getting_started/).
 
-[Official reference](https://tryolabs.github.io/norfair/latest/reference/).
+[API reference](https://akator-de.github.io/norfair-enough/latest/reference/).
 
 ## Examples & demos
 
