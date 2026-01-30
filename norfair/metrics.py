@@ -154,7 +154,7 @@ class DetectionFileParser:
         detections = []
         if len(indexes) > 0:
             actual_det = self.matrix_detections[indexes]
-            actual_det.shape = [actual_det.shape[0], actual_det.shape[2]]
+            actual_det = actual_det.reshape(actual_det.shape[0], actual_det.shape[2])
             for det in actual_det:
                 points = np.array([[det[2], det[3]], [det[4], det[5]]])
                 conf = det[6]
