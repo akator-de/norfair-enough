@@ -128,7 +128,7 @@ import sys
 from collections import deque
 from copy import deepcopy
 from math import exp, log, sqrt
-from typing import Any, Optional, Tuple, Union
+from typing import Any
 
 import numpy as np
 from numpy import dot, eye, isscalar, linalg, shape, zeros
@@ -1234,9 +1234,7 @@ class KalmanFilter:
 
         return x, P
 
-    def get_update(
-        self, z: Optional[np.ndarray] = None
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    def get_update(self, z: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
         """
         Computes the new estimate based on measurement `z` and returns it
         without altering the state of the filter.
@@ -1411,11 +1409,11 @@ class KalmanFilter:
 
     def test_matrix_dimensions(
         self,
-        z: Optional[np.ndarray] = None,
-        H: Optional[np.ndarray] = None,
-        R: Optional[np.ndarray] = None,
-        F: Optional[np.ndarray] = None,
-        Q: Optional[np.ndarray] = None,
+        z: np.ndarray | None = None,
+        H: np.ndarray | None = None,
+        R: np.ndarray | None = None,
+        F: np.ndarray | None = None,
+        Q: np.ndarray | None = None,
     ) -> None:
         """
         Performs a series of asserts to check that the size of everything
@@ -1517,16 +1515,16 @@ class KalmanFilter:
 
 
 def update(
-    x: Union[np.ndarray, float],
-    P: Union[np.ndarray, float],
-    z: Optional[np.ndarray],
-    R: Union[np.ndarray, float],
-    H: Optional[Union[np.ndarray, float, Tuple]] = None,
+    x: np.ndarray | float,
+    P: np.ndarray | float,
+    z: np.ndarray | None,
+    R: np.ndarray | float,
+    H: np.ndarray | float | tuple | None = None,
     return_all: bool = False,
-) -> Union[
-    Tuple[Union[np.ndarray, float], Union[np.ndarray, float]],
-    Tuple[Union[np.ndarray, float], Union[np.ndarray, float], Any, Any, Any, float],
-]:
+) -> (
+    tuple[np.ndarray | float, np.ndarray | float]
+    | tuple[np.ndarray | float, np.ndarray | float, Any, Any, Any, float]
+):
     """
     Add a new measurement (z) to the Kalman filter. If z is None, nothing is changed.
 

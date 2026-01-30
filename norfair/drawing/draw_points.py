@@ -1,4 +1,4 @@
-from typing import Optional, Sequence, Union
+from collections.abc import Sequence
 
 import numpy as np
 
@@ -12,20 +12,20 @@ from .utils import _build_text
 
 def draw_points(
     frame: np.ndarray,
-    drawables: Union[Sequence[Detection], Sequence[TrackedObject]] = None,
-    radius: Optional[int] = None,
-    thickness: Optional[int] = None,
+    drawables: Sequence[Detection] | Sequence[TrackedObject] = None,
+    radius: int | None = None,
+    thickness: int | None = None,
     color: ColorLike = "by_id",
     color_by_label: bool = None,  # deprecated
     draw_labels: bool = True,
-    text_size: Optional[int] = None,
+    text_size: int | None = None,
     draw_ids: bool = True,
     draw_points: bool = True,  # pylint: disable=redefined-outer-name
-    text_thickness: Optional[int] = None,
-    text_color: Optional[ColorLike] = None,
+    text_thickness: int | None = None,
+    text_color: ColorLike | None = None,
     hide_dead_points: bool = True,
     detections: Sequence["Detection"] = None,  # deprecated
-    label_size: Optional[int] = None,  # deprecated
+    label_size: int | None = None,  # deprecated
     draw_scores: bool = False,
 ) -> np.ndarray:
     """
@@ -189,14 +189,14 @@ _draw_points_alias = draw_points
 def draw_tracked_objects(
     frame: np.ndarray,
     objects: Sequence["TrackedObject"],
-    radius: Optional[int] = None,
-    color: Optional[ColorLike] = None,
-    id_size: Optional[float] = None,
-    id_thickness: Optional[int] = None,
+    radius: int | None = None,
+    color: ColorLike | None = None,
+    id_size: float | None = None,
+    id_thickness: int | None = None,
     draw_points: bool = True,  # pylint: disable=redefined-outer-name
     color_by_label: bool = False,
     draw_labels: bool = False,
-    label_size: Optional[int] = None,
+    label_size: int | None = None,
 ):
     """
     **Deprecated** use [`draw_points`][norfair.drawing.draw_points.draw_points]

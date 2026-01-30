@@ -1,6 +1,5 @@
 import os
 import time
-from typing import List, Optional, Union
 
 try:
     import cv2
@@ -64,12 +63,12 @@ class Video:
 
     def __init__(
         self,
-        camera: Optional[int] = None,
-        input_path: Optional[str] = None,
+        camera: int | None = None,
+        input_path: str | None = None,
         output_path: str = ".",
-        output_fps: Optional[float] = None,
+        output_fps: float | None = None,
         label: str = "",
-        output_fourcc: Optional[str] = None,
+        output_fourcc: str | None = None,
         output_extension: str = "mp4",
     ):
         self.camera = camera
@@ -78,7 +77,7 @@ class Video:
         self.label = label
         self.output_fourcc = output_fourcc
         self.output_extension = output_extension
-        self.output_video: Optional[cv2.VideoWriter] = None
+        self.output_video: cv2.VideoWriter | None = None
 
         # Input validation
         if (input_path is None and camera is None) or (
@@ -123,7 +122,7 @@ class Video:
         # Setup progressbar
         if self.label:
             description += f" | {self.label}"
-        progress_bar_fields: List[Union[str, ProgressColumn]] = [
+        progress_bar_fields: list[str | ProgressColumn] = [
             "[progress.description]{task.description}",
             BarColumn(),
             "[yellow]{task.fields[process_fps]:.2f}fps[/yellow]",
@@ -263,15 +262,15 @@ class Video:
 
         return os.path.join(self.output_path, file_name)
 
-    def get_codec_fourcc(self, filename: str) -> Optional[str]:
+    def get_codec_fourcc(self, filename: str) -> str | None:
         if self.output_fourcc is not None:
             return self.output_fourcc
 
         # Default codecs for each extension
         extension = filename[-3:].lower()
-        if "avi" == extension:
+        if extension == "avi":
             return "XVID"
-        elif "mp4" == extension:
+        elif extension == "mp4":
             return "mp4v"  # When available, "avc1" is better
         else:
             self._fail(
@@ -292,10 +291,7 @@ class Video:
         if len(description) < space_for_description:
             return description
         else:
-            return "{} ... {}".format(
-                description[: space_for_description // 2 - 3],
-                description[-space_for_description // 2 + 3 :],
-            )
+            return f"{description[: space_for_description // 2 - 3]} ... {description[-space_for_description // 2 + 3 :]}"
 
 
 class VideoFromFrames:

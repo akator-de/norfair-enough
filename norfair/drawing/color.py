@@ -1,10 +1,10 @@
 import re
-from typing import Hashable, Iterable, Tuple, Union
+from collections.abc import Hashable, Iterable
 
 # types
 
-ColorType = Tuple[int, int, int]
-ColorLike = Union[ColorType, str]
+ColorType = tuple[int, int, int]
+ColorLike = ColorType | str
 
 
 def hex_to_bgr(hex_value: str) -> ColorType:
@@ -327,7 +327,7 @@ class Palette:
     _default_color = Color.black
 
     @classmethod
-    def set(cls, palette: Union[str, Iterable[ColorLike]]):
+    def set(cls, palette: str | Iterable[ColorLike]):
         """
         Selects a color palette.
 

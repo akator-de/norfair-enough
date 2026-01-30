@@ -1,4 +1,4 @@
-from typing import Optional, Sequence, Tuple, Union
+from collections.abc import Sequence
 
 import numpy as np
 
@@ -12,21 +12,21 @@ from .utils import _build_text
 
 def draw_boxes(
     frame: np.ndarray,
-    drawables: Union[Sequence[Detection], Sequence[TrackedObject]] = None,
+    drawables: Sequence[Detection] | Sequence[TrackedObject] = None,
     color: ColorLike = "by_id",
-    thickness: Optional[int] = None,
+    thickness: int | None = None,
     random_color: bool = None,  # Deprecated
     color_by_label: bool = None,  # Deprecated
     draw_labels: bool = False,
-    text_size: Optional[float] = None,
+    text_size: float | None = None,
     draw_ids: bool = True,
-    text_color: Optional[ColorLike] = None,
-    text_thickness: Optional[int] = None,
+    text_color: ColorLike | None = None,
+    text_thickness: int | None = None,
     draw_box: bool = True,
     detections: Sequence["Detection"] = None,  # Deprecated
-    line_color: Optional[ColorLike] = None,  # Deprecated
-    line_width: Optional[int] = None,  # Deprecated
-    label_size: Optional[int] = None,  # Deprecated´
+    line_color: ColorLike | None = None,  # Deprecated
+    line_width: int | None = None,  # Deprecated
+    label_size: int | None = None,  # Deprecated´
     draw_scores: bool = False,
 ) -> np.ndarray:
     """
@@ -184,15 +184,15 @@ def draw_boxes(
 def draw_tracked_boxes(
     frame: np.ndarray,
     objects: Sequence["TrackedObject"],
-    border_colors: Optional[Tuple[int, int, int]] = None,
-    border_width: Optional[int] = None,
-    id_size: Optional[int] = None,
-    id_thickness: Optional[int] = None,
+    border_colors: tuple[int, int, int] | None = None,
+    border_width: int | None = None,
+    id_size: int | None = None,
+    id_thickness: int | None = None,
     draw_box: bool = True,
     color_by_label: bool = False,
     draw_labels: bool = False,
-    label_size: Optional[int] = None,
-    label_width: Optional[int] = None,
+    label_size: int | None = None,
+    label_width: int | None = None,
 ) -> np.array:
     "**Deprecated**. Use [`draw_box`][norfair.drawing.draw_boxes.draw_boxes]"
     warn_once("draw_tracked_boxes is deprecated, use draw_box instead")

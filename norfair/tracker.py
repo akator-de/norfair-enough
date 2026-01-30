@@ -1,5 +1,6 @@
+from collections.abc import Callable, Hashable, Sequence
 from logging import warning
-from typing import Any, Callable, Hashable, List, Optional, Sequence, Tuple, Union
+from typing import Any
 
 import numpy as np
 
@@ -79,21 +80,20 @@ class Tracker:
 
     def __init__(
         self,
-        distance_function: Union[str, Callable[["Detection", "TrackedObject"], float]],
+        distance_function: str | Callable[["Detection", "TrackedObject"], float],
         distance_threshold: float,
         hit_counter_max: int = 15,
-        initialization_delay: Optional[int] = None,
+        initialization_delay: int | None = None,
         pointwise_hit_counter_max: int = 4,
         detection_threshold: float = 0,
         filter_factory: FilterFactory = OptimizedKalmanFilterFactory(),
         past_detections_length: int = 4,
-        reid_distance_function: Optional[
-            Callable[["TrackedObject", "TrackedObject"], float]
-        ] = None,
+        reid_distance_function: Callable[["TrackedObject", "TrackedObject"], float]
+        | None = None,
         reid_distance_threshold: float = 0,
-        reid_hit_counter_max: Optional[int] = None,
+        reid_hit_counter_max: int | None = None,
     ):
-        self.tracked_objects: Sequence["TrackedObject"] = []
+        self.tracked_objects: Sequence[TrackedObject] = []
 
         if isinstance(distance_function, str):
             distance_function = get_distance_by_name(distance_function)
@@ -142,10 +142,10 @@ class Tracker:
 
     def update(
         self,
-        detections: Optional[List["Detection"]] = None,
+        detections: list["Detection"] | None = None,
         period: int = 1,
-        coord_transformations: Optional[CoordinatesTransformation] = None,
-    ) -> List["TrackedObject"]:
+        coord_transformations: CoordinatesTransformation | None = None,
+    ) -> list["TrackedObject"]:
         """
         Process detections found in each frame.
 
@@ -268,7 +268,7 @@ class Tracker:
         """Total number of TrackedObjects initialized in the by this Tracker"""
         return self._obj_factory.count
 
-    def get_active_objects(self) -> List["TrackedObject"]:
+    def get_active_objects(self) -> list["TrackedObject"]:
         """Get the list of active objects
 
         Returns
@@ -287,7 +287,7 @@ class Tracker:
         distance_function,
         distance_threshold,
         objects: Sequence["TrackedObject"],
-        candidates: Optional[Union[List["Detection"], List["TrackedObject"]]],
+        candidates: list["Detection"] | list["TrackedObject"] | None,
         period: int,
     ):
         if candidates is not None and len(candidates) > 0:
@@ -401,7 +401,7 @@ class _TrackedObjectFactory:
         period: int,
         filter_factory: "FilterFactory",
         past_detections_length: int,
-        reid_hit_counter_max: Optional[int],
+        reid_hit_counter_max: int | None,
         coord_transformations: CoordinatesTransformation,
     ) -> "TrackedObject":
         obj = TrackedObject(
@@ -423,7 +423,7 @@ class _TrackedObjectFactory:
         self.initializing_count += 1
         return self.initializing_count
 
-    def get_ids(self) -> Tuple[int, int]:
+    def get_ids(self) -> tuple[int, int]:
         self.count += 1
         _TrackedObjectFactory.global_count += 1
         return self.count, _TrackedObjectFactory.global_count
@@ -479,8 +479,8 @@ class TrackedObject:
         period: int,
         filter_factory: "FilterFactory",
         past_detections_length: int,
-        reid_hit_counter_max: Optional[int],
-        coord_transformations: Optional[CoordinatesTransformation] = None,
+        reid_hit_counter_max: int | None,
+        coord_transformations: CoordinatesTransformation | None = None,
     ):
         if not isinstance(initial_detection, Detection):
             raise ValueError(
@@ -496,17 +496,17 @@ class TrackedObject:
         self.initial_period: int = period
         self.hit_counter: int = period
         self.reid_hit_counter_max = reid_hit_counter_max
-        self.reid_hit_counter: Optional[int] = None
-        self.last_distance: Optional[float] = None
-        self.current_min_distance: Optional[float] = None
-        self.last_detection: "Detection" = initial_detection
+        self.reid_hit_counter: int | None = None
+        self.last_distance: float | None = None
+        self.current_min_distance: float | None = None
+        self.last_detection: Detection = initial_detection
         self.age: int = 0
         self.is_initializing: bool = self.hit_counter <= self.initialization_delay
         self.scores = initial_detection.scores
 
-        self.initializing_id: Optional[int] = self._obj_factory.get_initializing_id()
-        self.id: Optional[int] = None
-        self.global_id: Optional[int] = None
+        self.initializing_id: int | None = self._obj_factory.get_initializing_id()
+        self.id: int | None = None
+        self.global_id: int | None = None
         if not self.is_initializing:
             self._acquire_ids()
 
@@ -522,9 +522,9 @@ class TrackedObject:
         initial_detection.age = self.age
         self.past_detections_length = past_detections_length
         if past_detections_length > 0:
-            self.past_detections: Sequence["Detection"] = [initial_detection]
+            self.past_detections: Sequence[Detection] = [initial_detection]
         else:
-            self.past_detections: Sequence["Detection"] = []
+            self.past_detections: Sequence[Detection] = []
 
         # Create Kalman Filter
         self.filter = filter_factory.create_filter(initial_detection.absolute_points)
@@ -780,7 +780,7 @@ class Detection:
     def __init__(
         self,
         points: np.ndarray,
-        scores: Union[float, int, np.ndarray] = None,
+        scores: float | int | np.ndarray = None,
         data: Any = None,
         label: Hashable = None,
         embedding=None,
