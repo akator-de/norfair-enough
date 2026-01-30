@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
       - name: Setup a user for the commits
@@ -35,6 +35,6 @@ jobs:
           git config user.name ci-bot
           git config user.email ci-bot@users.noreply.github.com
       - name: Install dependencies
-        run: uv sync --group docs
+        run: uv sync --locked --group docs
       - name: Updating "dev"
         run: uv run mike deploy --push dev
