@@ -1,4 +1,4 @@
-site_name: Norfair
+site_name: norfair-enough
 theme:
   name: material
   favicon: img/icon.svg
@@ -11,8 +11,8 @@ theme:
     repo: fontawesome/brands/git-alt
   logo: img/logo-dark.svg
   language: en
-repo_name: tryolabs/norfair
-repo_url: https://github.com/tryolabs/norfair
+repo_name: akator-de/norfair-enough
+repo_url: https://github.com/akator-de/norfair-enough
 edit_uri: ""
 
 extra_css:

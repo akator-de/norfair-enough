@@ -1,23 +1,34 @@
-![Norfair by Tryolabs logo](https://raw.githubusercontent.com/tryolabs/norfair/master/docs/img/banner.png)
+# norfair-enough
 
-[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/tryolabs/norfair-demo)
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tryolabs/norfair/blob/master/demos/colab/colab_demo.ipynb)
+**A maintained fork of [tryolabs/norfair](https://github.com/tryolabs/norfair)** — lightweight Python library for real-time multi-object tracking.
 
-![PyPI - Python Versions](https://img.shields.io/pypi/pyversions/norfair)
-[![PyPI](https://img.shields.io/pypi/v/norfair?color=green)](https://pypi.org/project/norfair/)
-[![Documentation](https://img.shields.io/badge/api-reference-blue?logo=readthedocs)](https://tryolabs.github.io/norfair/)
-[![Board](https://img.shields.io/badge/project-board-blue?logo=github)](https://github.com/tryolabs/norfair/projects/1)
-![Build status](https://github.com/tryolabs/norfair/workflows/CI/badge.svg?branch=master)
-[![DOI](https://zenodo.org/badge/276473370.svg)](https://zenodo.org/badge/latestdoi/276473370)
-[![License](https://img.shields.io/github/license/tryolabs/norfair)](https://github.com/tryolabs/norfair/blob/master/LICENSE)
-
-Norfair is a customizable lightweight Python library for real-time multi-object tracking.
-
-Using Norfair, you can add tracking capabilities to any detector with just a few lines of code.
+The upstream Norfair repository is no longer actively maintained. This fork keeps the library alive for production use. There is no claim to be the official successor — just a pragmatic continuation. New maintainers are welcome.
 
 |                                           Tracking players with moving camera                                           |                                           Tracking 3D objects                                           |
 | :---------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------: |
 | ![Tracking players in a soccer match](https://raw.githubusercontent.com/tryolabs/norfair/master/docs/videos/soccer.gif) | ![Tracking objects in 3D](https://raw.githubusercontent.com/tryolabs/norfair/master/docs/videos/3d.gif) |
+
+## Installation
+
+norfair-enough currently supports Python 3.10+.
+
+For the minimal version, install as:
+
+```bash
+pip install norfair-enough
+```
+
+To install with optional dependencies:
+
+```bash
+pip install norfair-enough[video]    # Adds several video helper features running on OpenCV
+pip install norfair-enough[metrics]  # Supports running MOT metrics evaluation
+pip install norfair-enough[metrics,video]  # Everything included
+```
+
+> **Import note:** The Python import remains unchanged — use `from norfair import ...` as before.
+
+If the needed dependencies are already present in the system, installing the minimal version is enough for enabling the extra features. This is particularly useful for embedded devices, where installing compiled dependencies can be difficult, but they can sometimes come preinstalled with the system.
 
 ## Features
 
@@ -31,27 +42,7 @@ Using Norfair, you can add tracking capabilities to any detector with just a few
 
 - Fast. The only thing bounding inference speed will be the detection network feeding detections to Norfair.
 
-Norfair is built, used and maintained by [Tryolabs](https://tryolabs.com).
-
-## Installation
-
-Norfair currently supports Python 3.10+.
-
-For the minimal version, install as:
-
-```bash
-pip install norfair
-```
-
-To make Norfair install the dependencies to support more features, install as:
-
-```bash
-pip install norfair[video]  # Adds several video helper features running on OpenCV
-pip install norfair[metrics]  # Supports running MOT metrics evaluation
-pip install norfair[metrics,video]  # Everything included
-```
-
-If the needed dependencies are already present in the system, installing the minimal version of Norfair is enough for enabling the extra features. This is particularly useful for embedded devices, where installing compiled dependencies can be difficult, but they can sometimes come preinstalled with the system.
+Norfair was originally built by [Tryolabs](https://tryolabs.com).
 
 ## Documentation
 
@@ -61,12 +52,9 @@ If the needed dependencies are already present in the system, installing the min
 
 ## Examples & demos
 
-[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/tryolabs/norfair-demo)
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tryolabs/norfair/blob/master/demos/colab/colab_demo.ipynb)
+We provide several examples of how Norfair can be used to add tracking capabilities to different detectors, and also showcase more advanced features. All demos are available in the upstream repository at [tryolabs/norfair](https://github.com/tryolabs/norfair/tree/master/demos).
 
-We provide several examples of how Norfair can be used to add tracking capabilities to different detectors, and also showcase more advanced features.
-
-> Note: for ease of reproducibility, we provide Dockerfiles for all the demos. Even though Norfair does not need a GPU, the default configuration of most demos requires a GPU to be able to run the detectors. For this, make sure you install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) so that your GPU can be shared with Docker.
+> Note: for ease of reproducibility, the demos provide Dockerfiles. Even though Norfair does not need a GPU, the default configuration of most demos requires a GPU to be able to run the detectors. For this, make sure you install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) so that your GPU can be shared with Docker.
 >
 > It is possible to run several demos with a CPU, but you will have to modify the scripts or tinker with the installation of their dependencies.
 
@@ -92,18 +80,10 @@ Most tracking demos are showcased with vehicles and pedestrians, but the detecto
 5. [Track points in 3D](https://github.com/tryolabs/norfair/tree/master/demos/3d_track), using [MediaPipe Objectron](https://google.github.io/mediapipe/solutions/objectron.html).
 6. [Tracking of small objects](https://github.com/tryolabs/norfair/tree/master/demos/sahi), using [SAHI: Slicing Aided Hyper Inference](https://github.com/obss/sahi).
 
-### ROS integration
-
-To make it even easier to use Norfair in robotics projects, we now offer a version that integrates with the Robotic Operating System (ROS).
-
-We present a [ROS package](https://github.com/tryolabs/norfair-ros) and a [fully functional environment](https://github.com/tryolabs/norfair-ros-dev) running on Docker to do the first steps with this package and start your first application easier.
-
 ### Benchmarking and profiling
 
 1. [Kalman filter and distance function profiling](https://github.com/tryolabs/norfair/tree/master/demos/profiling) using [TRT pose estimator](https://github.com/NVIDIA-AI-IOT/trt_pose).
 2. Computation of [MOT17](https://motchallenge.net/data/MOT17/) scores using [motmetrics4norfair](https://github.com/tryolabs/norfair/tree/master/demos/motmetrics4norfair).
-
-![Norfair OpenPose Demo](https://raw.githubusercontent.com/tryolabs/norfair/master/docs/videos/openpose_skip_3_frames.gif)
 
 ## How it works
 
@@ -186,16 +166,12 @@ If you are looking for a tracker, here are some other projects worth noting:
 |  MOT20-05   | 87.9% 88.9% 87.0% | 96.0% | 98.1% | 94.1% 13.0% |
 |   OVERALL   | 87.3% 88.4% 86.2% | 95.6% | 98.1% | 93.7% 13.2% |
 
-## Commercial support
-
-Tryolabs can provide commercial support, implement new features in Norfair or build video analytics tools for solving your challenging problems. Norfair powers several video analytics applications, such as the [face mask detection](https://tryolabs.com/blog/2020/07/09/face-mask-detection-in-street-camera-video-streams-using-ai-behind-the-curtain/) tool.
-
-If you are interested, please [contact us](mailto:hello@tryolabs.com).
-
 ## Citing Norfair
 
-For citations in academic publications, please export your desired citation format (BibTeX or other) from [Zenodo](https://doi.org/10.5281/zenodo.5146253).
+For citations in academic publications, please export your desired citation format (BibTeX or other) from the original [Zenodo entry](https://doi.org/10.5281/zenodo.5146253).
 
 ## License
 
-Copyright © 2022, [Tryolabs](https://tryolabs.com). Released under the [BSD 3-Clause](https://github.com/tryolabs/norfair/blob/master/LICENSE).
+Copyright © 2022, [Tryolabs](https://tryolabs.com). Released under the [BSD 3-Clause](https://github.com/akator-de/norfair-enough/blob/master/LICENSE).
+
+This project is a fork of [tryolabs/norfair](https://github.com/tryolabs/norfair).

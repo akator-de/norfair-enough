@@ -1,20 +1,20 @@
-# Contributing to Norfair
+# Contributing to norfair-enough
 
-Thank you for your interest in contributing to Norfair! Before you begin writing code, it is important that you share your intention to contribute with the team, based on the type of contribution:
+Thank you for your interest in contributing to norfair-enough! Before you begin writing code, it is important that you share your intention to contribute with the team, based on the type of contribution:
 
 1. You want to propose a new feature and implement it:
     - Post your intended feature in an issue, and we shall discuss the design and implementation. Once we agree that the plan looks good, go ahead and implement it.
 2. You want to implement a feature or bug fix for an outstanding issue.
-    - Search for your issue in the [list](https://github.com/tryolabs/norfair/issues).
+    - Search for your issue in the [list](https://github.com/akator-de/norfair-enough/issues).
     - Pick an issue and comment that you'd like to work on the feature or bug-fix.
     - If you need more context on a particular issue, please ask and we shall provide it.
 
-Once you implement and test your feature or bug fix, please submit a Pull Request to https://github.com/tryolabs/norfair/pulls.
+Once you implement and test your feature or bug fix, please submit a Pull Request to https://github.com/akator-de/norfair-enough/pulls.
 
 
 # Setup
 
-1. Clone this repository `git clone git@github.com:tryolabs/norfair.git`.
+1. Clone this repository `git clone git@github.com:akator-de/norfair-enough.git`.
 2. Set up Python 3.10+ (we test on 3.10, 3.11, 3.12, 3.13). Using [pyenv](https://github.com/pyenv/pyenv) is highly recommended.
 3. Install [poetry](https://python-poetry.org/docs/#installation) version 1.2 or above.
 4. Install dependencies `poetry install --all-extras`.

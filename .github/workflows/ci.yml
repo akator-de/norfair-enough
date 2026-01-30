@@ -85,8 +85,8 @@ jobs:
 
       - name: Prepare package
         run: |
-          tar xvf "dist/norfair-$(poetry version -s).tar.gz"
-          mv norfair-$(poetry version -s) norfair-dist
+          tar xvf "dist/norfair_enough-$(poetry version -s).tar.gz"
+          mv norfair_enough-$(poetry version -s) norfair-dist
 
       - name: Save artifact
         uses: actions/upload-artifact@v4
