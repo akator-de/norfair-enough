@@ -212,7 +212,7 @@ def pretty_str(label, arr):
     except TypeError:
         pass
 
-    if isinstance(arr, (list, tuple, deque)):
+    if isinstance(arr, list | tuple | deque):
         return "\n".join(
             [pretty_str(label + "[" + str(i) + "]", x) for (i, x) in enumerate(arr)]
         )
@@ -1444,9 +1444,9 @@ class KalmanFilter:
         assert x.ndim in (1, 2), f"x must have one or two dimensions, but has {x.ndim}"
 
         if x.ndim == 1:
-            assert x.shape[0] == self.dim_x, (
-                f"Shape of x must be ({self.dim_x}, 1), but is {x.shape}"
-            )
+            assert (
+                x.shape[0] == self.dim_x
+            ), f"Shape of x must be ({self.dim_x}, 1), but is {x.shape}"
         else:
             assert x.shape == (
                 self.dim_x,
@@ -1466,12 +1466,12 @@ class KalmanFilter:
             self.dim_x,
         ), f"Shape of F must be ({self.dim_x}, {self.dim_x}), but is {F.shape}"
 
-        assert np.ndim(H) == 2, (
-            f"Shape of H must be (dim_z, {P.shape[0]}), but is {np.shape(H)}"
-        )
-        assert H.shape[1] == P.shape[0], (
-            f"Shape of H must be (dim_z, {P.shape[0]}), but is {H.shape}"
-        )
+        assert (
+            np.ndim(H) == 2
+        ), f"Shape of H must be (dim_z, {P.shape[0]}), but is {np.shape(H)}"
+        assert (
+            H.shape[1] == P.shape[0]
+        ), f"Shape of H must be (dim_z, {P.shape[0]}), but is {H.shape}"
 
         # shape of R must be the same as HPH'
         hph_shape = (H.shape[0], H.shape[0])
@@ -1485,9 +1485,9 @@ class KalmanFilter:
                 (1, 1),
             ], f"R must be scalar or one element array, but is shaped {r_shape}"
         else:
-            assert r_shape == hph_shape, (
-                f"Shape of R should be {hph_shape} but it is {r_shape}"
-            )
+            assert (
+                r_shape == hph_shape
+            ), f"Shape of R should be {hph_shape} but it is {r_shape}"
 
         if z is not None:
             z_shape = np.shape(z)
@@ -1509,9 +1509,9 @@ class KalmanFilter:
             ), f"Shape of z should be {np.shape(Hx)}, not {z_shape} for the given H"
 
         if np.ndim(Hx) > 1 and np.shape(Hx) != (1, 1):
-            assert np.shape(Hx) == z_shape, (
-                f"Shape of z should be {np.shape(Hx)} for the given H, but it is {z_shape}"
-            )  # pylint: disable=line-too-long
+            assert (
+                np.shape(Hx) == z_shape
+            ), f"Shape of z should be {np.shape(Hx)} for the given H, but it is {z_shape}"  # pylint: disable=line-too-long
 
 
 def update(
