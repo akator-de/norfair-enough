@@ -349,8 +349,7 @@ class Drawable:
             self.id = None
             self.label = obj.label
             self.scores = obj.scores
-            # TODO: alive points for detections could be the ones over the threshold
-            self.live_points = np.ones(obj.points.shape[0]).astype(bool)
+            self.live_points = np.ones(obj.points.shape[0]).astype(bool)  # see #13
 
         elif isinstance(obj, TrackedObject):
             self.points = obj.estimate
