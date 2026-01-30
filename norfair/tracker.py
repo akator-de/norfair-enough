@@ -746,12 +746,14 @@ class TrackedObject:
         self.last_distance = tracked_object.last_distance
         self.current_min_distance = tracked_object.current_min_distance
         self.last_detection = tracked_object.last_detection
+        self.last_detection.age = self.age
         self.detected_at_least_once_points = (
             tracked_object.detected_at_least_once_points
         )
         self.filter = tracked_object.filter
 
         for past_detection in tracked_object.past_detections:
+            past_detection.age = self.age
             self._conditionally_add_to_past_detections(past_detection)
 
     def update_coordinate_transformation(
