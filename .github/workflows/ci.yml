@@ -18,16 +18,16 @@ jobs:
   # versions of Python.
   #
   unit-tests:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       max-parallel: 3
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -43,12 +43,12 @@ jobs:
         run: tox -e py
 
   mot-metrics:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
@@ -64,12 +64,12 @@ jobs:
         run: tox -e mot-py313
 
   coverage:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
@@ -91,12 +91,12 @@ jobs:
           fail_ci_if_error: false
 
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -115,26 +115,26 @@ jobs:
           mv "norfair_enough-${VERSION}" norfair-dist
 
       - name: Save artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: norfair-dist
           path: norfair-dist
 
   install:
     needs: [build]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       max-parallel: 3
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Download a single artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: norfair-dist
           path: ./norfair-dist
@@ -151,16 +151,16 @@ jobs:
   # Executed only if GitHub release is "published".
   #
   release:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [unit-tests, mot-metrics]
     if: github.event_name == 'release'
     env:
       PYTHON_VERSION: "3.12"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
@@ -178,16 +178,16 @@ jobs:
 
 
   deploy-doc:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: [release]
     if: github.event_name == 'release'
     env:
       PYTHON_VERSION: "3.12"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
