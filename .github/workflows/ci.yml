@@ -35,13 +35,10 @@ jobs:
         uses: astral-sh/setup-uv@v5
 
       - name: Install tox
-        run: |
-          pip install --upgrade pip
-          pip install --upgrade tox
+        run: uv tool install tox --with tox-uv
 
       - name: Run tests
-        run: |
-          tox -e py
+        run: tox -e py
 
   mot-metrics:
     runs-on: ubuntu-22.04
@@ -53,14 +50,14 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
       - name: Install tox
-        run: |
-          pip install --upgrade pip
-          pip install --upgrade tox
+        run: uv tool install tox --with tox-uv
 
       - name: Run tests
-        run: |
-          tox -e mot-py313
+        run: tox -e mot-py313
 
   build:
     runs-on: ubuntu-22.04
