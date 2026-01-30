@@ -359,11 +359,11 @@ class Drawable:
             self.scores = obj.scores
             self.live_points = obj.live_points
         elif obj is None:
-            self.points = points
+            self.points = points  # pyrefly: ignore[bad-assignment]
             self.id = id
             self.label = label
             self.scores = scores
-            self.live_points = live_points
+            self.live_points = live_points  # pyrefly: ignore[bad-assignment]
         else:
             raise ValueError(
                 f"Extecting a Detection or a TrackedObject but received {type(obj)}"

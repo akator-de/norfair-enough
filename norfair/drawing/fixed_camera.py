@@ -53,7 +53,7 @@ class FixedCamera:
 
     def __init__(self, scale: float = 2, attenuation: float = 0.05):
         self.scale = scale
-        self._background = None
+        self._background: np.ndarray | None = None
         self._attenuation_factor = 1 - attenuation
 
     def adjust_frame(
@@ -76,6 +76,7 @@ class FixedCamera:
         """
 
         # initialize background if necessary
+        background: np.ndarray
         if self._background is None:
             original_size = (
                 frame.shape[1],
@@ -85,27 +86,25 @@ class FixedCamera:
             scaled_size = tuple(
                 (np.array(original_size) * np.array(self.scale)).round().astype(int)
             )
-            self._background = np.zeros(
+            background = np.zeros(
                 [scaled_size[1], scaled_size[0], frame.shape[-1]],
                 frame.dtype,
             )
         else:
-            self._background = (self._background * self._attenuation_factor).astype(
+            background = (self._background * self._attenuation_factor).astype(
                 frame.dtype
             )
 
         # top_left is the anchor coordinate from where we start drawing the fame on top of the background
         # aim to draw it in the center of the background but transformations will move this point
-        top_left = (
-            np.array(self._background.shape[:2]) // 2 - np.array(frame.shape[:2]) // 2
-        )
+        top_left = np.array(background.shape[:2]) // 2 - np.array(frame.shape[:2]) // 2
         top_left = (
             coord_transformation.rel_to_abs(top_left[::-1]).round().astype(int)[::-1]
         )
         # box of the background that will be updated and the limits of it
         background_y0, background_y1 = (top_left[0], top_left[0] + frame.shape[0])
         background_x0, background_x1 = (top_left[1], top_left[1] + frame.shape[1])
-        background_size_y, background_size_x = self._background.shape[:2]
+        background_size_y, background_size_x = background.shape[:2]
 
         # define box of the frame that will be used
         # if the scale is not enough to support the movement, warn the user but keep drawing
@@ -135,7 +134,8 @@ class FixedCamera:
             background_x0 = max(background_x0, 0)
             background_y1 = max(background_y1, 0)
             background_x1 = max(background_x1, 0)
-        self._background[
-            background_y0:background_y1, background_x0:background_x1, :
-        ] = frame[frame_y0:frame_y1, frame_x0:frame_x1, :]
-        return self._background
+        background[background_y0:background_y1, background_x0:background_x1, :] = frame[
+            frame_y0:frame_y1, frame_x0:frame_x1, :
+        ]
+        self._background = background
+        return background

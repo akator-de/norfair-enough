@@ -22,3 +22,5 @@ jobs:
         run: uv run ruff format --check --diff .
       - name: Lint
         run: uv run ruff check .
+      - name: Type check
+        run: uv run pyrefly check --summarize-errors

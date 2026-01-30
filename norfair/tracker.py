@@ -1,6 +1,6 @@
 from collections.abc import Callable, Hashable, Sequence
 from logging import warning
-from typing import Any, overload
+from typing import Any
 
 import numpy as np
 
@@ -100,7 +100,7 @@ class Tracker:
         distance_obj: Distance
         if isinstance(distance_function, str):
             distance_obj = get_distance_by_name(distance_function)
-        elif isinstance(distance_function, Callable):
+        elif callable(distance_function):
             warning(
                 "You are using a scalar distance function. If you want to speed up the"
                 " tracking process please consider using a vectorized distance"
@@ -136,10 +136,11 @@ class Tracker:
 
         self.distance_threshold = distance_threshold
         self.detection_threshold = detection_threshold
+        self.reid_distance_function: ScalarDistance | None
         if reid_distance_function is not None:
             self.reid_distance_function = ScalarDistance(reid_distance_function)
         else:
-            self.reid_distance_function = reid_distance_function
+            self.reid_distance_function = None
         self.reid_distance_threshold = reid_distance_threshold
         self._obj_factory = _TrackedObjectFactory()
 
@@ -285,44 +286,14 @@ class Tracker:
             if not o.is_initializing and o.hit_counter_is_positive
         ]
 
-    @overload
     def _update_objects_in_place(
         self,
-        distance_function,
-        distance_threshold,
-        objects: Sequence["TrackedObject"],
-        candidates: list["Detection"],
-        period: int,
-    ) -> tuple[list["Detection"], list["TrackedObject"], list["TrackedObject"]]: ...
-
-    @overload
-    def _update_objects_in_place(
-        self,
-        distance_function,
-        distance_threshold,
-        objects: Sequence["TrackedObject"],
-        candidates: list["TrackedObject"],
-        period: int,
-    ) -> tuple[list["TrackedObject"], list["TrackedObject"], list["TrackedObject"]]: ...
-
-    @overload
-    def _update_objects_in_place(
-        self,
-        distance_function,
-        distance_threshold,
-        objects: Sequence["TrackedObject"],
-        candidates: None,
-        period: int,
-    ) -> tuple[list["Detection"], list["TrackedObject"], list["TrackedObject"]]: ...
-
-    def _update_objects_in_place(
-        self,
-        distance_function,
-        distance_threshold,
+        distance_function: Distance,
+        distance_threshold: float,
         objects: Sequence["TrackedObject"],
         candidates: list["Detection"] | list["TrackedObject"] | None,
         period: int,
-    ):
+    ) -> tuple[list, list["TrackedObject"], list["TrackedObject"]]:
         if candidates is not None and len(candidates) > 0:
             distance_matrix = distance_function.get_distances(objects, candidates)
             if np.isnan(distance_matrix).any():
@@ -342,7 +313,11 @@ class Tracker:
             )
             if len(matched_cand_indices) > 0:
                 unmatched_candidates = [
-                    d for i, d in enumerate(candidates) if i not in matched_cand_indices
+                    d
+                    for i, d in enumerate(
+                        candidates  # pyrefly: ignore[bad-argument-type]
+                    )
+                    if i not in matched_cand_indices
                 ]
                 unmatched_objects = [
                     d for i, d in enumerate(objects) if i not in matched_obj_indices
@@ -371,13 +346,13 @@ class Tracker:
                         unmatched_candidates.append(matched_candidate)
                         unmatched_objects.append(matched_object)
             else:
-                unmatched_candidates, matched_objects, unmatched_objects = (
-                    candidates,
-                    [],
-                    objects,
-                )
+                unmatched_candidates = list(candidates)
+                matched_objects = []
+                unmatched_objects = list(objects)
         else:
-            unmatched_candidates, matched_objects, unmatched_objects = [], [], objects
+            unmatched_candidates = []
+            matched_objects = []
+            unmatched_objects = list(objects)
 
         return unmatched_candidates, matched_objects, unmatched_objects
 
@@ -554,16 +529,17 @@ class TrackedObject:
         )
         initial_detection.age = self.age
         self.past_detections_length = past_detections_length
+        self.past_detections: list[Detection]
         if past_detections_length > 0:
-            self.past_detections: list[Detection] = [initial_detection]
+            self.past_detections = [initial_detection]
         else:
-            self.past_detections: list[Detection] = []
+            self.past_detections = []
 
         # Create Kalman Filter
         self.filter = filter_factory.create_filter(initial_detection.absolute_points)
         self.dim_z = self.dim_points * self.num_points
         self.label = initial_detection.label
-        self.abs_to_rel = None
+        self.abs_to_rel: Callable[[np.ndarray], np.ndarray] | None = None
         if coord_transformations is not None:
             self.update_coordinate_transformation(coord_transformations)
 
@@ -825,13 +801,16 @@ class Detection:
     ):
         self.points = validate_points(points)
 
+        self.scores: np.ndarray | None
         if isinstance(scores, np.ndarray):
             assert len(scores) == len(self.points), (
                 "scores should be a np.ndarray with it's length being equal to the amount of points."
             )
+            self.scores = scores
         elif scores is not None:
-            scores = np.zeros((len(points),)) + scores
-        self.scores = scores
+            self.scores = np.zeros((len(points),)) + scores
+        else:
+            self.scores = None
         self.data = data
         self.label = label
         self.absolute_points = self.points.copy()

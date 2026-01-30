@@ -128,7 +128,6 @@ import sys
 from collections import deque
 from copy import deepcopy
 from math import exp, log, sqrt
-from typing import Any
 
 import numpy as np
 from numpy import dot, eye, isscalar, linalg, shape, zeros
@@ -1358,6 +1357,13 @@ class KalmanFilter:
         """
         return self._alpha_sq**0.5
 
+    @alpha.setter
+    def alpha(self, value):
+        if not np.isscalar(value) or value < 1:
+            raise ValueError("alpha must be a float greater than 1")
+
+        self._alpha_sq = value**2
+
     def log_likelihood_of(self, z):
         """
         log likelihood of the measurement `z`. This should only be called
@@ -1367,13 +1373,6 @@ class KalmanFilter:
         if z is None:
             return log(sys.float_info.min)
         return logpdf(z, dot(self.H, self.x), self.S)
-
-    @alpha.setter
-    def alpha(self, value):
-        if not np.isscalar(value) or value < 1:
-            raise ValueError("alpha must be a float greater than 1")
-
-        self._alpha_sq = value**2
 
     def __repr__(self):
         return "\n".join(
@@ -1523,7 +1522,14 @@ def update(
     return_all: bool = False,
 ) -> (
     tuple[np.ndarray | float, np.ndarray | float]
-    | tuple[np.ndarray | float, np.ndarray | float, Any, Any, Any, float]
+    | tuple[
+        np.ndarray | float,
+        np.ndarray | float,
+        np.ndarray | None,
+        np.ndarray | None,
+        np.ndarray | float | None,
+        float | None,
+    ]
 ):
     """
     Add a new measurement (z) to the Kalman filter. If z is None, nothing is changed.
@@ -1566,18 +1572,21 @@ def update(
     if z is None:
         return (x, P, None, None, None, None) if return_all else (x, P)
 
+    H_arr: np.ndarray
     if H is None:
-        H = np.array([1])
-    elif not isinstance(H, np.ndarray):
-        H = np.array(H)
-    if np.isscalar(H):
-        H = np.array([H])
+        H_arr = np.array([1])
+    elif isinstance(H, np.ndarray):
+        H_arr = H
+    else:
+        H_arr = np.array(H)
+    if np.isscalar(H_arr):
+        H_arr = np.array([H_arr])
 
-    Hx = np.atleast_1d(dot(H, x))
+    Hx = np.atleast_1d(dot(H_arr, x))
     z = reshape_z(z, Hx.shape[0], np.ndim(x))
     y = z - Hx
 
-    S = dot(dot(H, P), H.T) + R
+    S = dot(dot(H_arr, P), H_arr.T) + R
 
     if np.isscalar(S) or np.ndim(S) == 0:
         inv_S = 1.0 / S
@@ -1587,15 +1596,15 @@ def update(
         except np.linalg.LinAlgError:
             inv_S = 1.0 / S
 
-    K = dot(dot(P, H.T), inv_S)
+    K = dot(dot(P, H_arr.T), inv_S)
     x = x + dot(K, y)
     K = np.asarray(K)
-    KH = np.asarray(dot(K, H))
+    KH = np.asarray(dot(K, H_arr))
     I_KH = np.eye(KH.shape[0]) - KH
     P = dot(dot(I_KH, P), I_KH.T) + dot(dot(K, R), K.T)
 
     if return_all:
-        log_likelihood = logpdf(z, dot(H, x), S)
+        log_likelihood = logpdf(z, dot(H_arr, x), S)
         return x, P, y, K, S, log_likelihood
     return x, P
 

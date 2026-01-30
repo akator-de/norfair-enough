@@ -153,7 +153,7 @@ def draw_points(
                 if live or not hide_dead_points:
                     Drawer.circle(
                         frame,
-                        tuple(point.astype(int)),
+                        tuple(point.astype(int)),  # pyrefly: ignore[bad-argument-type]
                         radius=radius,
                         color=obj_color,
                         thickness=thickness,
@@ -169,7 +169,7 @@ def draw_points(
             Drawer.text(
                 frame,
                 text,
-                tuple(position.astype(int)),
+                tuple(position.astype(int)),  # pyrefly: ignore[bad-argument-type]
                 size=text_size,
                 color=obj_text_color,
                 thickness=text_thickness,
