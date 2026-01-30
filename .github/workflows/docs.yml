@@ -34,7 +34,7 @@ jobs:
         run: |
           git config user.name ci-bot
           git config user.email ci-bot@users.noreply.github.com
-      - name: Installing dependencies
-        run: uv pip install --system -r docs/requirements.txt
+      - name: Install dependencies
+        run: uv sync --group docs
       - name: Updating "dev"
-        run: mike deploy --push dev
+        run: uv run mike deploy --push dev

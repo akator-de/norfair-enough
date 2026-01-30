@@ -56,7 +56,7 @@ Any suggestion on how to improve the documentation is welcome and don't feel obl
 
 Nevertheless, if you still want to test the change first and create the PR yourself, follow these steps:
 
-1. Install documentation dependencies `uv run pip install -r docs/requirements.txt`.
+1. Install documentation dependencies `uv sync --group docs`.
 2. Start the debugging server `uv run mkdocs serve` and open http://localhost:8000.
 3. The above version is useful for debugging but it doesn't include the versioning. Once you are happy with the result you can see the final result with run `uv run mike deploy dev` and `uv run mike serve`. Open the browser and switch to `dev` version.
 
