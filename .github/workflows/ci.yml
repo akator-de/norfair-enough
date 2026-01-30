@@ -197,7 +197,7 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv pip install --system -r docs/requirements.txt
+        run: uv sync --group docs
 
       - name: Deploy docs
-        run: python docs/deploy_docs.py
+        run: uv run python docs/deploy_docs.py
