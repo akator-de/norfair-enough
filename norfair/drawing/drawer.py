@@ -29,7 +29,7 @@ class Drawer:
         position: tuple[int, int],
         radius: int | None = None,
         thickness: int | None = None,
-        color: ColorType = None,
+        color: ColorType | None = None,
     ) -> np.ndarray:
         """
         Draw a circle.
@@ -56,6 +56,8 @@ class Drawer:
             radius = int(max(max(frame.shape) * 0.005, 1))
         if thickness is None:
             thickness = radius - 1
+        if color is None:
+            color = Color.black
 
         return cv2.circle(
             frame,
@@ -108,13 +110,14 @@ class Drawer:
         np.ndarray
             The resulting frame.
         """
-        if size is None:
-            size = min(max(max(frame.shape) / 4000, 0.5), 1.5)
+        font_size = (
+            size if size is not None else min(max(max(frame.shape) / 4000, 0.5), 1.5)
+        )
         if thickness is None:
-            thickness = int(round(size) + 1)
+            thickness = int(round(font_size) + 1)
+        if color is None:
+            color = Color.black
 
-        if thickness is None and size is not None:
-            thickness = int(round(size) + 1)
         # adjust position based on the thickness
         anchor = (position[0] + thickness // 2, position[1] - thickness // 2)
         if shadow:
@@ -123,7 +126,7 @@ class Drawer:
                 text,
                 (anchor[0] + shadow_offset, anchor[1] + shadow_offset),
                 cv2.FONT_HERSHEY_SIMPLEX,
-                size,
+                font_size,
                 shadow_color,
                 thickness,
                 cv2.LINE_AA,
@@ -133,7 +136,7 @@ class Drawer:
             text,
             anchor,
             cv2.FONT_HERSHEY_SIMPLEX,
-            size,
+            font_size,
             color,
             thickness,
             cv2.LINE_AA,
@@ -166,6 +169,10 @@ class Drawer:
         np.ndarray
             The resulting frame.
         """
+        if color is None:
+            color = Color.black
+        if thickness is None:
+            thickness = 1
         frame = cv2.rectangle(
             frame,
             tuple(points[0]),
@@ -206,8 +213,10 @@ class Drawer:
             The resulting frame.
         """
         middle_x, middle_y = center
-        left, top = center - radius
-        right, bottom = center + radius
+        left = center[0] - radius
+        top = center[1] - radius
+        right = center[0] + radius
+        bottom = center[1] + radius
         frame = cls.line(
             frame,
             start=(middle_x, top),
@@ -328,12 +337,12 @@ class Drawable:
 
     def __init__(
         self,
-        obj: Detection | TrackedObject = None,
-        points: np.ndarray = None,
+        obj: Detection | TrackedObject | None = None,
+        points: np.ndarray | None = None,
         id: Any = None,
         label: Any = None,
-        scores: np.ndarray = None,
-        live_points: np.ndarray = None,
+        scores: np.ndarray | None = None,
+        live_points: np.ndarray | None = None,
     ) -> None:
         if isinstance(obj, Detection):
             self.points = obj.points

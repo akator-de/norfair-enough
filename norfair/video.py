@@ -1,12 +1,19 @@
 import os
 import time
+from typing import TYPE_CHECKING, Any
 
 try:
     import cv2
 except ImportError:
     from .utils import DummyOpenCVImport
 
-    cv2 = DummyOpenCVImport()
+    cv2 = DummyOpenCVImport()  # type: ignore[assignment, misc]
+
+if TYPE_CHECKING:
+    import cv2 as cv2_types
+else:
+    cv2_types = None  # type: ignore[misc]
+
 import numpy as np
 from rich import print
 from rich.progress import BarColumn, Progress, ProgressColumn, TimeRemainingColumn
@@ -14,6 +21,11 @@ from rich.progress import BarColumn, Progress, ProgressColumn, TimeRemainingColu
 from norfair import metrics
 
 from .utils import get_terminal_size
+
+
+def _get_fourcc(codec: str) -> int:
+    """Helper to get VideoWriter fourcc code with proper typing."""
+    return cv2.VideoWriter_fourcc(*codec)  # type: ignore[attr-defined]
 
 
 class Video:
@@ -77,7 +89,7 @@ class Video:
         self.label = label
         self.output_fourcc = output_fourcc
         self.output_extension = output_extension
-        self.output_video: cv2.VideoWriter | None = None
+        self.output_video: Any = None  # cv2.VideoWriter or None
 
         # Input validation
         if (input_path is None and camera is None) or (
@@ -107,6 +119,7 @@ class Video:
                 )
             description = os.path.basename(self.input_path)
         else:
+            assert self.camera is not None  # Validated in input_validation above
             self.video_capture = cv2.VideoCapture(self.camera)
             total_frames = 0
             description = f"Camera({self.camera})"
@@ -194,7 +207,7 @@ class Video:
         if self.output_video is None:
             # The user may need to access the output file path on their code
             output_file_path = self.get_output_file_path()
-            fourcc = cv2.VideoWriter_fourcc(*self.get_codec_fourcc(output_file_path))
+            fourcc = _get_fourcc(self.get_codec_fourcc(output_file_path))
             # Set on first frame write in case the user resizes the frame in some way
             output_size = (
                 frame.shape[1],
@@ -262,7 +275,7 @@ class Video:
 
         return os.path.join(self.output_path, file_name)
 
-    def get_codec_fourcc(self, filename: str) -> str | None:
+    def get_codec_fourcc(self, filename: str) -> str:
         if self.output_fourcc is not None:
             return self.output_fourcc
 
@@ -278,9 +291,8 @@ class Video:
                 f"[yellow]{filename}[/yellow]\n"
                 f"Please use '.mp4', '.avi', or provide a custom OpenCV fourcc codec name."
             )
-            return (
-                None  # Had to add this return to make mypya happy. I don't like this.
-            )
+            # _fail raises RuntimeError, so this line is unreachable
+            raise RuntimeError("Unreachable")
 
     def abbreviate_description(self, description: str) -> str:
         """Conditionally abbreviate description so that progress bar fits in small terminals"""
@@ -306,11 +318,14 @@ class VideoFromFrames:
             file_name = os.path.split(input_path)[1]
 
             # Search framerate on seqinfo.ini
-            fps = information_file.search(variable_name="frameRate")
+            fps_val = information_file.search(variable_name="frameRate")
+            fps = float(fps_val) if isinstance(fps_val, (int, str)) else fps_val
 
             # Search resolution in seqinfo.ini
-            horizontal_resolution = information_file.search(variable_name="imWidth")
-            vertical_resolution = information_file.search(variable_name="imHeight")
+            h_res = information_file.search(variable_name="imWidth")
+            v_res = information_file.search(variable_name="imHeight")
+            horizontal_resolution = int(h_res) if not isinstance(h_res, int) else h_res
+            vertical_resolution = int(v_res) if not isinstance(v_res, int) else v_res
             image_size = (horizontal_resolution, vertical_resolution)
 
             videos_folder = os.path.join(save_path, "videos")
@@ -318,17 +333,20 @@ class VideoFromFrames:
                 os.makedirs(videos_folder)
 
             video_path = os.path.join(videos_folder, file_name + ".mp4")
-            fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+            fourcc = _get_fourcc("mp4v")
 
             self.file_name = file_name
             # Video file
             self.video = cv2.VideoWriter(video_path, fourcc, fps, image_size)
 
-        self.length = information_file.search(variable_name="seqLength")
+        length_val = information_file.search(variable_name="seqLength")
+        self.length = int(length_val) if not isinstance(length_val, int) else length_val
         self.input_path = input_path
         self.frame_number = 1
-        self.image_extension = information_file.search("imExt")
-        self.image_directory = information_file.search("imDir")
+        ext_val = information_file.search("imExt")
+        self.image_extension = str(ext_val) if not isinstance(ext_val, str) else ext_val
+        dir_val = information_file.search("imDir")
+        self.image_directory = str(dir_val) if not isinstance(dir_val, str) else dir_val
 
     def __iter__(self):
         self.frame_number = 1
