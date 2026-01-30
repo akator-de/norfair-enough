@@ -451,6 +451,49 @@ def test_detection_age_set_when_buffer_full():
     assert tracked[0].last_detection.age == tracked[0].age
 
 
+def test_detection_age_after_merge():
+    """Test that detection ages are updated correctly after merging tracked objects."""
+
+    def reid_dist(new_obj, tracked_obj):
+        return float(np.linalg.norm(new_obj.estimate - tracked_obj.estimate))
+
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=1,
+        hit_counter_max=4,
+        initialization_delay=1,
+        reid_distance_function=reid_dist,
+        reid_distance_threshold=10,
+        reid_hit_counter_max=5,
+        past_detections_length=4,
+    )
+
+    # Create first track (will become initialized)
+    tracker.update([Detection(points=np.array([[1, 1]]))])
+    tracker.update([Detection(points=np.array([[1, 1]]))])
+    tracked = tracker.update([Detection(points=np.array([[1, 1]]))])
+    assert len(tracked) == 1
+    obj_id = tracked[0].id
+
+    # Let the object die (hit_counter goes negative)
+    for _ in range(5):
+        tracker.update()
+
+    # Create a new detection nearby that will trigger re-id merge
+    tracker.update([Detection(points=np.array([[2, 2]]))])
+    tracked = tracker.update([Detection(points=np.array([[2, 2]]))])
+    assert len(tracked) == 1
+    assert tracked[0].id == obj_id
+
+    # Verify that last_detection.age is set to the current object age
+    assert tracked[0].last_detection.age is not None
+    assert tracked[0].last_detection.age == tracked[0].age
+
+    # Verify past detections have ages set (not None)
+    for pd in tracked[0].past_detections:
+        assert pd.age is not None
+
+
 # TODO tests list:
 #   - detections with different labels
 #   - partial matches where some points are missing
