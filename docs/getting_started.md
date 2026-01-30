@@ -24,14 +24,14 @@ The detections from the model will need to be wrapped in an instance of [Detecti
 
 ## Install
 
-Installing Norfair is extremely easy, simply run `pip install norfair` to install the latest version from [PyPI](https://pypi.org/project/norfair/).
+Installing Norfair is extremely easy, simply run `pip install norfair-enough` to install the latest version from [PyPI](https://pypi.org/project/norfair-enough/).
 
-You can also install the latest version from the master branch using `pip install git+https://github.com/tryolabs/norfair.git@master#egg=norfair`
+You can also install the latest version from the master branch using `pip install git+https://github.com/akator-de/norfair-enough.git@master#egg=norfair-enough`
 
 ## Video
 
 Norfair offers optional functionality to process videos (mp4 and mov formats are supported) or capture a live feed from a camera.
-To use this functionality you need to install Norfair with the `video` extra using this command: `pip install norfair[video]`.
+To use this functionality you need to install Norfair with the `video` extra using this command: `pip install norfair-enough[video]`.
 
 Check the [Video class][norfair.video.Video] for more info on how to use it.
 
