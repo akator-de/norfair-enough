@@ -1,6 +1,6 @@
 from collections.abc import Callable, Hashable, Sequence
 from logging import warning
-from typing import Any
+from typing import Any, overload
 
 import numpy as np
 
@@ -178,7 +178,7 @@ class Tracker:
         List[TrackedObject]
             The list of active tracked objects.
         """
-        if coord_transformations is not None:
+        if coord_transformations is not None and detections is not None:
             for det in detections:
                 det.update_coordinate_transformation(coord_transformations)
 
@@ -284,6 +284,36 @@ class Tracker:
             for o in self.tracked_objects
             if not o.is_initializing and o.hit_counter_is_positive
         ]
+
+    @overload
+    def _update_objects_in_place(
+        self,
+        distance_function,
+        distance_threshold,
+        objects: Sequence["TrackedObject"],
+        candidates: list["Detection"],
+        period: int,
+    ) -> tuple[list["Detection"], list["TrackedObject"], list["TrackedObject"]]: ...
+
+    @overload
+    def _update_objects_in_place(
+        self,
+        distance_function,
+        distance_threshold,
+        objects: Sequence["TrackedObject"],
+        candidates: list["TrackedObject"],
+        period: int,
+    ) -> tuple[list["TrackedObject"], list["TrackedObject"], list["TrackedObject"]]: ...
+
+    @overload
+    def _update_objects_in_place(
+        self,
+        distance_function,
+        distance_threshold,
+        objects: Sequence["TrackedObject"],
+        candidates: None,
+        period: int,
+    ) -> tuple[list["Detection"], list["TrackedObject"], list["TrackedObject"]]: ...
 
     def _update_objects_in_place(
         self,
@@ -405,7 +435,7 @@ class _TrackedObjectFactory:
         filter_factory: "FilterFactory",
         past_detections_length: int,
         reid_hit_counter_max: int | None,
-        coord_transformations: CoordinatesTransformation,
+        coord_transformations: CoordinatesTransformation | None,
     ) -> "TrackedObject":
         obj = TrackedObject(
             obj_factory=self,
@@ -722,10 +752,15 @@ class TrackedObject:
         if len(self.past_detections) < self.past_detections_length:
             detection.age = self.age
             self.past_detections.append(detection)
-        elif self.age >= self.past_detections[0].age * self.past_detections_length:
-            self.past_detections.pop(0)
-            detection.age = self.age
-            self.past_detections.append(detection)
+        else:
+            first_detection_age = self.past_detections[0].age
+            if (
+                first_detection_age is not None
+                and self.age >= first_detection_age * self.past_detections_length
+            ):
+                self.past_detections.pop(0)
+                detection.age = self.age
+                self.past_detections.append(detection)
 
     def merge(self, tracked_object):
         """Merge with a not yet initialized TrackedObject instance"""
@@ -744,7 +779,7 @@ class TrackedObject:
             self._conditionally_add_to_past_detections(past_detection)
 
     def update_coordinate_transformation(
-        self, coordinate_transformation: CoordinatesTransformation
+        self, coordinate_transformation: CoordinatesTransformation | None
     ):
         if coordinate_transformation is not None:
             self.abs_to_rel = coordinate_transformation.abs_to_rel
@@ -783,7 +818,7 @@ class Detection:
     def __init__(
         self,
         points: np.ndarray,
-        scores: float | int | np.ndarray = None,
+        scores: float | int | np.ndarray | None = None,
         data: Any = None,
         label: Hashable = None,
         embedding=None,
@@ -801,7 +836,7 @@ class Detection:
         self.label = label
         self.absolute_points = self.points.copy()
         self.embedding = embedding
-        self.age = None
+        self.age: int | None = None
 
     def update_coordinate_transformation(
         self, coordinate_transformation: CoordinatesTransformation

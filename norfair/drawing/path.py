@@ -15,7 +15,7 @@ class Paths:
 
     Parameters
     ----------
-    get_points_to_draw : Optional[Callable[[np.array], np.array]], optional
+    get_points_to_draw : Optional[Callable[[np.ndarray], np.ndarray]], optional
         Function that takes a list of points (the `.estimate` attribute of a [`TrackedObject`][norfair.tracker.TrackedObject])
         and returns a list of points for which we want to draw their paths.
 
@@ -45,7 +45,7 @@ class Paths:
 
     def __init__(
         self,
-        get_points_to_draw: Callable[[np.array], np.array] | None = None,
+        get_points_to_draw: Callable[[np.ndarray], np.ndarray] | None = None,
         thickness: int | None = None,
         color: tuple[int, int, int] | None = None,
         radius: int | None = None,
@@ -53,10 +53,12 @@ class Paths:
     ):
         if get_points_to_draw is None:
 
-            def get_points_to_draw(points):
+            def default_get_points(points):
                 return [np.mean(np.array(points), axis=0)]
 
-        self.get_points_to_draw = get_points_to_draw
+            self.get_points_to_draw = default_get_points
+        else:
+            self.get_points_to_draw = get_points_to_draw
 
         self.radius = radius
         self.thickness = thickness
@@ -66,7 +68,7 @@ class Paths:
 
     def draw(
         self, frame: np.ndarray, tracked_objects: Sequence[TrackedObject]
-    ) -> np.array:
+    ) -> np.ndarray:
         """
         Draw the paths of the points interest on a frame.
 
@@ -134,7 +136,7 @@ class AbsolutePaths:
 
     Parameters
     ----------
-    get_points_to_draw : Optional[Callable[[np.array], np.array]], optional
+    get_points_to_draw : Optional[Callable[[np.ndarray], np.ndarray]], optional
         Function that takes a list of points (the `.estimate` attribute of a [`TrackedObject`][norfair.tracker.TrackedObject])
         and returns a list of points for which we want to draw their paths.
 
@@ -163,7 +165,7 @@ class AbsolutePaths:
 
     def __init__(
         self,
-        get_points_to_draw: Callable[[np.array], np.array] | None = None,
+        get_points_to_draw: Callable[[np.ndarray], np.ndarray] | None = None,
         thickness: int | None = None,
         color: tuple[int, int, int] | None = None,
         radius: int | None = None,
@@ -171,10 +173,12 @@ class AbsolutePaths:
     ):
         if get_points_to_draw is None:
 
-            def get_points_to_draw(points):
+            def default_get_points(points):
                 return [np.mean(np.array(points), axis=0)]
 
-        self.get_points_to_draw = get_points_to_draw
+            self.get_points_to_draw = default_get_points
+        else:
+            self.get_points_to_draw = get_points_to_draw
 
         self.radius = radius
         self.thickness = thickness
@@ -201,7 +205,14 @@ class AbsolutePaths:
 
             points_to_draw = self.get_points_to_draw(obj.get_estimate(absolute=True))
 
-            for point in coord_transform.abs_to_rel(points_to_draw):
+            # Convert from absolute to relative coordinates if transform is provided
+            points_rel = (
+                coord_transform.abs_to_rel(points_to_draw)
+                if coord_transform is not None
+                else points_to_draw
+            )
+
+            for point in points_rel:
                 Drawer.circle(
                     frame,
                     position=tuple(point.astype(int)),
@@ -213,11 +224,20 @@ class AbsolutePaths:
             last = points_to_draw
             for i, past_points in enumerate(self.past_points[obj.id]):
                 overlay = frame.copy()
-                last = coord_transform.abs_to_rel(last)
-                for j, point in enumerate(coord_transform.abs_to_rel(past_points)):
+                last_rel = (
+                    coord_transform.abs_to_rel(last)
+                    if coord_transform is not None
+                    else last
+                )
+                past_points_rel = (
+                    coord_transform.abs_to_rel(past_points)
+                    if coord_transform is not None
+                    else past_points
+                )
+                for j, point in enumerate(past_points_rel):
                     Drawer.line(
                         overlay,
-                        tuple(last[j].astype(int)),
+                        tuple(last_rel[j].astype(int)),
                         tuple(point.astype(int)),
                         color=color,
                         thickness=self.thickness,
