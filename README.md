@@ -1,5 +1,13 @@
 # norfair-enough
 
+[![CI](https://github.com/akator-de/norfair-enough/actions/workflows/ci.yml/badge.svg)](https://github.com/akator-de/norfair-enough/actions/workflows/ci.yml)
+[![Lint](https://github.com/akator-de/norfair-enough/actions/workflows/lint.yml/badge.svg)](https://github.com/akator-de/norfair-enough/actions/workflows/lint.yml)
+[![codecov](https://codecov.io/gh/akator-de/norfair-enough/graph/badge.svg)](https://codecov.io/gh/akator-de/norfair-enough)
+[![PyPI](https://img.shields.io/pypi/v/norfair-enough)](https://pypi.org/project/norfair-enough/)
+[![Python](https://img.shields.io/pypi/pyversions/norfair-enough)](https://pypi.org/project/norfair-enough/)
+[![Docs](https://img.shields.io/badge/docs-dev-blue)](https://akator-de.github.io/norfair-enough/)
+[![License](https://img.shields.io/github/license/akator-de/norfair-enough)](https://github.com/akator-de/norfair-enough/blob/main/LICENSE)
+
 **A maintained fork of [tryolabs/norfair](https://github.com/tryolabs/norfair)** — lightweight Python library for real-time multi-object tracking.
 
 The upstream Norfair repository is no longer actively maintained. This fork keeps the library alive for production use. There is no claim to be the official successor — just a pragmatic continuation. New maintainers are welcome.
