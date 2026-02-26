@@ -199,13 +199,13 @@ def test_camera_motion(mock_coordinate_transformation):
             [detection], coord_transformations=coord_transformation_mock
         )
 
-        # assert that the detection was correctly updated
+        # assert that the caller's detection is NOT mutated
         np.testing.assert_equal(
-            detection.absolute_points, validate_points(absolute_points)
+            detection.absolute_points, validate_points(relative_points)
         )
         np.testing.assert_equal(detection.points, validate_points(relative_points))
 
-        # check the tracked_object
+        # check the tracked_object (internal copy has transformed coordinates)
         assert len(tracked_objects) == 1
         obj = tracked_objects[0]
         np.testing.assert_almost_equal(

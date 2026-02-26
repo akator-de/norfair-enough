@@ -1,3 +1,4 @@
+import copy
 import logging
 import threading
 from collections.abc import Callable, Hashable, Sequence
@@ -192,6 +193,11 @@ class Tracker:
         List[TrackedObject]
             The list of active tracked objects.
         """
+        # Shallow-copy detections so the tracker never mutates the caller's objects
+        # (e.g. setting .age or transforming .absolute_points).
+        if detections is not None:
+            detections = [copy.copy(d) for d in detections]
+
         if coord_transformations is not None and detections is not None:
             for det in detections:
                 det.update_coordinate_transformation(coord_transformations)

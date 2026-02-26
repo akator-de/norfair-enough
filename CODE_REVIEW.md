@@ -134,7 +134,7 @@ Not exported despite being public API:
 
 Resources (VideoCapture, OutputVideo) only released on full iterator exhaustion. Early `break` causes resource leak.
 
-### CR-24: `Detection` objects mutated by tracker (`tracker.py:530, 726`) — OPEN
+### CR-24: `Detection` objects mutated by tracker (`tracker.py:530, 726`) — FIXED (PR #21)
 
 Tracker sets `detection.age` on input `Detection` objects. Surprising side effect for callers.
 
@@ -251,7 +251,6 @@ Compound blending doesn't produce the linear fade that `np.linspace(0.99, 0.01, 
 
 | CR | Category | Summary |
 |---|---|---|
-| CR-24 | Design | `Detection` objects mutated by tracker |
 | CR-26 | Design | Fragile `hasattr` type dispatch in distances |
 | CR-28–33 | Performance | Greedy matching, list.remove, ScalarDistance loop, label iteration, frame copies, alpha blending |
 | CR-45 | CI | No macOS/Windows CI |
