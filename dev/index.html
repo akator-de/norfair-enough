@@ -1058,8 +1058,8 @@
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center;"><img alt="Tracking players in a soccer match" src="https://raw.githubusercontent.com/tryolabs/norfair/master/docs/videos/soccer.gif" /></td>
-<td style="text-align: center;"><img alt="Tracking objects in 3D" src="https://raw.githubusercontent.com/tryolabs/norfair/master/docs/videos/3d.gif" /></td>
+<td style="text-align: center;"><img alt="Tracking players in a soccer match" src="https://raw.githubusercontent.com/akator-de/norfair-enough/main/docs/videos/soccer.webp" /></td>
+<td style="text-align: center;"><img alt="Tracking objects in 3D" src="https://raw.githubusercontent.com/akator-de/norfair-enough/main/docs/videos/3d.webp" /></td>
 </tr>
 </tbody>
 </table>
@@ -1136,7 +1136,7 @@ pip<span class="w"> </span>install<span class="w"> </span>norfair-enough<span cl
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">#</a></h2>
 <p>Norfair works by estimating the future position of each point based on its past positions. It then tries to match these estimated positions with newly detected points provided by the detector. For this matching to occur, Norfair can rely on any distance function. There are some predefined distances already integrated in Norfair, and the users can also define their own custom distances. Therefore, each object tracker can be made as simple or as complex as needed.</p>
 <p>As an example we use <a href="https://github.com/facebookresearch/detectron2">Detectron2</a> to get the single point detections to use with this distance function. We just use the centroids of the bounding boxes it produces around cars as our detections, and get the following results.</p>
-<p><img alt="Tracking cars with Norfair" src="https://raw.githubusercontent.com/tryolabs/norfair/master/docs/videos/traffic.gif" /></p>
+<p><img alt="Tracking cars with Norfair" src="https://raw.githubusercontent.com/akator-de/norfair-enough/main/docs/videos/traffic.webp" /></p>
 <p>On the left you can see the points we get from Detectron2, and on the right how Norfair tracks them assigning a unique identifier through time. Even a straightforward distance function like this one can work when the tracking needed is simple.</p>
 <p>Norfair also provides several useful tools for creating a video inference loop. Here is what the full code for creating the previous example looks like, including the code needed to set up Detectron2:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
