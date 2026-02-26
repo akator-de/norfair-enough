@@ -4,7 +4,7 @@ All notable changes to norfair-enough will be documented in this file.
 
 This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2.3.0. Published on PyPI as [`norfair-enough`](https://pypi.org/project/norfair-enough/).
 
-## [2.3.0] - 2025-02-26
+## [2.4.0] - 2025-02-26
 
 ### Breaking Changes
 
