@@ -150,3 +150,6 @@ train/
 # Claude Code
 .claude/
 CLAUDE.md
+
+# Project TODO (local only)
+TODO.md
