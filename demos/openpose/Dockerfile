@@ -50,6 +50,6 @@ RUN cmake \
     ..
 RUN make --jobs `nproc`
 
-RUN pip install git+https://github.com/tryolabs/norfair.git@master
+RUN pip install norfair-enough
 
 WORKDIR /demo/src

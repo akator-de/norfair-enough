@@ -14,7 +14,7 @@ RUN pip install 'git+https://github.com/facebookresearch/detectron2.git'
 # For some reason it doesn't work with latest version of OpenCV
 RUN pip install opencv-python==4.5.5.64
 
-RUN pip install git+https://github.com/tryolabs/norfair.git@master#egg=norfair
+RUN pip install norfair-enough==2.4.0
 
 WORKDIR /demo/src/
 
