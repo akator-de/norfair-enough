@@ -175,13 +175,13 @@ def test_iou():
     # invalid bbox
     det = np.array([[0, 0]])
     obj = np.array([[0, 0]])
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         iou.distance_function(det, obj)
 
     # invalid bbox
     det = np.array([[0, 0, 1, 1, 2, 2]])
     obj = np.array([[0, 0, 2, 2]])
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         iou.distance_function(det, obj)
 
 

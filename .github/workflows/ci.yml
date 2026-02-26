@@ -79,7 +79,7 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync --locked --group test
+        run: uv sync --locked --all-extras --group test
 
       - name: Run tests with coverage
         run: uv run pytest tests/ --ignore=tests/mot_metrics.py --cov=norfair --cov-report=term-missing --cov-report=xml
@@ -152,7 +152,7 @@ jobs:
   #
   release:
     runs-on: ubuntu-24.04
-    needs: [unit-tests, mot-metrics]
+    needs: [unit-tests, mot-metrics, build, install]
     if: github.event_name == 'release'
     env:
       PYTHON_VERSION: "3.12"
