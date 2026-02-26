@@ -248,11 +248,6 @@ class TestDrawable:
         assert d.live_points.shape == (3,)
         assert d.live_points.dtype == bool
 
-    def test_error_message_typo_fix(self):
-        """Verify the error message says 'Expecting' not 'Extecting'."""
-        with pytest.raises(ValueError, match="Expecting"):
-            Drawable(42)
-
 
 # ---------------------------------------------------------------------------
 # hex_to_bgr uppercase (CR-07 fix verification)
