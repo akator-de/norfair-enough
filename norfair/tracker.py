@@ -812,7 +812,7 @@ class Detection:
         if isinstance(scores, np.ndarray):
             if len(scores) != len(self.points):
                 raise ValueError(
-                    "scores should be a np.ndarray with its length being equal to the amount of points."
+                    f"scores should be a np.ndarray with length {len(self.points)}, but got length {len(scores)}."
                 )
             self.scores = scores
         elif scores is not None:

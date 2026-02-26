@@ -451,7 +451,7 @@ class MotionEstimator:
                     p = tuple(prev.astype(int).ravel())
                     cv2.line(frame, c, p, self.flow_color, 2)
                     cv2.circle(frame, c, 3, self.flow_color, -1)
-        except Exception as e:
+        except (cv2.error, ValueError, TypeError) as e:
             logger.warning(e)
 
         update_prvs, coord_transformations = True, None
@@ -460,7 +460,7 @@ class MotionEstimator:
                 update_prvs, coord_transformations = self.transformations_getter(
                     curr_pts, prev_pts
                 )
-            except Exception as e:
+            except (TypeError, ValueError, np.linalg.LinAlgError) as e:
                 logger.warning(e)
                 del self.transformations_getter
                 self.transformations_getter = copy.deepcopy(
