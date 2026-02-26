@@ -302,7 +302,7 @@ class Tracker:
                 )
 
             # Used just for debugging distance function
-            if distance_matrix.any():
+            if distance_matrix.size > 0:
                 for i, minimum in enumerate(distance_matrix.min(axis=0)):
                     objects[i].current_min_distance = (
                         minimum if minimum < distance_threshold else None
