@@ -14,7 +14,7 @@ The upstream Norfair repository is no longer actively maintained. This fork keep
 
 |                                           Tracking players with moving camera                                           |                                           Tracking 3D objects                                           |
 | :---------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------: |
-| ![Tracking players in a soccer match](https://raw.githubusercontent.com/tryolabs/norfair/master/docs/videos/soccer.gif) | ![Tracking objects in 3D](https://raw.githubusercontent.com/tryolabs/norfair/master/docs/videos/3d.gif) |
+| ![Tracking players in a soccer match](https://raw.githubusercontent.com/akator-de/norfair-enough/main/docs/videos/soccer.webp) | ![Tracking objects in 3D](https://raw.githubusercontent.com/akator-de/norfair-enough/main/docs/videos/3d.webp) |
 
 ## Installation
 
@@ -99,7 +99,7 @@ Norfair works by estimating the future position of each point based on its past 
 
 As an example we use [Detectron2](https://github.com/facebookresearch/detectron2) to get the single point detections to use with this distance function. We just use the centroids of the bounding boxes it produces around cars as our detections, and get the following results.
 
-![Tracking cars with Norfair](https://raw.githubusercontent.com/tryolabs/norfair/master/docs/videos/traffic.gif)
+![Tracking cars with Norfair](https://raw.githubusercontent.com/akator-de/norfair-enough/main/docs/videos/traffic.webp)
 
 On the left you can see the points we get from Detectron2, and on the right how Norfair tracks them assigning a unique identifier through time. Even a straightforward distance function like this one can work when the tracking needed is simple.
 
