@@ -1,5 +1,5 @@
+import logging
 from collections.abc import Callable, Hashable, Sequence
-from logging import warning
 from typing import Any
 
 import numpy as np
@@ -14,6 +14,8 @@ from .distances import (
 )
 from .filter import FilterFactory, OptimizedKalmanFilterFactory
 from .utils import validate_points
+
+logger = logging.getLogger(__name__)
 
 
 class Tracker:
@@ -87,7 +89,7 @@ class Tracker:
         initialization_delay: int | None = None,
         pointwise_hit_counter_max: int = 4,
         detection_threshold: float = 0,
-        filter_factory: FilterFactory = OptimizedKalmanFilterFactory(),
+        filter_factory: FilterFactory | None = None,
         past_detections_length: int = 4,
         reid_distance_function: Callable[["TrackedObject", "TrackedObject"], float]
         | None = None,
@@ -96,12 +98,15 @@ class Tracker:
     ):
         self.tracked_objects: list[TrackedObject] = []
 
+        if filter_factory is None:
+            filter_factory = OptimizedKalmanFilterFactory()
+
         # Convert distance_function to Distance object
         distance_obj: Distance
         if isinstance(distance_function, str):
             distance_obj = get_distance_by_name(distance_function)
         elif callable(distance_function):
-            warning(
+            logger.warning(
                 "You are using a scalar distance function. If you want to speed up the"
                 " tracking process please consider using a vectorized distance"
                 f" function such as {AVAILABLE_VECTORIZED_DISTANCES}."
@@ -122,7 +127,7 @@ class Tracker:
             self.past_detections_length = past_detections_length
         else:
             raise ValueError(
-                f"Argument `past_detections_length` is {past_detections_length} and should be larger than 0."
+                f"Argument `past_detections_length` is {past_detections_length} and should be 0 or larger."
             )
 
         if initialization_delay is None:
@@ -655,7 +660,8 @@ class TrackedObject:
         # points which were detected).
         # TODO: Use keypoint confidence information to change R on each sensor instead?
         if detection.scores is not None:
-            assert len(detection.scores.shape) == 1
+            if len(detection.scores.shape) != 1:
+                raise ValueError("Detection scores must be a 1-dimensional array.")
             points_over_threshold_mask = detection.scores > self.detection_threshold
             matched_sensors_mask = np.array(
                 [(m,) * self.dim_points for m in points_over_threshold_mask]
@@ -804,9 +810,10 @@ class Detection:
 
         self.scores: np.ndarray | None
         if isinstance(scores, np.ndarray):
-            assert len(scores) == len(self.points), (
-                "scores should be a np.ndarray with it's length being equal to the amount of points."
-            )
+            if len(scores) != len(self.points):
+                raise ValueError(
+                    f"scores should be a np.ndarray with length {len(self.points)}, but got length {len(scores)}."
+                )
             self.scores = scores
         elif scores is not None:
             self.scores = np.zeros((len(points),)) + scores

@@ -2,8 +2,8 @@
 
 import contextlib
 import copy
+import logging
 from abc import ABC, abstractmethod
-from logging import warning
 
 import numpy as np
 
@@ -13,6 +13,8 @@ except ImportError:
     from .utils import DummyOpenCVImport
 
     cv2 = DummyOpenCVImport()
+
+logger = logging.getLogger(__name__)
 
 
 #
@@ -232,7 +234,7 @@ class HomographyTransformationGetter(TransformationGetter):
             and isinstance(curr_pts, np.ndarray)
             and curr_pts.shape[0] >= 4
         ):
-            warning(
+            logger.warning(
                 "The homography couldn't be computed in this frame "
                 "due to low amount of points"
             )
@@ -449,8 +451,8 @@ class MotionEstimator:
                     p = tuple(prev.astype(int).ravel())
                     cv2.line(frame, c, p, self.flow_color, 2)
                     cv2.circle(frame, c, 3, self.flow_color, -1)
-        except Exception as e:
-            warning(e)
+        except (cv2.error, ValueError, TypeError) as e:
+            logger.warning(e)
 
         update_prvs, coord_transformations = True, None
         if curr_pts is not None and prev_pts is not None:
@@ -458,8 +460,8 @@ class MotionEstimator:
                 update_prvs, coord_transformations = self.transformations_getter(
                     curr_pts, prev_pts
                 )
-            except Exception as e:
-                warning(e)
+            except (TypeError, ValueError, np.linalg.LinAlgError) as e:
+                logger.warning(e)
                 del self.transformations_getter
                 self.transformations_getter = copy.deepcopy(
                     self.transformations_getter_copy
