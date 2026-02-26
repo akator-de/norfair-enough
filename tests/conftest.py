@@ -1,7 +1,15 @@
 import numpy as np
 import pytest
 
+from norfair.tracker import _TrackedObjectFactory
 from norfair.utils import validate_points
+
+
+@pytest.fixture(autouse=True)
+def reset_global_count():
+    """Reset TrackedObject global count before each test for isolation."""
+    _TrackedObjectFactory.global_count = 0
+    yield
 
 
 @pytest.fixture

@@ -1,17 +1,13 @@
 import os.path
-import sys
-import warnings
 
-# Check for NumPy 2.0+ compatibility
 import numpy as np
+import pytest
 
 if np.__version__.split(".")[0] >= "2":
-    warnings.warn(
-        "MOT metrics tests are not compatible with NumPy 2.0+. "
-        "Skipping these tests. To run MOT metrics tests, use NumPy < 2.0.",
-        stacklevel=1,
+    pytest.skip(
+        "motmetrics incompatible with NumPy 2.x",
+        allow_module_level=True,
     )
-    sys.exit(0)
 
 import pandas as pd
 

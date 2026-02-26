@@ -323,3 +323,72 @@ def test_scipy_distance(mock_obj, mock_det):
     assert isinstance(dist_matrix, np.ndarray)
     assert dist_matrix.shape == (1, 1)
     assert dist_matrix[0, 0] == 1.0
+
+
+def test_vectorized_distance_with_labels(mock_obj, mock_det):
+    """Test that VectorizedDistance handles labels correctly."""
+
+    def distance_function(cands, objs):
+        return np.full(
+            (len(cands), len(objs)),
+            fill_value=0.5,
+            dtype=np.float32,
+        )
+
+    vd = VectorizedDistance(distance_function)
+
+    det_car = mock_det([[1, 2], [3, 4]], label="car")
+    det_person = mock_det([[5, 6], [7, 8]], label="person")
+    obj_car = mock_obj([[1, 2], [3, 4]], label="car")
+    obj_person = mock_obj([[5, 6], [7, 8]], label="person")
+
+    dist_matrix = vd.get_distances([obj_car, obj_person], [det_car, det_person])
+
+    assert dist_matrix.shape == (2, 2)
+    # Same label should have finite distance
+    assert dist_matrix[0, 0] == 0.5  # car-car
+    assert dist_matrix[1, 1] == 0.5  # person-person
+    # Different labels should be inf
+    assert dist_matrix[0, 1] == np.inf  # car-person
+    assert dist_matrix[1, 0] == np.inf  # person-car
+
+
+def test_iou_multi_box():
+    """Test IoU with multiple boxes (NxM distance matrix)."""
+    from norfair.distances import iou
+
+    candidates = np.array(
+        [
+            [0, 0, 2, 2],
+            [3, 3, 5, 5],
+        ]
+    )
+    objects = np.array(
+        [
+            [0, 0, 2, 2],
+            [1, 1, 3, 3],
+            [3, 3, 5, 5],
+        ]
+    )
+
+    dist = iou(candidates, objects)
+    assert dist.shape == (2, 3)
+    # Perfect match for first candidate with first object
+    np.testing.assert_almost_equal(dist[0, 0], 0.0)
+    # Perfect match for second candidate with third object
+    np.testing.assert_almost_equal(dist[1, 2], 0.0)
+    # No overlap between first candidate and third object
+    np.testing.assert_almost_equal(dist[0, 2], 1.0)
+
+
+def test_scalar_distance_label_mismatch(mock_obj, mock_det):
+    """Test that ScalarDistance warns when some detections have labels and some don't."""
+    fro = ScalarDistance(frobenius)
+
+    det_with_label = mock_det([[1, 2], [3, 4]], label="car")
+    obj_no_label = mock_obj([[1, 2], [3, 4]], label=None)
+
+    dist_matrix = fro.get_distances([obj_no_label], [det_with_label])
+
+    # Should be inf because labels don't match
+    assert dist_matrix[0, 0] == np.inf
