@@ -1,3 +1,4 @@
+import contextlib
 import os
 import time
 from typing import TYPE_CHECKING, Any
@@ -187,21 +188,25 @@ class Video:
                 f"[white]Output video file saved to: {self.get_output_file_path()}[/white]"
             )
         self.video_capture.release()
-        cv2.destroyAllWindows()
+        with contextlib.suppress(cv2.error):
+            cv2.destroyAllWindows()
 
     # This is a generator, note the yield keyword below.
     def __iter__(self):
+        if self._closed:
+            raise RuntimeError("Cannot iterate over a closed Video")
         try:
             with self.progress_bar as progress_bar:
                 start = time.time()
 
                 # Iterate over video
                 while True:
-                    self.frame_counter += 1
                     ret, frame = self.video_capture.read()
                     if ret is False or frame is None:
                         break
-                    process_fps = self.frame_counter / (time.time() - start)
+                    self.frame_counter += 1
+                    elapsed = time.time() - start
+                    process_fps = self.frame_counter / elapsed if elapsed > 0 else 0.0
                     progress_bar.update(
                         self.task, advance=1, refresh=True, process_fps=process_fps
                     )
