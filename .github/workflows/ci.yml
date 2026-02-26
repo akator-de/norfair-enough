@@ -134,7 +134,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Download a single artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: norfair-dist
           path: ./norfair-dist
