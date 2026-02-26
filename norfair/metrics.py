@@ -109,6 +109,14 @@ class PredictionsTextFile:
         if self.frame_number > self.length:
             self.text_file.close()
 
+    def close(self):
+        """Close the underlying file handle."""
+        if hasattr(self, "text_file") and self.text_file and not self.text_file.closed:
+            self.text_file.close()
+
+    def __del__(self):
+        self.close()
+
 
 class DetectionFileParser:
     """Get Norfair detections from MOTChallenge text files containing detections"""
@@ -225,14 +233,7 @@ class Accumulators:
                     -1,
                     -1,
                 ]
-                if np.shape(self.matrix_predictions)[0] == 0:
-                    self.matrix_predictions = new_row
-                else:
-                    self.matrix_predictions = (
-                        np.vstack(  # pyrefly: ignore[bad-assignment]
-                            (self.matrix_predictions, new_row)
-                        )
-                    )
+                self.matrix_predictions.append(new_row)
         self.frame_number += 1
         # Advance in progress bar
         try:

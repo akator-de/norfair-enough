@@ -246,8 +246,8 @@ class Video:
             frame = cv2.resize(
                 frame,
                 (
-                    frame.shape[1] // downsample_ratio,
-                    frame.shape[0] // downsample_ratio,
+                    int(frame.shape[1] / downsample_ratio),
+                    int(frame.shape[0] / downsample_ratio),
                 ),
             )
         cv2.imshow("Output", frame)
@@ -268,7 +268,7 @@ class Video:
             return self.output_path
 
         if self.input_path is not None:
-            file_name = self.input_path.split("/")[-1].split(".")[0]
+            file_name = os.path.splitext(os.path.basename(self.input_path))[0]
         else:
             file_name = f"camera_{self.camera}"
         file_name = f"{file_name}_out.{self.output_extension}"
@@ -280,7 +280,7 @@ class Video:
             return self.output_fourcc
 
         # Default codecs for each extension
-        extension = filename[-3:].lower()
+        extension = os.path.splitext(filename)[1].lstrip(".").lower()
         if extension == "avi":
             return "XVID"
         elif extension == "mp4":

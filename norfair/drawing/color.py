@@ -25,14 +25,14 @@ def hex_to_bgr(hex_value: str) -> ColorType:
     ValueError
         if the string is invalid
     """
-    if re.match("#[a-f0-9]{6}$", hex_value):
+    if re.match("#[a-fA-F0-9]{6}$", hex_value):
         return (
             int(hex_value[5:7], 16),
             int(hex_value[3:5], 16),
             int(hex_value[1:3], 16),
         )
 
-    if re.match("#[a-f0-9]{3}$", hex_value):
+    if re.match("#[a-fA-F0-9]{3}$", hex_value):
         return (
             int(hex_value[3] * 2, 16),
             int(hex_value[2] * 2, 16),
