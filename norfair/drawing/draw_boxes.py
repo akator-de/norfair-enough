@@ -194,8 +194,8 @@ def draw_tracked_boxes(
     label_size: int | None = None,
     label_width: int | None = None,
 ) -> np.ndarray:
-    "**Deprecated**. Use [`draw_box`][norfair.drawing.draw_boxes.draw_boxes]"
-    warn_once("draw_tracked_boxes is deprecated, use draw_box instead")
+    "**Deprecated**. Use [`draw_boxes`][norfair.drawing.draw_boxes.draw_boxes]"
+    warn_once("draw_tracked_boxes is deprecated, use draw_boxes instead")
     # Determine color - default to "by_id" if border_colors is None
     selected_color: ColorLike = (
         "by_label"

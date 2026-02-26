@@ -257,4 +257,11 @@ class AbsolutePaths:
             # pyrefly: ignore[bad-argument-type]
             self.past_points[obj.id].insert(0, points_to_draw)
             self.past_points[obj.id] = self.past_points[obj.id][: self.max_history]
+
+        # Clean up dead objects to prevent memory leak
+        active_ids = {obj.id for obj in tracked_objects}
+        dead_ids = [k for k in self.past_points if k not in active_ids]
+        for k in dead_ids:
+            del self.past_points[k]
+
         return frame
