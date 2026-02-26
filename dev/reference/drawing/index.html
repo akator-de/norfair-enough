@@ -4776,7 +4776,7 @@ By default, False is used which means the points are drawn as if the camera were
     <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">shape</span>
 
     <span class="c1"># get absolute points grid</span>
-    <span class="n">points</span> <span class="o">=</span> <span class="n">_get_grid</span><span class="p">(</span><span class="n">grid_size</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">polar</span><span class="o">=</span><span class="n">polar</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">_get_grid</span><span class="p">(</span><span class="n">grid_size</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">polar</span><span class="o">=</span><span class="n">polar</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="c1"># transform the points to relative coordinates</span>
     <span class="k">if</span> <span class="n">coord_transformations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -4900,12 +4900,7 @@ By default, False is used which means the points are drawn as if the camera were
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/drawing/draw_points.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span>
 <span class="normal">194</span>
@@ -4952,7 +4947,12 @@ By default, False is used which means the points are drawn as if the camera were
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
-<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw_tracked_objects</span><span class="p">(</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw_tracked_objects</span><span class="p">(</span>
     <span class="n">frame</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span>
     <span class="n">radius</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4991,7 +4991,7 @@ By default, False is used which means the points are drawn as if the camera were
     <span class="k">elif</span> <span class="n">id_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">text_size_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">id_size</span><span class="p">)</span>
 
-    <span class="n">_draw_points_alias</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">_draw_points_alias</span><span class="p">(</span>
         <span class="n">frame</span><span class="o">=</span><span class="n">frame</span><span class="p">,</span>
         <span class="n">drawables</span><span class="o">=</span><span class="n">objects</span><span class="p">,</span>
         <span class="n">color</span><span class="o">=</span><span class="n">selected_color</span><span class="p">,</span>
@@ -5550,7 +5550,12 @@ All points of a detection are considered to be alive.</p>
 <span class="normal">175</span>
 <span class="normal">176</span>
 <span class="normal">177</span>
-<span class="normal">178</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw_points</span><span class="p">(</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw_points</span><span class="p">(</span>
     <span class="n">frame</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">drawables</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Detection</span><span class="p">]</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">TrackedObject</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">radius</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -5700,20 +5705,25 @@ All points of a detection are considered to be alive.</p>
                     <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">draw_labels</span> <span class="ow">or</span> <span class="n">draw_ids</span> <span class="ow">or</span> <span class="n">draw_scores</span><span class="p">:</span>
-            <span class="n">position</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">live_points</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">position</span> <span class="o">-=</span> <span class="n">radius</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">_build_text</span><span class="p">(</span>
-                <span class="n">d</span><span class="p">,</span> <span class="n">draw_labels</span><span class="o">=</span><span class="n">draw_labels</span><span class="p">,</span> <span class="n">draw_ids</span><span class="o">=</span><span class="n">draw_ids</span><span class="p">,</span> <span class="n">draw_scores</span><span class="o">=</span><span class="n">draw_scores</span>
-            <span class="p">)</span>
+            <span class="n">live</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">points</span><span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">live_points</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">live</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">position</span> <span class="o">=</span> <span class="n">live</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">position</span> <span class="o">-=</span> <span class="n">radius</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">_build_text</span><span class="p">(</span>
+                    <span class="n">d</span><span class="p">,</span>
+                    <span class="n">draw_labels</span><span class="o">=</span><span class="n">draw_labels</span><span class="p">,</span>
+                    <span class="n">draw_ids</span><span class="o">=</span><span class="n">draw_ids</span><span class="p">,</span>
+                    <span class="n">draw_scores</span><span class="o">=</span><span class="n">draw_scores</span><span class="p">,</span>
+                <span class="p">)</span>
 
-            <span class="n">Drawer</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
-                <span class="n">frame</span><span class="p">,</span>
-                <span class="n">text</span><span class="p">,</span>
-                <span class="nb">tuple</span><span class="p">(</span><span class="n">position</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)),</span>  <span class="c1"># pyrefly: ignore[bad-argument-type]</span>
-                <span class="n">size</span><span class="o">=</span><span class="n">text_size</span><span class="p">,</span>
-                <span class="n">color</span><span class="o">=</span><span class="n">obj_text_color</span><span class="p">,</span>
-                <span class="n">thickness</span><span class="o">=</span><span class="n">text_thickness</span><span class="p">,</span>
-            <span class="p">)</span>
+                <span class="n">Drawer</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+                    <span class="n">frame</span><span class="p">,</span>
+                    <span class="n">text</span><span class="p">,</span>
+                    <span class="nb">tuple</span><span class="p">(</span><span class="n">position</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)),</span>  <span class="c1"># pyrefly: ignore[bad-argument-type]</span>
+                    <span class="n">size</span><span class="o">=</span><span class="n">text_size</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">obj_text_color</span><span class="p">,</span>
+                    <span class="n">thickness</span><span class="o">=</span><span class="n">text_thickness</span><span class="p">,</span>
+                <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">frame</span>
 </code></pre></div></td></tr></table></div>
@@ -5738,12 +5748,7 @@ All points of a detection are considered to be alive.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/drawing/draw_points.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span>
 <span class="normal">194</span>
@@ -5790,7 +5795,12 @@ All points of a detection are considered to be alive.</p>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
-<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw_tracked_objects</span><span class="p">(</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw_tracked_objects</span><span class="p">(</span>
     <span class="n">frame</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span>
     <span class="n">radius</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -5829,7 +5839,7 @@ All points of a detection are considered to be alive.</p>
     <span class="k">elif</span> <span class="n">id_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">text_size_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">id_size</span><span class="p">)</span>
 
-    <span class="n">_draw_points_alias</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">_draw_points_alias</span><span class="p">(</span>
         <span class="n">frame</span><span class="o">=</span><span class="n">frame</span><span class="p">,</span>
         <span class="n">drawables</span><span class="o">=</span><span class="n">objects</span><span class="p">,</span>
         <span class="n">color</span><span class="o">=</span><span class="n">selected_color</span><span class="p">,</span>
@@ -9874,7 +9884,7 @@ By default, False is used which means the points are drawn as if the camera were
     <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">shape</span>
 
     <span class="c1"># get absolute points grid</span>
-    <span class="n">points</span> <span class="o">=</span> <span class="n">_get_grid</span><span class="p">(</span><span class="n">grid_size</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">polar</span><span class="o">=</span><span class="n">polar</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">_get_grid</span><span class="p">(</span><span class="n">grid_size</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">polar</span><span class="o">=</span><span class="n">polar</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="c1"># transform the points to relative coordinates</span>
     <span class="k">if</span> <span class="n">coord_transformations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

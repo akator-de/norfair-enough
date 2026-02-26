@@ -7849,7 +7849,7 @@ If used, this argument (<code>reid_hit_counter_max</code>) defines how long an o
                 <span class="p">)</span>
 
             <span class="c1"># Used just for debugging distance function</span>
-            <span class="k">if</span> <span class="n">distance_matrix</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">distance_matrix</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">minimum</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">distance_matrix</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)):</span>
                     <span class="n">objects</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">current_min_distance</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="n">minimum</span> <span class="k">if</span> <span class="n">minimum</span> <span class="o">&lt;</span> <span class="n">distance_threshold</span> <span class="k">else</span> <span class="kc">None</span>
@@ -9215,7 +9215,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;camera_</span><span class="si">{self.camera}</span><span class="s2">&quot;</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;camera_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">_out.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_extension</span><span class="si">}</span><span class="s2">&quot;</span>
 
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
@@ -9631,7 +9631,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">file_name</span> <span class="o">=</span> <span class="s2">&quot;camera_</span><span class="si">{self.camera}</span><span class="s2">&quot;</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;camera_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">_out.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_extension</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
@@ -11055,7 +11055,7 @@ By default, False is used which means the points are drawn as if the camera were
     <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">shape</span>
 
     <span class="c1"># get absolute points grid</span>
-    <span class="n">points</span> <span class="o">=</span> <span class="n">_get_grid</span><span class="p">(</span><span class="n">grid_size</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">polar</span><span class="o">=</span><span class="n">polar</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">_get_grid</span><span class="p">(</span><span class="n">grid_size</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">polar</span><span class="o">=</span><span class="n">polar</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="c1"># transform the points to relative coordinates</span>
     <span class="k">if</span> <span class="n">coord_transformations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -11179,12 +11179,7 @@ By default, False is used which means the points are drawn as if the camera were
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/drawing/draw_points.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
-<span class="normal">191</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span>
 <span class="normal">194</span>
@@ -11231,7 +11226,12 @@ By default, False is used which means the points are drawn as if the camera were
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
-<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw_tracked_objects</span><span class="p">(</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw_tracked_objects</span><span class="p">(</span>
     <span class="n">frame</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span>
     <span class="n">radius</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -11270,7 +11270,7 @@ By default, False is used which means the points are drawn as if the camera were
     <span class="k">elif</span> <span class="n">id_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">text_size_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">id_size</span><span class="p">)</span>
 
-    <span class="n">_draw_points_alias</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">_draw_points_alias</span><span class="p">(</span>
         <span class="n">frame</span><span class="o">=</span><span class="n">frame</span><span class="p">,</span>
         <span class="n">drawables</span><span class="o">=</span><span class="n">objects</span><span class="p">,</span>
         <span class="n">color</span><span class="o">=</span><span class="n">selected_color</span><span class="p">,</span>
