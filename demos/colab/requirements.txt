@@ -3,4 +3,4 @@ torchvision==0.13.1
 rich==12.5.1
 opencv-python==4.6.0.66
 tqdm==4.64.1
-git+https://github.com/tryolabs/norfair.git@master
+norfair-enough==2.4.0

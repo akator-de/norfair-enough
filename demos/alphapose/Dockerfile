@@ -44,6 +44,6 @@ RUN pip3 install gdown==4.4.0 && \
 # if you want to use yolox-x as the detector
 # RUN wget -P /root/AlphaPose/detector/yolox/data/ https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.0/yolox_x.pth
 
-RUN pip install git+https://github.com/tryolabs/norfair.git@master#egg=norfair
+RUN pip install norfair-enough
 
 WORKDIR /root/AlphaPose/

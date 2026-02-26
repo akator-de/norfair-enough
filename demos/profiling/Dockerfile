@@ -11,7 +11,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-# install torch2trt and trt-pose and norfair
+# install torch2trt and trt-pose and norfair-enough
 WORKDIR /
 RUN git clone https://github.com/NVIDIA-AI-IOT/torch2trt && \
     git clone https://github.com/NVIDIA-AI-IOT/trt_pose
@@ -25,6 +25,6 @@ RUN python setup.py install && \
     gdown --id 1XYDdCUdiF2xxx4rznmLb62SdOUZuoNbd
 
 WORKDIR /
-RUN pip install git+https://github.com/tryolabs/norfair.git@master
+RUN pip install norfair-enough
 
 WORKDIR /demo/src/

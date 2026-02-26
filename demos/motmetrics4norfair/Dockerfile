@@ -35,6 +35,6 @@ RUN pip install -r requirements.txt && \
     pip install cython_bbox
 
 WORKDIR /
-RUN pip install git+https://github.com/tryolabs/norfair.git@master#egg=norfair[metrics,video]
+RUN pip install norfair-enough[metrics,video]
 
 WORKDIR /demo/src/
