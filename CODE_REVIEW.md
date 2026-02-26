@@ -130,7 +130,7 @@ Not exported despite being public API:
 
 `DummyOpenCVImport.__getattribute__` blocks ALL attribute access including `__class__`, `__repr__` etc. `__getattr__` would be sufficient and preserve basic introspection.
 
-### CR-23: No context manager for `Video` (`video.py:182-188`) — OPEN
+### CR-23: No context manager for `Video` (`video.py:182-188`) — FIXED (PR #20)
 
 Resources (VideoCapture, OutputVideo) only released on full iterator exhaustion. Early `break` causes resource leak.
 
@@ -251,7 +251,6 @@ Compound blending doesn't produce the linear fade that `np.linspace(0.99, 0.01, 
 
 | CR | Category | Summary |
 |---|---|---|
-| CR-23 | Design | No context manager for `Video` (resource leak on early break) |
 | CR-24 | Design | `Detection` objects mutated by tracker |
 | CR-26 | Design | Fragile `hasattr` type dispatch in distances |
 | CR-28–33 | Performance | Greedy matching, list.remove, ScalarDistance loop, label iteration, frame copies, alpha blending |
