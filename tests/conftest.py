@@ -17,10 +17,6 @@ def mock_det():
     def _make_detection(points, scores=None, label=None):
         if not isinstance(points, np.ndarray):
             points = np.array(points)
-        if scores is not None and not isinstance(scores, np.ndarray):
-            scores = np.array(scores)
-            if scores.ndim == 0 and points.shape[0] > 1:
-                scores = np.full(points.shape[0], scores)
         return Detection(points=points, scores=scores, label=label)
 
     return _make_detection

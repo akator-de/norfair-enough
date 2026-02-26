@@ -187,6 +187,8 @@ class VectorizedDistance(Distance):
             dtype=np.float32,
         )
 
+        from .tracker import Detection
+
         object_labels = np.array([o.label for o in objects]).astype(str)
         candidate_labels = np.array([c.label for c in candidates]).astype(str)
 
@@ -203,8 +205,6 @@ class VectorizedDistance(Distance):
                 if str(o.label) == label:
                     stacked_objects.append(o.estimate.ravel())
             stacked_objects = np.stack(stacked_objects)
-
-            from .tracker import Detection
 
             stacked_candidates = []
             for c in candidates:
