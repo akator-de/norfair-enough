@@ -1,4 +1,5 @@
 import logging
+import threading
 from collections.abc import Callable, Hashable, Sequence
 from typing import Any
 
@@ -79,6 +80,13 @@ class Tracker:
         Each tracked object keeps an internal ReID hit counter which tracks how often it's getting recognized by another tracker,
         each time it gets a match this counter goes up, and each time it doesn't it goes down. If it goes below 0 the object gets destroyed.
         If used, this argument (`reid_hit_counter_max`) defines how long an object can live without getting matched to any detections, before it is destroyed.
+
+    Notes
+    -----
+    Individual ``Tracker`` instances are **not** thread-safe; do not call
+    ``update`` on the same instance from multiple threads. However, using
+    separate ``Tracker`` instances in different threads is safe — the shared
+    ``global_id`` counter is protected by a lock.
     """
 
     def __init__(
@@ -399,6 +407,7 @@ class Tracker:
 
 class _TrackedObjectFactory:
     global_count = 0
+    _lock = threading.Lock()
 
     def __init__(self) -> None:
         self.count = 0
@@ -438,8 +447,9 @@ class _TrackedObjectFactory:
 
     def get_ids(self) -> tuple[int, int]:
         self.count += 1
-        _TrackedObjectFactory.global_count += 1
-        return self.count, _TrackedObjectFactory.global_count
+        with _TrackedObjectFactory._lock:
+            _TrackedObjectFactory.global_count += 1
+            return self.count, _TrackedObjectFactory.global_count
 
 
 class TrackedObject:

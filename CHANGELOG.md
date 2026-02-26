@@ -26,6 +26,7 @@ This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2
 - Fix various typos and placeholder docstrings
 
 ### Changed
+- Protect `TrackedObject.global_id` counter with a lock for thread safety
 - Replace mutable default argument in `Tracker.__init__`
 - Unify logging to use `logging.getLogger(__name__)` across all modules
 - Replace `assert` with `ValueError` for input validation
