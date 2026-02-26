@@ -106,7 +106,6 @@ unsupported-operation = false
 
 [tool.ruff]
 line-length = 88
-extend-exclude = ["demos"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]

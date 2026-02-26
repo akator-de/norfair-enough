@@ -112,7 +112,7 @@ for input_path in sequences_paths:
     img_size = [info_file.search("imHeight"), info_file.search("imWidth")]
 
     byte_tracked_objects = []
-    for frame_number, detections in enumerate(all_detections):
+    for _frame_number, detections in enumerate(all_detections):
         byte_detections = []
         for det in detections:
             byte_det = np.append(det.points.reshape((1, -1)), det.scores[0])

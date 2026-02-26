@@ -1,15 +1,15 @@
-from typing import List
+from __future__ import annotations
 
 import numpy as np
 from sahi.predict import get_prediction, get_sliced_prediction
 from sahi.prediction import PredictionResult
 from utils import create_arg_parser, obtain_detection_model
 
-from norfair import Detection, Tracker, Video, draw_boxes, draw_tracked_boxes
+from norfair import Detection, Tracker, Video, draw_boxes
 from norfair.filter import OptimizedKalmanFilterFactory
 
 
-def get_detections(object_prediction_list: PredictionResult) -> List[Detection]:
+def get_detections(object_prediction_list: PredictionResult) -> list[Detection]:
     detections = []
     for prediction in object_prediction_list:
         bbox = prediction.bbox
@@ -55,6 +55,7 @@ def main(
 
     video = Video(input_path=video_path, output_path=output_path)
 
+    detections = []
     for i, frame in enumerate(video):
         if i % skip_period == 0:
             if enable_sahi:
@@ -75,7 +76,7 @@ def main(
             tracked_objects = tracker.update()
 
         draw_boxes(frame, detections)
-        draw_tracked_boxes(frame, tracked_objects)
+        draw_boxes(frame, tracked_objects)
         video.write(frame)
 
 

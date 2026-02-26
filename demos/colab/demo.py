@@ -1,5 +1,4 @@
 import argparse
-from typing import List
 
 import numpy as np
 from draw import center, draw
@@ -13,7 +12,7 @@ DISTANCE_THRESHOLD_CENTROID: float = 0.08
 
 
 def inference(
-    input_video: str, model: str, track_points: str, model_threshold: str, classes: List
+    input_video: str, model: str, track_points: str, model_threshold: str, classes: list
 ):
     coord_transformations = None
     paths_drawer = None

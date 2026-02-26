@@ -57,9 +57,8 @@ class DataWriter:
         else:
             self.result_queue = mp.Queue(maxsize=queueSize)
 
-        if opt.save_img:
-            if not os.path.exists(opt.outputpath + "/vis"):
-                os.mkdir(opt.outputpath + "/vis")
+        if opt.save_img and not os.path.exists(opt.outputpath + "/vis"):
+            os.mkdir(opt.outputpath + "/vis")
 
         if opt.pose_flow:
             from trackers.PoseFlow.poseflow_infer import PoseFlowWrapper
@@ -274,9 +273,7 @@ class DataWriter:
                     tracked_objects = self.tracker.update(detections=detections)
                     norfair.draw_tracked_objects(img, tracked_objects)
 
-                    if hm_data.size()[1] == 49:
-                        pass
-                    elif self.opt.vis_fast:
+                    if hm_data.size()[1] == 49 or self.opt.vis_fast:
                         pass
                     else:
                         pass
@@ -339,10 +336,8 @@ class DataWriter:
     def recognize_video_ext(self, ext=""):
         if ext == "mp4":
             return cv2.VideoWriter_fourcc(*"mp4v"), "." + ext
-        elif ext == "avi":
-            return cv2.VideoWriter_fourcc(*"XVID"), "." + ext
-        elif ext == "mov":
+        elif ext == "avi" or ext == "mov":
             return cv2.VideoWriter_fourcc(*"XVID"), "." + ext
         else:
-            print("Unknow video format {}, will use .mp4 instead of it".format(ext))
+            print(f"Unknow video format {ext}, will use .mp4 instead of it")
             return cv2.VideoWriter_fourcc(*"mp4v"), ".mp4"

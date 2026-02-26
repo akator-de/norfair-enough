@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import cv2
 import numpy as np
 
-from norfair import Palette
+from norfair import Detection, Palette, TrackedObject
 
 CONNECTED_INDEXES = [1, 2, 4, 3, 1, 5, 7, 3, 7, 8, 6, 5, 6, 2, 4, 8]
 
@@ -181,7 +183,7 @@ def draw_3d_tracked_boxes(
     return frame
 
 
-def scaled_euclidean(detection: "Detection", tracked_object: "TrackedObject") -> float:
+def scaled_euclidean(detection: Detection, tracked_object: TrackedObject) -> float:
     """
     Average euclidean distance between the points in detection and estimates in tracked_object, rescaled by the object diagonal
     See `np.linalg.norm`.

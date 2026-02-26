@@ -1,4 +1,4 @@
-FROM ultralytics/yolov5:v6.2
+FROM ultralytics/yolov5:latest
 
 # Install Norfair
 RUN pip install norfair-enough

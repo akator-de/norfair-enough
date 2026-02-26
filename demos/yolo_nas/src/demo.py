@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import argparse
-from typing import List, Optional, Union
 
 import numpy as np
 import super_gradients
@@ -10,32 +11,30 @@ from norfair import Detection, Tracker, Video
 
 DISTANCE_THRESHOLD_BBOX: float = 0.7
 DISTANCE_THRESHOLD_CENTROID: int = 30
-MAX_DISTANCE: int = 10000
 
 
 class YOLO_NAS:
-    def __init__(self, model_name: str, device: Optional[str] = None):
+    def __init__(self, model_name: str, device: str | None = None):
         if device is not None and "cuda" in device and not torch.cuda.is_available():
             raise Exception(
                 "Selected device='cuda', but cuda is not available to Pytorch."
             )
         # automatically set device if its None
-        elif device is None:
+        if device is None:
             device = "cuda:0" if torch.cuda.is_available() else "cpu"
 
         # load model
-        else:
-            self.model = super_gradients.training.models.get(
-                "yolo_nas_l", pretrained_weights="coco"
-            ).cuda()
+        self.model = super_gradients.training.models.get(
+            model_name, pretrained_weights="coco"
+        ).to(device)
 
     def __call__(
         self,
-        img: Union[str, np.ndarray],
+        img: str | np.ndarray,
         conf_threshold: float = 0.35,
         iou_threshold: float = 0.45,
         image_size: int = 720,
-        classes: Optional[List[int]] = None,
+        classes: list[int] | None = None,
     ) -> torch.tensor:
         if classes is not None:
             self.model.classes = classes
@@ -47,9 +46,9 @@ class YOLO_NAS:
 def yolo_detections_to_norfair_detections(
     yolo_detections: torch.tensor,
     track_points: str = "centroid",  # bbox or centroid
-) -> List[Detection]:
+) -> list[Detection]:
     """convert detections_as_xywh to norfair detections"""
-    norfair_detections: List[Detection] = []
+    norfair_detections: list[Detection] = []
 
     if track_points == "centroid":
         detections_as_xywh = yolo_detections.xywh[0]
@@ -74,7 +73,7 @@ def yolo_detections_to_norfair_detections(
         confidence = detections_as_xyxy.prediction.confidence
         bboxes = detections_as_xyxy.prediction.bboxes_xyxy
 
-        for i, (label, conf, bbox_yolo) in enumerate(zip(labels, confidence, bboxes)):
+        for label, conf, bbox_yolo in zip(labels, confidence, bboxes):
             bbox = np.array(
                 [
                     [bbox_yolo[0], bbox_yolo[1]],
@@ -87,25 +86,25 @@ def yolo_detections_to_norfair_detections(
                 Detection(points=bbox, scores=scores, label=class_names[int(label)])
             )
 
-        return norfair_detections
+    return norfair_detections
 
 
 parser = argparse.ArgumentParser(description="Track objects in a video.")
 parser.add_argument("files", type=str, nargs="+", help="Video files to process")
 parser.add_argument(
-    "--model-name", type=str, default="yolovnas", help="YOLOv5 model name"
+    "--model-name", type=str, default="yolo_nas_l", help="YOLO-NAS model name"
 )
 parser.add_argument(
-    "--img-size", type=int, default="720", help="YOLO_nas inference size (pixels)"
+    "--img-size", type=int, default="720", help="YOLO-NAS inference size (pixels)"
 )
 parser.add_argument(
     "--conf-threshold",
     type=float,
     default="0.25",
-    help="YOLOv5 object confidence threshold",
+    help="YOLO-NAS object confidence threshold",
 )
 parser.add_argument(
-    "--iou-threshold", type=float, default="0.45", help="YOLOv5 IOU threshold for NMS"
+    "--iou-threshold", type=float, default="0.45", help="YOLO-NAS IOU threshold for NMS"
 )
 parser.add_argument(
     "--classes",
@@ -154,7 +153,7 @@ for input_path in args.files:
         tracked_objects = tracker.update(detections=detections)
         if args.track_points == "centroid":
             norfair.draw_points(frame, detections)
-            norfair.draw_tracked_objects(frame, tracked_objects)
+            norfair.draw_points(frame, tracked_objects)
         elif args.track_points == "bbox":
             norfair.draw_boxes(frame, detections)
             norfair.draw_boxes(frame, tracked_objects, draw_ids=True)

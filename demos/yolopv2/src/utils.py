@@ -3,7 +3,6 @@ import logging
 import re
 import time
 from pathlib import Path
-from typing import List
 
 import cv2
 import numpy as np
@@ -17,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 def yolop_detections_to_norfair_detections(
     yolop_detections: torch.tensor,
-) -> List[Detection]:
+) -> list[Detection]:
     """convert detections_as_xywh to norfair detections"""
-    norfair_detections: List[Detection] = []
+    norfair_detections: list[Detection] = []
 
     for detection_as_xyxy in yolop_detections[0]:
         # Move to cpu
@@ -140,7 +139,7 @@ def non_max_suppression(
     xc = prediction[..., 4] > conf_thres  # candidates
 
     # Settings
-    min_wh, max_wh = 2, 4096  # (pixels) minimum and maximum box width and height
+    _min_wh, max_wh = 2, 4096  # (pixels) minimum and maximum box width and height
     max_det = 300  # maximum number of detections per image
     max_nms = 30000  # maximum number of boxes into torchvision.ops.nms()
     time_limit = 10.0  # seconds to quit after
@@ -155,11 +154,11 @@ def non_max_suppression(
 
         # Cat apriori labels if autolabelling
         if labels and len(labels[xi]):
-            l = labels[xi]
-            v = torch.zeros((len(l), nc + 5), device=x.device)
-            v[:, :4] = l[:, 1:5]  # box
+            lbl = labels[xi]
+            v = torch.zeros((len(lbl), nc + 5), device=x.device)
+            v[:, :4] = lbl[:, 1:5]  # box
             v[:, 4] = 1.0  # conf
-            v[range(len(l)), l[:, 0].long() + 5] = 1.0  # cls
+            v[range(len(lbl)), lbl[:, 0].long() + 5] = 1.0  # cls
             x = torch.cat((x, v), 0)
 
         # If none remain process next image

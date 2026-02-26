@@ -166,7 +166,7 @@ for input_path in sequences_paths:
             tracked_objects = tracker.update()
 
         x1y1x2y2_tracked_objects = []
-        for n, obj in enumerate(tracked_objects):
+        for obj in tracked_objects:
             half_height = obj.estimate[1, 1] / 2
             half_width = obj.estimate[1, 0] * half_height
             half_size = np.array([half_width, half_height])

@@ -56,7 +56,7 @@ def get_preprocesser(model_width, model_height):
 
 
 def get_postprocesser(video_width, video_height):
-    with open("/trt_pose/tasks/human_pose/human_pose.json", "r") as f:
+    with open("/trt_pose/tasks/human_pose/human_pose.json") as f:
         human_pose = json.load(f)
     topology = trt_pose.coco.coco_category_to_topology(human_pose)
     parse_objects = ParseObjects(topology)
@@ -116,7 +116,7 @@ def get_model(
 
         if pose_decriptor is None:
             # First, let's load the JSON file which describes the human pose task.
-            with open("/trt_pose/tasks/human_pose/human_pose.json", "r") as f:
+            with open("/trt_pose/tasks/human_pose/human_pose.json") as f:
                 pose_decriptor = json.load(f)
 
         # Next, we'll load our model.

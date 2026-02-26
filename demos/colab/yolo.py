@@ -1,5 +1,4 @@
 import os
-from typing import List, Optional, Union
 
 import numpy as np
 import torch
@@ -8,7 +7,7 @@ from norfair import Detection
 
 
 class YOLO:
-    def __init__(self, model_path: str, device: Optional[str] = None):
+    def __init__(self, model_path: str, device: str | None = None):
         if device is not None and "cuda" in device and not torch.cuda.is_available():
             raise Exception(
                 "Selected device='cuda', but cuda is not available to Pytorch."
@@ -25,16 +24,16 @@ class YOLO:
         # load model
         try:
             self.model = torch.hub.load("WongKinYiu/yolov7", "custom", model_path)
-        except:
-            raise Exception("Failed to load model from {}".format(model_path))
+        except Exception as err:
+            raise Exception(f"Failed to load model from {model_path}") from err
 
     def __call__(
         self,
-        img: Union[str, np.ndarray],
+        img: str | np.ndarray,
         conf_threshold: float = 0.25,
         iou_threshold: float = 0.45,
         image_size: int = 720,
-        classes: Optional[List[int]] = None,
+        classes: list[int] | None = None,
     ) -> torch.tensor:
         self.model.conf = conf_threshold
         self.model.iou = iou_threshold
@@ -47,9 +46,9 @@ class YOLO:
 def yolo_detections_to_norfair_detections(
     yolo_detections: torch.tensor,
     track_points: str = "centroid",  # bbox or centroid
-) -> List[Detection]:
+) -> list[Detection]:
     """convert detections_as_xywh to norfair detections"""
-    norfair_detections: List[Detection] = []
+    norfair_detections: list[Detection] = []
 
     if track_points == "centroid":
         detections_as_xywh = yolo_detections.xywh[0]

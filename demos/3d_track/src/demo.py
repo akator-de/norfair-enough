@@ -71,8 +71,8 @@ with mp_objectron.Objectron(
 
                 if args.draw_paths:
                     # initialize path drawer
-                    def get_points_to_draw(points3d):
-                        return [projecter.eye_2_pixel(points3d)[0].astype(int)]
+                    def get_points_to_draw(points3d, _projecter=projecter):
+                        return [_projecter.eye_2_pixel(points3d)[0].astype(int)]
 
                     path_drawer = Paths(get_points_to_draw)
 

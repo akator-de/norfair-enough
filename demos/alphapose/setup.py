@@ -12,7 +12,7 @@ MAJOR = 0
 MINOR = 5
 PATCH = 0
 SUFFIX = ""
-SHORT_VERSION = "{}.{}.{}{}".format(MAJOR, MINOR, PATCH, SUFFIX)
+SHORT_VERSION = f"{MAJOR}.{MINOR}.{PATCH}{SUFFIX}"
 
 version_file = "alphapose/version.py"
 
@@ -55,8 +55,8 @@ def get_hash():
             from alphapose.version import __version__
 
             sha = __version__.split("+")[-1]
-        except ImportError:
-            raise ImportError("Unable to get git version")
+        except ImportError as err:
+            raise ImportError("Unable to get git version") from err
     else:
         sha = "unknown"
 
@@ -78,7 +78,7 @@ short_version = '{}'
 
 
 def get_version():
-    with open(version_file, "r") as f:
+    with open(version_file) as f:
         exec(compile(f.read(), version_file, "exec"))
     return locals()["__version__"]
 
@@ -89,7 +89,7 @@ def make_cython_ext(name, module, sources):
         extra_compile_args = {"cxx": ["-Wno-unused-function", "-Wno-write-strings"]}
 
     extension = Extension(
-        "{}.{}".format(module, name),
+        f"{module}.{name}",
         [os.path.join(*module.split("."), p) for p in sources],
         include_dirs=[np.get_include()],
         language="c++",
@@ -101,7 +101,7 @@ def make_cython_ext(name, module, sources):
 
 def make_cuda_ext(name, module, sources):
     return CUDAExtension(
-        name="{}.{}".format(module, name),
+        name=f"{module}.{name}",
         sources=[os.path.join(*module.split("."), p) for p in sources],
         extra_compile_args={
             "cxx": [],
@@ -182,10 +182,7 @@ def get_install_requires():
 def is_installed(package_name):
     from pip._internal.utils.misc import get_installed_distributions
 
-    for p in get_installed_distributions():
-        if package_name in p.egg_name():
-            return True
-    return False
+    return any(package_name in p.egg_name() for p in get_installed_distributions())
 
 
 if __name__ == "__main__":

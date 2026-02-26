@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.12-slim-bookworm
 
 RUN apt update && \
     apt install -y libgl1 libglib2.0-0 && \

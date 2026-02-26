@@ -1,15 +1,15 @@
 import random
 
-random.seed(1337)
-
 import cv2
 import numpy as np
 import typer
 from utils import get_hist
 from video_generator import generate_video
 
-from norfair import Tracker, Video, draw_points, draw_tracked_objects, get_cutout
+from norfair import Tracker, Video, draw_points, get_cutout
 from norfair.filter import OptimizedKalmanFilterFactory
+
+random.seed(1337)
 
 
 def embedding_distance(matched_not_init_trackers, unmatched_trackers):
@@ -66,6 +66,7 @@ def main(
         )
 
     video = Video(input_path=video_path, output_path=output_path)
+    detections = []
     for i, cv2_frame in enumerate(video):
         if i % skip_period == 0:
             detections = video_predictions[i]
@@ -81,7 +82,7 @@ def main(
         else:
             tracked_objects = tracker.update()
         draw_points(cv2_frame, detections)
-        draw_tracked_objects(cv2_frame, tracked_objects)
+        draw_points(cv2_frame, tracked_objects)
         frame_with_border = np.ones(
             shape=(
                 cv2_frame.shape[0] + 2 * border_size,
