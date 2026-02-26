@@ -160,20 +160,25 @@ def draw_points(
                     )
 
         if draw_labels or draw_ids or draw_scores:
-            position = d.points[d.live_points].mean(axis=0)
-            position -= radius
-            text = _build_text(
-                d, draw_labels=draw_labels, draw_ids=draw_ids, draw_scores=draw_scores
-            )
+            live = d.points[d.live_points]
+            if len(live) > 0:
+                position = live.mean(axis=0)
+                position -= radius
+                text = _build_text(
+                    d,
+                    draw_labels=draw_labels,
+                    draw_ids=draw_ids,
+                    draw_scores=draw_scores,
+                )
 
-            Drawer.text(
-                frame,
-                text,
-                tuple(position.astype(int)),  # pyrefly: ignore[bad-argument-type]
-                size=text_size,
-                color=obj_text_color,
-                thickness=text_thickness,
-            )
+                Drawer.text(
+                    frame,
+                    text,
+                    tuple(position.astype(int)),  # pyrefly: ignore[bad-argument-type]
+                    size=text_size,
+                    color=obj_text_color,
+                    thickness=text_thickness,
+                )
 
     return frame
 
@@ -222,7 +227,7 @@ def draw_tracked_objects(
     elif id_size is not None:
         text_size_value = int(id_size)
 
-    _draw_points_alias(
+    return _draw_points_alias(
         frame=frame,
         drawables=objects,
         color=selected_color,

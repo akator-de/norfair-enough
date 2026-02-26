@@ -270,7 +270,7 @@ class Video:
         if self.input_path is not None:
             file_name = self.input_path.split("/")[-1].split(".")[0]
         else:
-            file_name = "camera_{self.camera}"
+            file_name = f"camera_{self.camera}"
         file_name = f"{file_name}_out.{self.output_extension}"
 
         return os.path.join(self.output_path, file_name)
