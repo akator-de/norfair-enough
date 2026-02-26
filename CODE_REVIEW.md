@@ -119,7 +119,7 @@ Should unify to `logging.getLogger(__name__)`.
 
 Assertions disabled with `python -O`. Should use `if ... raise ValueError(...)`.
 
-### CR-21: Missing public API exports in `__init__.py` — OPEN
+### CR-21: Missing public API exports in `__init__.py` — FIXED (PR #19)
 
 Not exported despite being public API:
 - `TrackedObject`, `Distance`, `FilterFactory`, `ColorLike`
@@ -251,7 +251,6 @@ Compound blending doesn't produce the linear fade that `np.linspace(0.99, 0.01, 
 
 | CR | Category | Summary |
 |---|---|---|
-| CR-21 | Design | Missing public API exports in `__init__.py` |
 | CR-23 | Design | No context manager for `Video` (resource leak on early break) |
 | CR-24 | Design | `Detection` objects mutated by tracker |
 | CR-26 | Design | Fragile `hasattr` type dispatch in distances |

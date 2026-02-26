@@ -17,7 +17,17 @@ Examples
 
 import importlib.metadata
 
+from .camera_motion import (
+    CoordinatesTransformation,
+    HomographyTransformation,
+    HomographyTransformationGetter,
+    MotionEstimator,
+    TransformationGetter,
+    TranslationTransformation,
+    TranslationTransformationGetter,
+)
 from .distances import (
+    Distance,
     ScalarDistance,
     ScipyDistance,
     VectorizedDistance,
@@ -33,6 +43,7 @@ from .distances import (
 from .drawing import (
     AbsolutePaths,
     Color,
+    ColorLike,
     ColorType,
     Drawable,
     FixedCamera,
@@ -45,18 +56,34 @@ from .drawing import (
     draw_tracked_objects,
 )
 from .filter import (
+    FilterFactory,
     FilterPyKalmanFilterFactory,
     NoFilterFactory,
     OptimizedKalmanFilterFactory,
 )
-from .tracker import Detection, Tracker
+from .metrics import (
+    Accumulators,
+    DetectionFileParser,
+    InformationFile,
+    PredictionsTextFile,
+)
+from .tracker import Detection, TrackedObject, Tracker
 from .utils import get_cutout, print_objects_as_table
 from .video import Video
 
 __version__ = importlib.metadata.version("norfair-enough")
 
 __all__ = [
+    # camera_motion
+    "CoordinatesTransformation",
+    "HomographyTransformation",
+    "HomographyTransformationGetter",
+    "MotionEstimator",
+    "TransformationGetter",
+    "TranslationTransformation",
+    "TranslationTransformationGetter",
     # distances
+    "Distance",
     "ScalarDistance",
     "ScipyDistance",
     "VectorizedDistance",
@@ -71,6 +98,7 @@ __all__ = [
     # drawing
     "AbsolutePaths",
     "Color",
+    "ColorLike",
     "ColorType",
     "Drawable",
     "FixedCamera",
@@ -82,12 +110,19 @@ __all__ = [
     "draw_tracked_boxes",
     "draw_tracked_objects",
     # filter
+    "FilterFactory",
     "FilterPyKalmanFilterFactory",
     "NoFilterFactory",
     "OptimizedKalmanFilterFactory",
+    # metrics
+    "Accumulators",
+    "DetectionFileParser",
+    "InformationFile",
+    "PredictionsTextFile",
     # tracker
     "Detection",
     "Tracker",
+    "TrackedObject",
     # utils
     "get_cutout",
     "print_objects_as_table",
