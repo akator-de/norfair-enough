@@ -4872,7 +4872,7 @@ Use a bigger scale if the camera is moving too much.</p>
 
 
 
-        <p>Class to control the color pallete for drawing.</p>
+        <p>Class to control the color palette for drawing.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
@@ -4958,7 +4958,7 @@ Use a bigger scale if the camera is moving too much.</p>
 <span class="normal">371</span>
 <span class="normal">372</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Palette</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Class to control the color pallete for drawing.</span>
+<span class="sd">    Class to control the color palette for drawing.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -5582,7 +5582,7 @@ if it is <code>0</code> then the path is never erased.</p>
         <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">tracked_objects</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">abs_to_rel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">warn_once</span><span class="p">(</span>
-                    <span class="s2">&quot;It seems that your using the Path drawer together with MotionEstimator. This is not fully supported and the results will not be what&#39;s expected&quot;</span>
+                    <span class="s2">&quot;It seems that you&#39;re using the Path drawer together with MotionEstimator. This is not fully supported and the results will not be what&#39;s expected&quot;</span>
                 <span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -5803,7 +5803,7 @@ if it is <code>0</code> then the path is never erased.</p>
     <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">tracked_objects</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">abs_to_rel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">warn_once</span><span class="p">(</span>
-                <span class="s2">&quot;It seems that your using the Path drawer together with MotionEstimator. This is not fully supported and the results will not be what&#39;s expected&quot;</span>
+                <span class="s2">&quot;It seems that you&#39;re using the Path drawer together with MotionEstimator. This is not fully supported and the results will not be what&#39;s expected&quot;</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -6316,37 +6316,6 @@ which shall be used as initial position estimation for it.</p>
 comparative purposes and it is not advised to use it for tracking on a real application.</p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>FilterFactory</code>
-            </td>
-            <td>
-                  <code><span title="_type_">_type_</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><em>description</em></p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
 
 
 
@@ -6378,11 +6347,7 @@ comparative purposes and it is not advised to use it for tracking on a real appl
 <span class="normal">155</span>
 <span class="normal">156</span>
 <span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">NoFilterFactory</span><span class="p">(</span><span class="n">FilterFactory</span><span class="p">):</span>
+<span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">NoFilterFactory</span><span class="p">(</span><span class="n">FilterFactory</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class allows the user to try Norfair without any predictive filter or velocity estimation.</span>
 
@@ -6392,10 +6357,6 @@ comparative purposes and it is not advised to use it for tracking on a real appl
 <span class="sd">    [`OptimizedKalmanFilterFactory`](#optimizedkalmanfilterfactory) class, so this class exists only for</span>
 <span class="sd">    comparative purposes and it is not advised to use it for tracking on a real application.</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    FilterFactory : _type_</span>
-<span class="sd">        _description_</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">create_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_detection</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -6558,7 +6519,11 @@ comparative purposes and it is not advised to use it for tracking on a real appl
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>norfair/filter.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">246</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
 <span class="normal">247</span>
 <span class="normal">248</span>
 <span class="normal">249</span>
@@ -6607,11 +6572,7 @@ comparative purposes and it is not advised to use it for tracking on a real appl
 <span class="normal">292</span>
 <span class="normal">293</span>
 <span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">OptimizedKalmanFilterFactory</span><span class="p">(</span><span class="n">FilterFactory</span><span class="p">):</span>
+<span class="normal">295</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">OptimizedKalmanFilterFactory</span><span class="p">(</span><span class="n">FilterFactory</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates faster Filters than [`FilterPyKalmanFilterFactory`][norfair.filter.FilterPyKalmanFilterFactory].</span>
 
@@ -9169,7 +9130,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        int</span>
-<span class="sd">            _description_</span>
+<span class="sd">            The key code from ``cv2.waitKey(1)``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_video</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># The user may need to access the output file path on their code</span>
@@ -9206,7 +9167,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        int</span>
-<span class="sd">            _description_</span>
+<span class="sd">            The key code from ``cv2.waitKey(1)``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Resize to lower resolution for faster streaming over slow connections</span>
         <span class="k">if</span> <span class="n">downsample_ratio</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
@@ -9347,7 +9308,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><em>description</em></p>
+                <p>The key code from <code>cv2.waitKey(1)</code>.</p>
               </div>
             </td>
           </tr>
@@ -9400,7 +9361,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    int</span>
-<span class="sd">        _description_</span>
+<span class="sd">        The key code from ``cv2.waitKey(1)``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_video</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># The user may need to access the output file path on their code</span>
@@ -9503,7 +9464,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><em>description</em></p>
+                <p>The key code from <code>cv2.waitKey(1)</code>.</p>
               </div>
             </td>
           </tr>
@@ -9557,7 +9518,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    int</span>
-<span class="sd">        _description_</span>
+<span class="sd">        The key code from ``cv2.waitKey(1)``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Resize to lower resolution for faster streaming over slow connections</span>
     <span class="k">if</span> <span class="n">downsample_ratio</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>

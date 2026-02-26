@@ -968,7 +968,7 @@
 <a id="norfair.camera_motion"></a>
     <div class="doc doc-contents first">
 
-        <p>Camera motion stimation module.</p>
+        <p>Camera motion estimation module.</p>
 
 
 
@@ -2137,7 +2137,7 @@ More points make the estimation process slower but more precise</p>
 <span class="normal">7</span>
 <span class="normal">8</span>
 <span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tracker</span><span class="p">,</span> <span class="n">Video</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">norfair.camera_motion</span> <span class="n">MotionEstimator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">norfair.camera_motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">MotionEstimator</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">video</span> <span class="o">=</span> <span class="n">Video</span><span class="p">(</span><span class="s2">&quot;video.mp4&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">motion_estimator</span> <span class="o">=</span> <span class="n">MotionEstimator</span><span class="p">()</span>
@@ -2336,7 +2336,7 @@ More points make the estimation process slower but more precise</p>
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from norfair import Tracker, Video</span>
-<span class="sd">    &gt;&gt;&gt; from norfair.camera_motion MotionEstimator</span>
+<span class="sd">    &gt;&gt;&gt; from norfair.camera_motion import MotionEstimator</span>
 <span class="sd">    &gt;&gt;&gt; video = Video(&quot;video.mp4&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; tracker = Tracker(...)</span>
 <span class="sd">    &gt;&gt;&gt; motion_estimator = MotionEstimator()</span>
