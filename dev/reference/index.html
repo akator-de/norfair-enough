@@ -3283,7 +3283,14 @@ and returns a list of points for which we want to draw their paths.</p>
 <span class="normal">257</span>
 <span class="normal">258</span>
 <span class="normal">259</span>
-<span class="normal">260</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AbsolutePaths</span><span class="p">:</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AbsolutePaths</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class that draws the absolute paths taken by a set of points.</span>
 
@@ -3412,6 +3419,13 @@ and returns a list of points for which we want to draw their paths.</p>
             <span class="c1"># pyrefly: ignore[bad-argument-type]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">points_to_draw</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">][:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_history</span><span class="p">]</span>
+
+        <span class="c1"># Clean up dead objects to prevent memory leak</span>
+        <span class="n">active_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">tracked_objects</span><span class="p">}</span>
+        <span class="n">dead_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">active_ids</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dead_ids</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
         <span class="k">return</span> <span class="n">frame</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -4145,7 +4159,7 @@ If this parameter is passed, all other arguments are ignored</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">live_points</span> <span class="o">=</span> <span class="n">live_points</span>  <span class="c1"># pyrefly: ignore[bad-assignment]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Extecting a Detection or a TrackedObject but received </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Expecting a Detection or a TrackedObject but received </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -9191,8 +9205,8 @@ Notice that some fourcc are not compatible with some extensions.</p>
             <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
                 <span class="n">frame</span><span class="p">,</span>
                 <span class="p">(</span>
-                    <span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="n">downsample_ratio</span><span class="p">,</span>
-                    <span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">downsample_ratio</span><span class="p">,</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">downsample_ratio</span><span class="p">),</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">downsample_ratio</span><span class="p">),</span>
                 <span class="p">),</span>
             <span class="p">)</span>
         <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Output&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
@@ -9213,7 +9227,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;camera_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">_out.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_extension</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -9225,7 +9239,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_fourcc</span>
 
         <span class="c1"># Default codecs for each extension</span>
-        <span class="n">extension</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;avi&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;XVID&quot;</span>
         <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;mp4&quot;</span><span class="p">:</span>
@@ -9542,8 +9556,8 @@ Notice that some fourcc are not compatible with some extensions.</p>
         <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
             <span class="n">frame</span><span class="p">,</span>
             <span class="p">(</span>
-                <span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="n">downsample_ratio</span><span class="p">,</span>
-                <span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">downsample_ratio</span><span class="p">,</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">downsample_ratio</span><span class="p">),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">downsample_ratio</span><span class="p">),</span>
             <span class="p">),</span>
         <span class="p">)</span>
     <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Output&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
@@ -9629,7 +9643,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span>
 
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;camera_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">_out.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_extension</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -11089,7 +11103,7 @@ By default, False is used which means the points are drawn as if the camera were
 
     <div class="doc doc-contents ">
 
-        <p><strong>Deprecated</strong>. Use <a class="autorefs autorefs-internal" title="draw_boxes(frame, drawables=None, color='by_id', thickness=None, random_color=None, color_by_label=None, draw_labels=False, text_size=None, draw_ids=True, text_color=None, text_thickness=None, draw_box=True, detections=None, line_color=None, line_width=None, label_size=None, draw_scores=False)" href="drawing/#norfair.drawing.draw_boxes.draw_boxes"><code>draw_box</code></a></p>
+        <p><strong>Deprecated</strong>. Use <a class="autorefs autorefs-internal" title="draw_boxes(frame, drawables=None, color='by_id', thickness=None, random_color=None, color_by_label=None, draw_labels=False, text_size=None, draw_ids=True, text_color=None, text_thickness=None, draw_box=True, detections=None, line_color=None, line_width=None, label_size=None, draw_scores=False)" href="drawing/#norfair.drawing.draw_boxes.draw_boxes"><code>draw_boxes</code></a></p>
 
 
             <details class="mkdocstrings-source">
@@ -11138,8 +11152,8 @@ By default, False is used which means the points are drawn as if the camera were
     <span class="n">label_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">label_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-    <span class="s2">&quot;**Deprecated**. Use [`draw_box`][norfair.drawing.draw_boxes.draw_boxes]&quot;</span>
-    <span class="n">warn_once</span><span class="p">(</span><span class="s2">&quot;draw_tracked_boxes is deprecated, use draw_box instead&quot;</span><span class="p">)</span>
+    <span class="s2">&quot;**Deprecated**. Use [`draw_boxes`][norfair.drawing.draw_boxes.draw_boxes]&quot;</span>
+    <span class="n">warn_once</span><span class="p">(</span><span class="s2">&quot;draw_tracked_boxes is deprecated, use draw_boxes instead&quot;</span><span class="p">)</span>
     <span class="c1"># Determine color - default to &quot;by_id&quot; if border_colors is None</span>
     <span class="n">selected_color</span><span class="p">:</span> <span class="n">ColorLike</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;by_label&quot;</span>

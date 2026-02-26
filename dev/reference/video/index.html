@@ -1590,8 +1590,8 @@ Notice that some fourcc are not compatible with some extensions.</p>
             <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
                 <span class="n">frame</span><span class="p">,</span>
                 <span class="p">(</span>
-                    <span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="n">downsample_ratio</span><span class="p">,</span>
-                    <span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">downsample_ratio</span><span class="p">,</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">downsample_ratio</span><span class="p">),</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">downsample_ratio</span><span class="p">),</span>
                 <span class="p">),</span>
             <span class="p">)</span>
         <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Output&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
@@ -1612,7 +1612,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;camera_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">_out.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_extension</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -1624,7 +1624,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_fourcc</span>
 
         <span class="c1"># Default codecs for each extension</span>
-        <span class="n">extension</span> <span class="o">=</span> <span class="n">filename</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;avi&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;XVID&quot;</span>
         <span class="k">elif</span> <span class="n">extension</span> <span class="o">==</span> <span class="s2">&quot;mp4&quot;</span><span class="p">:</span>
@@ -1941,8 +1941,8 @@ Notice that some fourcc are not compatible with some extensions.</p>
         <span class="n">frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
             <span class="n">frame</span><span class="p">,</span>
             <span class="p">(</span>
-                <span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="n">downsample_ratio</span><span class="p">,</span>
-                <span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="n">downsample_ratio</span><span class="p">,</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">downsample_ratio</span><span class="p">),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">downsample_ratio</span><span class="p">),</span>
             <span class="p">),</span>
         <span class="p">)</span>
     <span class="n">cv2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="s2">&quot;Output&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
@@ -2028,7 +2028,7 @@ Notice that some fourcc are not compatible with some extensions.</p>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span>
 
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;camera_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">camera</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">_out.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_extension</span><span class="si">}</span><span class="s2">&quot;</span>

@@ -2792,7 +2792,7 @@ If this parameter is passed, all other arguments are ignored</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">live_points</span> <span class="o">=</span> <span class="n">live_points</span>  <span class="c1"># pyrefly: ignore[bad-assignment]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Extecting a Detection or a TrackedObject but received </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Expecting a Detection or a TrackedObject but received </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -3769,7 +3769,14 @@ and returns a list of points for which we want to draw their paths.</p>
 <span class="normal">257</span>
 <span class="normal">258</span>
 <span class="normal">259</span>
-<span class="normal">260</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AbsolutePaths</span><span class="p">:</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AbsolutePaths</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class that draws the absolute paths taken by a set of points.</span>
 
@@ -3898,6 +3905,13 @@ and returns a list of points for which we want to draw their paths.</p>
             <span class="c1"># pyrefly: ignore[bad-argument-type]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">points_to_draw</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">][:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_history</span><span class="p">]</span>
+
+        <span class="c1"># Clean up dead objects to prevent memory leak</span>
+        <span class="n">active_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">tracked_objects</span><span class="p">}</span>
+        <span class="n">dead_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">active_ids</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dead_ids</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
         <span class="k">return</span> <span class="n">frame</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -4810,7 +4824,7 @@ By default, False is used which means the points are drawn as if the camera were
 
     <div class="doc doc-contents ">
 
-        <p><strong>Deprecated</strong>. Use <a class="autorefs autorefs-internal" title="draw_boxes(frame, drawables=None, color='by_id', thickness=None, random_color=None, color_by_label=None, draw_labels=False, text_size=None, draw_ids=True, text_color=None, text_thickness=None, draw_box=True, detections=None, line_color=None, line_width=None, label_size=None, draw_scores=False)" href="#norfair.drawing.draw_boxes.draw_boxes"><code>draw_box</code></a></p>
+        <p><strong>Deprecated</strong>. Use <a class="autorefs autorefs-internal" title="draw_boxes(frame, drawables=None, color='by_id', thickness=None, random_color=None, color_by_label=None, draw_labels=False, text_size=None, draw_ids=True, text_color=None, text_thickness=None, draw_box=True, detections=None, line_color=None, line_width=None, label_size=None, draw_scores=False)" href="#norfair.drawing.draw_boxes.draw_boxes"><code>draw_boxes</code></a></p>
 
 
             <details class="mkdocstrings-source">
@@ -4859,8 +4873,8 @@ By default, False is used which means the points are drawn as if the camera were
     <span class="n">label_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">label_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-    <span class="s2">&quot;**Deprecated**. Use [`draw_box`][norfair.drawing.draw_boxes.draw_boxes]&quot;</span>
-    <span class="n">warn_once</span><span class="p">(</span><span class="s2">&quot;draw_tracked_boxes is deprecated, use draw_box instead&quot;</span><span class="p">)</span>
+    <span class="s2">&quot;**Deprecated**. Use [`draw_boxes`][norfair.drawing.draw_boxes.draw_boxes]&quot;</span>
+    <span class="n">warn_once</span><span class="p">(</span><span class="s2">&quot;draw_tracked_boxes is deprecated, use draw_boxes instead&quot;</span><span class="p">)</span>
     <span class="c1"># Determine color - default to &quot;by_id&quot; if border_colors is None</span>
     <span class="n">selected_color</span><span class="p">:</span> <span class="n">ColorLike</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;by_label&quot;</span>
@@ -6601,7 +6615,7 @@ If an object doesn't have an id this parameter is ignored.</p>
 
     <div class="doc doc-contents ">
 
-        <p><strong>Deprecated</strong>. Use <a class="autorefs autorefs-internal" title="draw_boxes(frame, drawables=None, color='by_id', thickness=None, random_color=None, color_by_label=None, draw_labels=False, text_size=None, draw_ids=True, text_color=None, text_thickness=None, draw_box=True, detections=None, line_color=None, line_width=None, label_size=None, draw_scores=False)" href="#norfair.drawing.draw_boxes.draw_boxes"><code>draw_box</code></a></p>
+        <p><strong>Deprecated</strong>. Use <a class="autorefs autorefs-internal" title="draw_boxes(frame, drawables=None, color='by_id', thickness=None, random_color=None, color_by_label=None, draw_labels=False, text_size=None, draw_ids=True, text_color=None, text_thickness=None, draw_box=True, detections=None, line_color=None, line_width=None, label_size=None, draw_scores=False)" href="#norfair.drawing.draw_boxes.draw_boxes"><code>draw_boxes</code></a></p>
 
 
             <details class="mkdocstrings-source">
@@ -6650,8 +6664,8 @@ If an object doesn't have an id this parameter is ignored.</p>
     <span class="n">label_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">label_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-    <span class="s2">&quot;**Deprecated**. Use [`draw_box`][norfair.drawing.draw_boxes.draw_boxes]&quot;</span>
-    <span class="n">warn_once</span><span class="p">(</span><span class="s2">&quot;draw_tracked_boxes is deprecated, use draw_box instead&quot;</span><span class="p">)</span>
+    <span class="s2">&quot;**Deprecated**. Use [`draw_boxes`][norfair.drawing.draw_boxes.draw_boxes]&quot;</span>
+    <span class="n">warn_once</span><span class="p">(</span><span class="s2">&quot;draw_tracked_boxes is deprecated, use draw_boxes instead&quot;</span><span class="p">)</span>
     <span class="c1"># Determine color - default to &quot;by_id&quot; if border_colors is None</span>
     <span class="n">selected_color</span><span class="p">:</span> <span class="n">ColorLike</span> <span class="o">=</span> <span class="p">(</span>
         <span class="s2">&quot;by_label&quot;</span>
@@ -7657,14 +7671,14 @@ This is the format opencv uses.</p>
 <span class="sd">    ValueError</span>
 <span class="sd">        if the string is invalid</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;#[a-f0-9]</span><span class="si">{6}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">hex_value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;#[a-fA-F0-9]</span><span class="si">{6}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">hex_value</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="nb">int</span><span class="p">(</span><span class="n">hex_value</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">7</span><span class="p">],</span> <span class="mi">16</span><span class="p">),</span>
             <span class="nb">int</span><span class="p">(</span><span class="n">hex_value</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">5</span><span class="p">],</span> <span class="mi">16</span><span class="p">),</span>
             <span class="nb">int</span><span class="p">(</span><span class="n">hex_value</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="mi">16</span><span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;#[a-f0-9]</span><span class="si">{3}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">hex_value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">&quot;#[a-fA-F0-9]</span><span class="si">{3}</span><span class="s2">$&quot;</span><span class="p">,</span> <span class="n">hex_value</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="nb">int</span><span class="p">(</span><span class="n">hex_value</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
             <span class="nb">int</span><span class="p">(</span><span class="n">hex_value</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
@@ -8738,7 +8752,14 @@ and returns a list of points for which we want to draw their paths.</p>
 <span class="normal">257</span>
 <span class="normal">258</span>
 <span class="normal">259</span>
-<span class="normal">260</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AbsolutePaths</span><span class="p">:</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AbsolutePaths</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class that draws the absolute paths taken by a set of points.</span>
 
@@ -8867,6 +8888,13 @@ and returns a list of points for which we want to draw their paths.</p>
             <span class="c1"># pyrefly: ignore[bad-argument-type]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">]</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">points_to_draw</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">][:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_history</span><span class="p">]</span>
+
+        <span class="c1"># Clean up dead objects to prevent memory leak</span>
+        <span class="n">active_ids</span> <span class="o">=</span> <span class="p">{</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">tracked_objects</span><span class="p">}</span>
+        <span class="n">dead_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">active_ids</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dead_ids</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
         <span class="k">return</span> <span class="n">frame</span>
 </code></pre></div></td></tr></table></div>
               </details>
