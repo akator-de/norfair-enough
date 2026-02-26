@@ -4,6 +4,36 @@ All notable changes to norfair-enough will be documented in this file.
 
 This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2.3.0. Published on PyPI as [`norfair-enough`](https://pypi.org/project/norfair-enough/).
 
+## [Unreleased]
+
+### Fixed
+- Fix missing f-string for camera output filename (`video.py`)
+- Fix `draw_tracked_objects` not returning the frame
+- Fix NaN text position when all tracked points are dead
+- Fix `lru_cache` on mutable NumPy array in grid drawing
+- Fix misplaced docstring in `PredictionsTextFile.update`
+- Fix `distance_matrix.any()` incorrectly skipping zero distances
+- Fix `hex_to_bgr` rejecting uppercase hex color strings
+- Fix float dimensions from `downsample_ratio` in video output
+- Fix non-portable path handling in video output filename
+- Fix file extension extraction in video codec selection
+- Fix division-by-zero workaround in homography transformation
+- Fix file handle leak in `PredictionsTextFile`
+- Fix quadratic array growth in `Accumulators.update`
+- Fix typo "Extecting" in `Drawable` error message
+- Fix memory leak for destroyed objects in `AbsolutePaths`
+- Fix wrong function reference in `draw_tracked_boxes` docstring
+- Fix various typos and placeholder docstrings
+
+### Changed
+- Replace mutable default argument in `Tracker.__init__`
+- Unify logging to use `logging.getLogger(__name__)` across all modules
+- Replace `assert` with `ValueError` for input validation
+- Use `__getattr__` instead of `__getattribute__` in dummy import classes
+- Validate both candidates and objects in `iou` distance function
+- Improve test coverage for `NoFilterFactory`, label matching, and drawing
+- Improve CI pipeline: lint on push, release gates, coverage with extras
+
 ## [2.4.0] - 2025-02-26
 
 ### Breaking Changes
