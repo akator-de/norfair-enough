@@ -202,7 +202,7 @@ class Video:
         Returns
         -------
         int
-            _description_
+            The key code from ``cv2.waitKey(1)``.
         """
         if self.output_video is None:
             # The user may need to access the output file path on their code
@@ -239,7 +239,7 @@ class Video:
         Returns
         -------
         int
-            _description_
+            The key code from ``cv2.waitKey(1)``.
         """
         # Resize to lower resolution for faster streaming over slow connections
         if downsample_ratio != 1.0:
