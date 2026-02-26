@@ -17,7 +17,7 @@ import pandas as pd
 
 from norfair import FilterPyKalmanFilterFactory, Tracker, metrics
 
-DATASET_PATH = "train/train"
+DATASET_PATH = "train"
 MOTA_ERROR_THRESHOLD = 0.0
 
 DETECTION_THRESHOLD = 0.01
