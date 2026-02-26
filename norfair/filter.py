@@ -142,10 +142,6 @@ class NoFilterFactory(FilterFactory):
     [`OptimizedKalmanFilterFactory`](#optimizedkalmanfilterfactory) class, so this class exists only for
     comparative purposes and it is not advised to use it for tracking on a real application.
 
-    Parameters
-    ----------
-    FilterFactory : _type_
-        _description_
     """
 
     def create_filter(self, initial_detection: np.ndarray):
