@@ -74,12 +74,12 @@ class PredictionsTextFile:
         self.frame_number = 1
 
     def update(self, predictions, frame_number=None):
-        if frame_number is None:
-            frame_number = self.frame_number
         """
         Write tracked object information in the output file (for this frame), in the format
         frame_number, id, bb_left, bb_top, bb_width, bb_height, -1, -1, -1, -1
         """
+        if frame_number is None:
+            frame_number = self.frame_number
         for obj in predictions:
             frame_str = str(int(frame_number))
             id_str = str(int(obj.id))
