@@ -312,7 +312,7 @@ PALETTES = {
 
 class Palette:
     """
-    Class to control the color pallete for drawing.
+    Class to control the color palette for drawing.
 
     Examples
     --------

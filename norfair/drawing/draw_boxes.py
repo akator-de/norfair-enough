@@ -26,7 +26,7 @@ def draw_boxes(
     detections: Sequence["Detection"] | None = None,  # Deprecated
     line_color: ColorLike | None = None,  # Deprecated
     line_width: int | None = None,  # Deprecated
-    label_size: int | None = None,  # Deprecated´
+    label_size: int | None = None,  # Deprecated
     draw_scores: bool = False,
 ) -> np.ndarray:
     """
