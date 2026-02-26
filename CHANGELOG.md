@@ -27,6 +27,7 @@ This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2
 
 ### Changed
 - Protect `TrackedObject.global_id` counter with a lock for thread safety
+- Export all public API symbols (`TrackedObject`, `Distance`, `FilterFactory`, `ColorLike`, camera motion and metrics classes) from the top-level package
 - Replace mutable default argument in `Tracker.__init__`
 - Unify logging to use `logging.getLogger(__name__)` across all modules
 - Replace `assert` with `ValueError` for input validation
