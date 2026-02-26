@@ -281,7 +281,7 @@ class Drawer:
         gamma: float = 0,
     ) -> np.ndarray:
         """
-        Blend 2 frame as a wheigthted sum.
+        Blend 2 frames as a weighted sum.
 
         Parameters
         ----------

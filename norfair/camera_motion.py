@@ -1,4 +1,4 @@
-"Camera motion stimation module."
+"Camera motion estimation module."
 
 import contextlib
 import copy
@@ -355,7 +355,7 @@ class MotionEstimator:
     Examples
     --------
     >>> from norfair import Tracker, Video
-    >>> from norfair.camera_motion MotionEstimator
+    >>> from norfair.camera_motion import MotionEstimator
     >>> video = Video("video.mp4")
     >>> tracker = Tracker(...)
     >>> motion_estimator = MotionEstimator()
