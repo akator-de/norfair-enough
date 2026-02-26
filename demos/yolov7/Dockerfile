@@ -12,6 +12,6 @@ RUN pip install -r https://raw.githubusercontent.com/WongKinYiu/yolov7/main/requ
     # For some reason it doesn't work with latest version of OpenCV \
     pip install opencv-python==4.5.5.64
 
-RUN pip install git+https://github.com/tryolabs/norfair.git@master#egg=norfair
+RUN pip install norfair-enough
 
 WORKDIR /demo/src/

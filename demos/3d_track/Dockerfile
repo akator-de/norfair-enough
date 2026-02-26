@@ -10,6 +10,6 @@ RUN pip install --upgrade pip && \
     pip install mediapipe==0.8.11 && \
     pip install opencv-python==4.5.5.64
 
-RUN pip install git+https://github.com/tryolabs/norfair.git@master#egg=norfair
+RUN pip install norfair-enough
 
 WORKDIR /demo/src/

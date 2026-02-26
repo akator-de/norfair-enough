@@ -12,7 +12,7 @@ RUN pip install -r https://raw.githubusercontent.com/Deci-AI/super-gradients/mas
     # For some reason it doesn't work with latest version of OpenCV \ --> AttributeError: partially initialized module 'cv2' has no attribute '_registerMatType' (most likely due to a circular import)
     pip install opencv-python==4.5.5.64
 
-RUN pip install git+https://github.com/tryolabs/norfair.git@master#egg=norfair
+RUN pip install norfair-enough
 
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
