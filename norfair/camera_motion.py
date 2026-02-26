@@ -153,7 +153,7 @@ class HomographyTransformation(CoordinatesTransformation):
         points_with_ones = np.hstack((points, ones))
         points_transformed = points_with_ones @ self.homography_matrix.T
         last_column = points_transformed[:, -1]
-        last_column[last_column == 0] = 0.0000001
+        last_column = np.where(last_column == 0, np.finfo(float).eps, last_column)
         points_transformed = points_transformed / last_column.reshape(-1, 1)
         result = points_transformed[:, :2]
         if single_point:
@@ -168,7 +168,7 @@ class HomographyTransformation(CoordinatesTransformation):
         points_with_ones = np.hstack((points, ones))
         points_transformed = points_with_ones @ self.inverse_homography_matrix.T
         last_column = points_transformed[:, -1]
-        last_column[last_column == 0] = 0.0000001
+        last_column = np.where(last_column == 0, np.finfo(float).eps, last_column)
         points_transformed = points_transformed / last_column.reshape(-1, 1)
         result = points_transformed[:, :2]
         if single_point:
