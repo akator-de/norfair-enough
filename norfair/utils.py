@@ -68,7 +68,7 @@ def get_cutout(points, image):
 
 
 class DummyOpenCVImport:
-    def __getattribute__(self, name):
+    def __getattr__(self, name):
         raise ImportError(
             r"""[bold red]Missing dependency:[/bold red] You are trying to use Norfair's video features. However, OpenCV is not installed.
 
@@ -77,7 +77,7 @@ Please, make sure there is an existing installation of OpenCV or install Norfair
 
 
 class DummyMOTMetricsImport:
-    def __getattribute__(self, name):
+    def __getattr__(self, name):
         raise ImportError(
             r"""[bold red]Missing dependency:[/bold red] You are trying to use Norfair's metrics features without the required dependencies.
 

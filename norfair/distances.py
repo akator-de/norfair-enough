@@ -1,9 +1,9 @@
 """Predefined distances"""
 
+import logging
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
 from functools import partial
-from logging import warning
 from typing import TYPE_CHECKING, overload
 
 import numpy as np
@@ -15,6 +15,8 @@ if TYPE_CHECKING:
     from .tracker import Detection, TrackedObject
 
     Candidate: TypeAlias = "Detection | TrackedObject"
+
+logger = logging.getLogger(__name__)
 
 
 class Distance(ABC):
@@ -121,7 +123,7 @@ class ScalarDistance(Distance):
             for o, obj in enumerate(objects):
                 if candidate.label != obj.label:
                     if (candidate.label is None) or (obj.label is None):
-                        print("\nThere are detections with and without label!")
+                        logger.warning("There are detections with and without label!")
                     continue
                 distance = self.distance_function(candidate, obj)
                 distance_matrix[c, o] = distance
@@ -376,14 +378,19 @@ def _validate_bboxes(bboxes: np.ndarray):
     """
     Validate that bounding boxes are well formed.
     """
-    assert (
+    if not (
         isinstance(bboxes, np.ndarray)
         and len(bboxes.shape) == 2
         and bboxes.shape[1] == 4
-    ), f"Bounding boxes must be defined as np.array with (N, 4) shape, {bboxes} given"
+    ):
+        raise ValueError(
+            f"Bounding boxes must be defined as np.array with (N, 4) shape, {bboxes} given"
+        )
 
     if not (all(bboxes[:, 0] < bboxes[:, 2]) and all(bboxes[:, 1] < bboxes[:, 3])):
-        warning("Incorrect bounding boxes. Check that x_min < x_max and y_min < y_max.")
+        logger.warning(
+            "Incorrect bounding boxes. Check that x_min < x_max and y_min < y_max."
+        )
 
 
 def iou(candidates: np.ndarray, objects: np.ndarray) -> np.ndarray:
@@ -407,6 +414,7 @@ def iou(candidates: np.ndarray, objects: np.ndarray) -> np.ndarray:
         (N, K) numpy.ndarray of `1 - iou` between candidates and objects.
     """
     _validate_bboxes(candidates)
+    _validate_bboxes(objects)
 
     area_candidates = _boxes_area(candidates.T)
     area_objects = _boxes_area(objects.T)
@@ -480,7 +488,7 @@ def get_distance_by_name(name: str) -> Distance:
 
     distance_function: Distance
     if name in _SCALAR_DISTANCE_FUNCTIONS:
-        warning(
+        logger.warning(
             "You are using a scalar distance function. If you want to speed up the"
             " tracking process please consider using a vectorized distance function"
             f" such as {AVAILABLE_VECTORIZED_DISTANCES}."
@@ -490,7 +498,7 @@ def get_distance_by_name(name: str) -> Distance:
         distance_function = ScipyDistance(name)
     elif name in _VECTORIZED_DISTANCE_FUNCTIONS:
         if name == "iou_opt":
-            warning("iou_opt is deprecated, use iou instead")
+            logger.warning("iou_opt is deprecated, use iou instead")
         distance_function = VectorizedDistance(_VECTORIZED_DISTANCE_FUNCTIONS[name])
     else:
         raise ValueError(
