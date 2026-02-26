@@ -239,7 +239,7 @@ class TestDrawable:
         np.testing.assert_array_equal(d.live_points, lp)
 
     def test_invalid_type_raises(self):
-        with pytest.raises(ValueError, match="Extecting"):
+        with pytest.raises(ValueError, match="Expecting"):
             Drawable("not a valid object")
 
     def test_detection_live_points_shape(self):
@@ -247,3 +247,19 @@ class TestDrawable:
         d = Drawable(det)
         assert d.live_points.shape == (3,)
         assert d.live_points.dtype == bool
+
+
+# ---------------------------------------------------------------------------
+# hex_to_bgr uppercase (CR-07 fix verification)
+# ---------------------------------------------------------------------------
+
+
+class TestHexToBgrUppercase:
+    def test_uppercase_hex(self):
+        assert hex_to_bgr("#FF0000") == (0, 0, 255)
+        assert hex_to_bgr("#FFFFFF") == (255, 255, 255)
+        assert hex_to_bgr("#00FF00") == (0, 255, 0)
+
+    def test_mixed_case_hex(self):
+        assert hex_to_bgr("#aAbBcC") == (0xCC, 0xBB, 0xAA)
+        assert hex_to_bgr("#FfFfFf") == (255, 255, 255)

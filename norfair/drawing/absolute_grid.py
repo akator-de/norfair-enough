@@ -84,7 +84,7 @@ def draw_absolute_grid(
     h, w, _ = frame.shape
 
     # get absolute points grid
-    points = _get_grid(grid_size, w, h, polar=polar)
+    points = _get_grid(grid_size, w, h, polar=polar).copy()
 
     # transform the points to relative coordinates
     if coord_transformations is None:

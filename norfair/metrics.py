@@ -74,12 +74,12 @@ class PredictionsTextFile:
         self.frame_number = 1
 
     def update(self, predictions, frame_number=None):
-        if frame_number is None:
-            frame_number = self.frame_number
         """
         Write tracked object information in the output file (for this frame), in the format
         frame_number, id, bb_left, bb_top, bb_width, bb_height, -1, -1, -1, -1
         """
+        if frame_number is None:
+            frame_number = self.frame_number
         for obj in predictions:
             frame_str = str(int(frame_number))
             id_str = str(int(obj.id))
@@ -108,6 +108,14 @@ class PredictionsTextFile:
 
         if self.frame_number > self.length:
             self.text_file.close()
+
+    def close(self):
+        """Close the underlying file handle."""
+        if hasattr(self, "text_file") and self.text_file and not self.text_file.closed:
+            self.text_file.close()
+
+    def __del__(self):
+        self.close()
 
 
 class DetectionFileParser:
@@ -225,14 +233,7 @@ class Accumulators:
                     -1,
                     -1,
                 ]
-                if np.shape(self.matrix_predictions)[0] == 0:
-                    self.matrix_predictions = new_row
-                else:
-                    self.matrix_predictions = (
-                        np.vstack(  # pyrefly: ignore[bad-assignment]
-                            (self.matrix_predictions, new_row)
-                        )
-                    )
+                self.matrix_predictions.append(new_row)
         self.frame_number += 1
         # Advance in progress bar
         try:

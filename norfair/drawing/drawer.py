@@ -365,5 +365,5 @@ class Drawable:
             self.live_points = live_points  # pyrefly: ignore[bad-assignment]
         else:
             raise ValueError(
-                f"Extecting a Detection or a TrackedObject but received {type(obj)}"
+                f"Expecting a Detection or a TrackedObject but received {type(obj)}"
             )
