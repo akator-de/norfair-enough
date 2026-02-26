@@ -26,6 +26,9 @@ This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2
 - Fix various typos and placeholder docstrings
 
 ### Changed
+- Optimize greedy matching to sort-once instead of iterative argmin (O(nm log nm) vs O(nm min(n,m)))
+- Replace O(n*k) `list.remove()` in tracking loop with single-pass set filter
+- Use precomputed label masks in `VectorizedDistance` instead of redundant string comparisons
 - Replace fragile `hasattr` type dispatch with `isinstance` in vectorized distance functions
 - Protect `TrackedObject.global_id` counter with a lock for thread safety
 - Replace mutable default argument in `Tracker.__init__`

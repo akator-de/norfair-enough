@@ -200,20 +200,20 @@ class VectorizedDistance(Distance):
             obj_mask = object_labels == label
             cand_mask = candidate_labels == label
 
-            stacked_objects = []
-            for o in objects:
-                if str(o.label) == label:
-                    stacked_objects.append(o.estimate.ravel())
-            stacked_objects = np.stack(stacked_objects)
+            obj_indices = np.where(obj_mask)[0]
+            stacked_objects = np.stack(
+                [objects[i].estimate.ravel() for i in obj_indices]
+            )
 
-            stacked_candidates = []
-            for c in candidates:
-                if str(c.label) == label:
-                    if isinstance(c, Detection):
-                        stacked_candidates.append(c.points.ravel())
-                    else:
-                        stacked_candidates.append(c.estimate.ravel())
-            stacked_candidates = np.stack(stacked_candidates)
+            cand_indices = np.where(cand_mask)[0]
+            stacked_candidates = np.stack(
+                [
+                    candidates[i].points.ravel()
+                    if isinstance(candidates[i], Detection)
+                    else candidates[i].estimate.ravel()
+                    for i in cand_indices
+                ]
+            )
 
             # calculate the pairwise distances between objects and candidates with this label
             # and assign the result to the correct positions inside distance_matrix
