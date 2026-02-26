@@ -494,8 +494,91 @@ def test_detection_age_after_merge():
         assert pd.age is not None
 
 
-# TODO tests list:
-#   - detections with different labels
-#   - partial matches where some points are missing
-#   - pointwise_hit_counter_max
-#   - past detections
+def test_label_matching():
+    """Test that detections with different labels are not matched together."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        hit_counter_max=4,
+        initialization_delay=0,
+    )
+
+    # Two detections at same point but different labels
+    det_a = Detection(points=np.array([[1, 1]]), label="car")
+    det_b = Detection(points=np.array([[1, 1]]), label="person")
+    tracked = tracker.update([det_a, det_b])
+    assert len(tracked) == 2
+
+    # Each should maintain its label
+    labels = {obj.label for obj in tracked}
+    assert labels == {"car", "person"}
+
+
+def test_nan_distance_raises():
+    """Test that NaN in distance matrix raises ValueError."""
+
+    def bad_distance(det, obj):
+        return float("nan")
+
+    tracker = Tracker(
+        distance_function=bad_distance,
+        distance_threshold=100,
+        hit_counter_max=4,
+        initialization_delay=0,
+    )
+
+    tracker.update([Detection(points=np.array([[1, 1]]))])
+    with pytest.raises(ValueError, match="nan"):
+        tracker.update([Detection(points=np.array([[1, 1]]))])
+
+
+def test_period_parameter():
+    """Test that the period parameter affects hit counter increments."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        hit_counter_max=20,
+        initialization_delay=0,
+    )
+
+    det = [Detection(points=np.array([[1, 1]]))]
+    tracked = tracker.update(det, period=5)
+    assert len(tracked) == 1
+    # With period=5, hit_counter should be 5 (initial period)
+    assert tracked[0].hit_counter == 5
+
+
+def test_estimate_velocity():
+    """Test that estimate_velocity returns expected shape."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        hit_counter_max=4,
+        initialization_delay=0,
+    )
+
+    tracked = tracker.update([Detection(points=np.array([[1, 1]]))])
+    assert len(tracked) == 1
+    vel = tracked[0].estimate_velocity
+    assert vel.shape == (1, 2)
+
+
+def test_global_id():
+    """Test that global_id is assigned and unique across trackers."""
+    tracker1 = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        initialization_delay=0,
+    )
+    tracker2 = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        initialization_delay=0,
+    )
+
+    t1 = tracker1.update([Detection(points=np.array([[1, 1]]))])
+    t2 = tracker2.update([Detection(points=np.array([[2, 2]]))])
+
+    assert t1[0].global_id is not None
+    assert t2[0].global_id is not None
+    assert t1[0].global_id != t2[0].global_id
