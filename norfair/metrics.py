@@ -5,7 +5,7 @@ import numpy as np
 from rich import print
 from rich.progress import track
 
-from norfair import Detection
+from norfair.tracker import Detection
 
 # MotMetrics and pandas are optional dependencies
 try:
