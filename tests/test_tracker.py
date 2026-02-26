@@ -582,3 +582,343 @@ def test_global_id():
     assert t1[0].global_id is not None
     assert t2[0].global_id is not None
     assert t1[0].global_id != t2[0].global_id
+
+
+def test_detection_scalar_score():
+    """Test that Detection accepts a scalar score and broadcasts it."""
+    det = Detection(points=np.array([[1, 2], [3, 4]]), scores=0.9)
+    assert det.scores is not None
+    assert len(det.scores) == 2
+    assert det.scores[0] == 0.9
+    assert det.scores[1] == 0.9
+
+
+def test_detection_int_score():
+    """Test that Detection accepts an int score."""
+    det = Detection(points=np.array([[1, 2], [3, 4]]), scores=1)
+    assert det.scores is not None
+    assert len(det.scores) == 2
+    assert det.scores[0] == 1
+    assert det.scores[1] == 1
+
+
+def test_detection_score_length_mismatch():
+    """Test that Detection raises error when scores length doesn't match points."""
+    with pytest.raises(ValueError, match="length"):
+        Detection(points=np.array([[1, 2], [3, 4]]), scores=np.array([0.9]))
+
+
+def test_detection_with_data_attribute():
+    """Test that Detection can store arbitrary data."""
+    data = {"embedding": np.array([1, 2, 3]), "metadata": "test"}
+    det = Detection(points=np.array([[1, 2]]), data=data)
+    assert det.data == data
+    assert det.data["metadata"] == "test"
+
+
+def test_detection_with_embedding():
+    """Test that Detection can store embedding."""
+    embedding = np.array([0.1, 0.2, 0.3, 0.4])
+    det = Detection(points=np.array([[1, 2]]), embedding=embedding)
+    assert np.array_equal(det.embedding, embedding)
+
+
+def test_tracker_with_no_detections_initially():
+    """Test tracker update with no detections in first frames."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        initialization_delay=0,
+    )
+
+    # Update with no detections
+    tracked = tracker.update(None)
+    assert len(tracked) == 0
+
+    tracked = tracker.update([])
+    assert len(tracked) == 0
+
+    # Now add a detection
+    tracked = tracker.update([Detection(points=np.array([[1, 1]]))])
+    assert len(tracked) == 1
+
+
+def test_tracker_with_vectorized_distance_string():
+    """Test tracker initialized with vectorized distance by name."""
+    tracker = Tracker(
+        distance_function="iou",
+        distance_threshold=0.5,
+        initialization_delay=0,
+    )
+
+    det = Detection(points=np.array([[0, 0], [10, 10]]))
+    tracked = tracker.update([det])
+    assert len(tracked) == 1
+
+
+def test_tracker_past_detections_length_zero():
+    """Test that past_detections_length=0 works correctly."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        initialization_delay=0,
+        past_detections_length=0,
+    )
+
+    det = Detection(points=np.array([[1, 1]]))
+    tracked = tracker.update([det])
+    assert len(tracked) == 1
+    assert len(tracked[0].past_detections) == 0
+
+
+def test_tracker_past_detections_length_negative():
+    """Test that negative past_detections_length raises error."""
+    with pytest.raises(ValueError, match="should be 0 or larger"):
+        Tracker(
+            distance_function="euclidean",
+            distance_threshold=100,
+            past_detections_length=-1,
+        )
+
+
+def test_tracked_object_live_points():
+    """Test that live_points property works correctly."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        initialization_delay=0,
+        pointwise_hit_counter_max=2,
+    )
+
+    det = Detection(points=np.array([[1, 1], [2, 2]]), scores=np.array([0.9, 0.9]))
+    tracked = tracker.update([det])
+    assert tracked[0].live_points.all()
+
+    # Update with only one point visible
+    det2 = Detection(points=np.array([[1, 1], [2, 2]]), scores=np.array([0.9, 0.0]))
+    tracked = tracker.update([det2])
+    # After a few updates without the second point, it should die
+    tracked = tracker.update(None)
+    tracked = tracker.update(None)
+    tracked = tracker.update(None)
+    if len(tracked) > 0:
+        assert not tracked[0].live_points[1]
+
+
+def test_tracked_object_absolute_coordinates():
+    """Test getting absolute coordinates when coord_transformations provided."""
+
+    class MockTransform:
+        def rel_to_abs(self, points):
+            return points + 10
+
+        def abs_to_rel(self, points):
+            return points - 10
+
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        initialization_delay=0,
+    )
+
+    det = Detection(points=np.array([[1.0, 1.0]]))
+    transform = MockTransform()
+    tracked = tracker.update([det], coord_transformations=transform)
+
+    assert len(tracked) == 1
+    # Absolute estimate should be shifted
+    np.testing.assert_almost_equal(tracked[0].get_estimate(absolute=True), [[11, 11]])
+    # Relative estimate should be original
+    np.testing.assert_almost_equal(tracked[0].get_estimate(absolute=False), [[1, 1]])
+
+
+def test_get_estimate_without_transformation_raises():
+    """Test that getting absolute estimate without transformation raises error."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        initialization_delay=0,
+    )
+
+    det = Detection(points=np.array([[1, 1]]))
+    tracked = tracker.update([det])
+
+    with pytest.raises(ValueError, match="coord_transformations"):
+        tracked[0].get_estimate(absolute=True)
+
+
+def test_tracker_with_callable_distance():
+    """Test tracker with a custom callable distance function."""
+
+    def custom_distance(det, obj):
+        return float(np.linalg.norm(det.points - obj.estimate))
+
+    tracker = Tracker(
+        distance_function=custom_distance,
+        distance_threshold=10,
+        initialization_delay=0,
+    )
+
+    det = Detection(points=np.array([[1, 1]]))
+    tracked = tracker.update([det])
+    assert len(tracked) == 1
+
+
+def test_tracker_invalid_distance_type():
+    """Test that invalid distance_function type raises error."""
+    with pytest.raises(ValueError, match="should be a string or function"):
+        Tracker(distance_function=123, distance_threshold=10)
+
+
+def test_detection_scores_none():
+    """Test Detection with scores=None."""
+    det = Detection(points=np.array([[1, 2]]), scores=None)
+    assert det.scores is None
+
+
+def test_tracked_object_repr():
+    """Test TrackedObject string representation."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        initialization_delay=0,
+    )
+
+    det = Detection(points=np.array([[1, 1]]))
+    tracked = tracker.update([det])
+
+    repr_str = repr(tracked[0])
+    assert "Object_" in repr_str
+    assert "age:" in repr_str
+    assert "hit_counter:" in repr_str
+
+
+def test_multiple_objects_matching():
+    """Test matching multiple detections to multiple objects."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=10,
+        initialization_delay=0,
+    )
+
+    # Create two objects
+    dets1 = [
+        Detection(points=np.array([[0, 0]])),
+        Detection(points=np.array([[100, 100]])),
+    ]
+    tracked = tracker.update(dets1)
+    assert len(tracked) == 2
+
+    # Update with moved detections
+    dets2 = [
+        Detection(points=np.array([[1, 1]])),
+        Detection(points=np.array([[101, 101]])),
+    ]
+    tracked = tracker.update(dets2)
+    assert len(tracked) == 2
+    # IDs should be preserved
+    ids = {obj.id for obj in tracked}
+    assert len(ids) == 2
+
+
+def test_tracker_distance_threshold_filtering():
+    """Test that detections beyond distance threshold are not matched."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=5,
+        initialization_delay=0,
+    )
+
+    det1 = Detection(points=np.array([[0, 0]]))
+    tracked = tracker.update([det1])
+    assert len(tracked) == 1
+    obj_id = tracked[0].id
+
+    # Move detection far away (beyond threshold)
+    det2 = Detection(points=np.array([[100, 100]]))
+    tracked = tracker.update([det2])
+
+    # Should have 2 objects now (old one dying, new one created)
+    assert tracker.total_object_count == 2
+
+
+def test_tracker_with_3d_points():
+    """Test tracker with 3D points."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=10,
+        initialization_delay=0,
+    )
+
+    det = Detection(points=np.array([[1, 2, 3], [4, 5, 6]]))
+    tracked = tracker.update([det])
+    assert len(tracked) == 1
+    assert tracked[0].estimate.shape == (2, 3)
+
+
+def test_detection_invalid_type():
+    """Test that TrackedObject initialization validates Detection type."""
+    from norfair.tracker import _TrackedObjectFactory
+
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        initialization_delay=0,
+    )
+
+    # This should work
+    det = Detection(points=np.array([[1, 1]]))
+    tracker.update([det])
+
+    # This should fail if we try to create tracked object with wrong type
+    factory = _TrackedObjectFactory()
+    with pytest.raises(ValueError, match="Detection"):
+        factory.create(
+            initial_detection="not a detection",
+            hit_counter_max=10,
+            initialization_delay=0,
+            pointwise_hit_counter_max=4,
+            detection_threshold=0.0,
+            period=1,
+            filter_factory=OptimizedKalmanFilterFactory(),
+            past_detections_length=4,
+            reid_hit_counter_max=None,
+            coord_transformations=None,
+        )
+
+
+def test_tracker_current_min_distance():
+    """Test that current_min_distance is set correctly."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        initialization_delay=0,
+    )
+
+    det1 = Detection(points=np.array([[0, 0]]))
+    tracked = tracker.update([det1])
+
+    det2 = Detection(points=np.array([[3, 4]]))
+    tracked = tracker.update([det2])
+
+    # Current min distance should be set
+    assert tracked[0].current_min_distance is not None
+    # Distance from (0,0) to (3,4) is 5
+    np.testing.assert_almost_equal(tracked[0].current_min_distance, 5.0)
+
+
+def test_tracker_last_distance():
+    """Test that last_distance is set after matching."""
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        initialization_delay=0,
+    )
+
+    det1 = Detection(points=np.array([[0, 0]]))
+    tracked = tracker.update([det1])
+    assert tracked[0].last_distance is None
+
+    det2 = Detection(points=np.array([[3, 4]]))
+    tracked = tracker.update([det2])
+    assert tracked[0].last_distance is not None
