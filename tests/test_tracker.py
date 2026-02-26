@@ -582,3 +582,160 @@ def test_global_id():
     assert t1[0].global_id is not None
     assert t2[0].global_id is not None
     assert t1[0].global_id != t2[0].global_id
+
+
+def test_global_id_thread_safety():
+    """Test that global_id counter is thread-safe."""
+    import threading
+
+    from norfair.tracker import _TrackedObjectFactory
+
+    # Reset counter
+    _TrackedObjectFactory.global_count = 0
+
+    results = []
+
+    def create_objects(num_objects):
+        factory = _TrackedObjectFactory()
+        for _ in range(num_objects):
+            local_id, global_id = factory.get_ids()
+            results.append(global_id)
+
+    # Create multiple threads that create objects concurrently
+    threads = []
+    num_threads = 10
+    objects_per_thread = 10
+
+    for _ in range(num_threads):
+        thread = threading.Thread(target=create_objects, args=(objects_per_thread,))
+        threads.append(thread)
+        thread.start()
+
+    for thread in threads:
+        thread.join()
+
+    # Verify all global_ids are unique
+    assert len(results) == num_threads * objects_per_thread
+    assert len(set(results)) == len(results), "Duplicate global_ids detected"
+
+
+def test_detection_scores_broadcast():
+    """Test that scalar scores are broadcast to all points."""
+    import numpy as np
+
+    from norfair import Detection
+
+    # Test with integer score
+    det = Detection(points=np.array([[1, 2], [3, 4]]), scores=5)
+    assert det.scores is not None
+    assert len(det.scores) == 2
+    assert det.scores[0] == 5
+    assert det.scores[1] == 5
+
+    # Test with float score
+    det = Detection(points=np.array([[1, 2], [3, 4]]), scores=0.75)
+    assert det.scores is not None
+    assert len(det.scores) == 2
+    assert det.scores[0] == 0.75
+    assert det.scores[1] == 0.75
+
+
+def test_tracked_object_scores_attribute():
+    """Test that TrackedObject.scores is set from matched detection."""
+    import numpy as np
+
+    from norfair import Detection, Tracker
+
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        initialization_delay=0,
+    )
+
+    # Create detection with scores
+    det = Detection(points=np.array([[1, 1]]), scores=np.array([0.9]))
+    tracked = tracker.update([det])
+
+    assert len(tracked) == 1
+    assert tracked[0].scores is not None
+    assert tracked[0].scores[0] == 0.9
+
+    # After tracker_step without match, scores should be None
+    tracker.update()
+    assert tracked[0].scores is None
+
+
+def test_empty_candidates_and_objects():
+    """Test distance functions with empty candidates or objects."""
+    from norfair.distances import ScalarDistance, VectorizedDistance, frobenius
+
+    # Test ScalarDistance with empty lists
+    scalar_dist = ScalarDistance(frobenius)
+    dist_matrix = scalar_dist.get_distances([], [])
+    assert dist_matrix.shape == (0, 0)
+
+    # Test VectorizedDistance with empty lists
+    def vec_dist_func(cands, objs):
+        return np.zeros((len(cands), len(objs)))
+
+    vec_dist = VectorizedDistance(vec_dist_func)
+    dist_matrix = vec_dist.get_distances([], [])
+    assert dist_matrix.shape == (0, 0)
+
+
+def test_isinstance_type_checking_in_vectorized_distance(mock_det, mock_obj):
+    """Test that VectorizedDistance uses isinstance for type checking."""
+    from norfair.distances import VectorizedDistance
+    from norfair.tracker import Detection
+
+    def dist_func(cands, objs):
+        return np.zeros((len(cands), len(objs)))
+
+    vd = VectorizedDistance(dist_func)
+
+    # Create a Detection and a TrackedObject
+    det = mock_det([[1, 2], [3, 4]])
+    obj = mock_obj([[1, 2], [3, 4]])
+
+    # This should work with isinstance checking
+    dist_matrix = vd.get_distances([obj], [det])
+    assert dist_matrix.shape == (1, 1)
+
+
+def test_iou_validates_both_candidates_and_objects():
+    """Test that iou validates both candidates and objects bounding boxes."""
+    from norfair.distances import iou
+
+    # Valid candidates, invalid objects
+    valid_candidates = np.array([[0, 0, 2, 2]])
+    invalid_objects = np.array([[0, 0]])  # Wrong shape
+
+    with pytest.raises(ValueError, match="must be defined as np.array with"):
+        iou(valid_candidates, invalid_objects)
+
+    # Invalid candidates, valid objects
+    invalid_candidates = np.array([[0, 0]])  # Wrong shape
+    valid_objects = np.array([[0, 0, 2, 2]])
+
+    with pytest.raises(ValueError, match="must be defined as np.array with"):
+        iou(invalid_candidates, valid_objects)
+
+
+def test_detection_with_single_float_score():
+    """Test Detection accepts single float/int score (not just np.ndarray)."""
+    import numpy as np
+
+    from norfair import Detection
+
+    # Single point with float score
+    det = Detection(points=np.array([[1, 2]]), scores=0.8)
+    assert det.scores is not None
+    assert isinstance(det.scores, np.ndarray)
+    assert len(det.scores) == 1
+    assert det.scores[0] == 0.8
+
+    # Multiple points with single float score (should broadcast)
+    det = Detection(points=np.array([[1, 2], [3, 4], [5, 6]]), scores=0.9)
+    assert det.scores is not None
+    assert len(det.scores) == 3
+    np.testing.assert_array_equal(det.scores, [0.9, 0.9, 0.9])
