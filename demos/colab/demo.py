@@ -12,12 +12,16 @@ DISTANCE_THRESHOLD_CENTROID: float = 0.08
 
 
 def inference(
-    input_video: str, model: str, track_points: str, model_threshold: str, classes: list
+    input_video: str,
+    model_path: str,
+    track_points: str,
+    model_threshold: str,
+    classes: list[int] | None,
 ):
     coord_transformations = None
     paths_drawer = None
     fix_paths = True
-    model = YOLO(model)
+    model = YOLO(model_path)
     video = Video(input_path=input_video)
 
     transformations_getter = HomographyTransformationGetter()

@@ -35,7 +35,7 @@ class YOLO_NAS:
         iou_threshold: float = 0.45,
         image_size: int = 720,
         classes: list[int] | None = None,
-    ) -> torch.tensor:
+    ) -> torch.Tensor:
         if classes is not None:
             self.model.classes = classes
 
@@ -44,7 +44,7 @@ class YOLO_NAS:
 
 
 def yolo_detections_to_norfair_detections(
-    yolo_detections: torch.tensor,
+    yolo_detections: torch.Tensor,
     track_points: str = "centroid",  # bbox or centroid
 ) -> list[Detection]:
     """convert detections_as_xywh to norfair detections"""
@@ -113,7 +113,10 @@ parser.add_argument(
     help="Filter by class: --classes 0, or --classes 0 2 3",
 )
 parser.add_argument(
-    "--device", type=str, default="cuda", help="Inference device: 'cpu' or 'cuda'"
+    "--device",
+    type=str,
+    default=None,
+    help="Inference device: 'cpu' or 'cuda' (auto-detect if omitted)",
 )
 parser.add_argument(
     "--track-points",
