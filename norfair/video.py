@@ -1,3 +1,4 @@
+import contextlib
 import os
 import time
 from typing import TYPE_CHECKING, Any
@@ -67,10 +68,14 @@ class Video:
 
     Examples
     --------
-    >>> video = Video(input_path="video.mp4")
-    >>> for frame in video:
-    >>>     # << Your modifications to the frame would go here >>
-    >>>     video.write(frame)
+    >>> with Video(input_path="video.mp4") as video:
+    ...     for frame in video:
+    ...         # << Your modifications to the frame would go here >>
+    ...         video.write(frame)
+
+    The context manager ensures that video resources are released even if the
+    loop is interrupted early. Iterating without ``with`` still works — resources
+    are released when the iterator is exhausted or when ``close()`` is called.
     """
 
     def __init__(
@@ -131,6 +136,7 @@ class Video:
         self.input_height = self.video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
         self.input_width = self.video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)
         self.frame_counter = 0
+        self._closed = False
 
         # Setup progressbar
         if self.label:
@@ -161,31 +167,52 @@ class Video:
             process_fps=0,
         )
 
-    # This is a generator, note the yield keyword below.
-    def __iter__(self):
-        with self.progress_bar as progress_bar:
-            start = time.time()
+    def __enter__(self):
+        return self
 
-            # Iterate over video
-            while True:
-                self.frame_counter += 1
-                ret, frame = self.video_capture.read()
-                if ret is False or frame is None:
-                    break
-                process_fps = self.frame_counter / (time.time() - start)
-                progress_bar.update(
-                    self.task, advance=1, refresh=True, process_fps=process_fps
-                )
-                yield frame
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+        return False
 
-        # Cleanup
+    def close(self):
+        """Release video resources (VideoCapture, VideoWriter, GUI windows).
+
+        Safe to call multiple times; subsequent calls are no-ops.
+        """
+        if self._closed:
+            return
+        self._closed = True
         if self.output_video is not None:
             self.output_video.release()
             print(
                 f"[white]Output video file saved to: {self.get_output_file_path()}[/white]"
             )
         self.video_capture.release()
-        cv2.destroyAllWindows()
+        with contextlib.suppress(cv2.error):
+            cv2.destroyAllWindows()
+
+    # This is a generator, note the yield keyword below.
+    def __iter__(self):
+        if self._closed:
+            raise RuntimeError("Cannot iterate over a closed Video")
+        try:
+            with self.progress_bar as progress_bar:
+                start = time.time()
+
+                # Iterate over video
+                while True:
+                    ret, frame = self.video_capture.read()
+                    if ret is False or frame is None:
+                        break
+                    self.frame_counter += 1
+                    elapsed = time.time() - start
+                    process_fps = self.frame_counter / elapsed if elapsed > 0 else 0.0
+                    progress_bar.update(
+                        self.task, advance=1, refresh=True, process_fps=process_fps
+                    )
+                    yield frame
+        finally:
+            self.close()
 
     def _fail(self, msg: str):
         raise RuntimeError(msg)
