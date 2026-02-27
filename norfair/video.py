@@ -74,8 +74,8 @@ class Video:
     ...         video.write(frame)
 
     The context manager ensures that video resources are released even if the
-    loop is interrupted early.  Iterating without ``with`` still works — resources
-    are released when the iterator is exhausted or garbage-collected.
+    loop is interrupted early. Iterating without ``with`` still works — resources
+    are released when the iterator is exhausted or when ``close()`` is called.
     """
 
     def __init__(
