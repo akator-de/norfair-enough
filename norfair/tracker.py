@@ -1,7 +1,7 @@
 import logging
 import threading
 from collections.abc import Callable, Hashable, Sequence
-from typing import Any
+from typing import Any, overload
 
 import numpy as np
 
@@ -240,7 +240,7 @@ class Tracker:
             self.distance_function,
             self.distance_threshold,
             [o for o in alive_objects if not o.is_initializing],
-            detections,
+            detections or [],
             period,
         )
 
@@ -310,6 +310,26 @@ class Tracker:
             if not o.is_initializing and o.hit_counter_is_positive
         ]
 
+    @overload
+    def _update_objects_in_place(
+        self,
+        distance_function: Distance,
+        distance_threshold: float,
+        objects: Sequence["TrackedObject"],
+        candidates: list["Detection"],
+        period: int,
+    ) -> tuple[list["Detection"], list["TrackedObject"], list["TrackedObject"]]: ...
+
+    @overload
+    def _update_objects_in_place(
+        self,
+        distance_function: Distance,
+        distance_threshold: float,
+        objects: Sequence["TrackedObject"],
+        candidates: list["TrackedObject"] | None,
+        period: int,
+    ) -> tuple[list["TrackedObject"], list["TrackedObject"], list["TrackedObject"]]: ...
+
     def _update_objects_in_place(
         self,
         distance_function: Distance,
@@ -347,6 +367,7 @@ class Tracker:
                     d for i, d in enumerate(objects) if i not in matched_obj_indices
                 ]
                 matched_objects = []
+                candidates_to_remove: set[int] = set()
 
                 # Handle matched people/detections
                 for match_cand_idx, match_obj_idx in zip(
@@ -363,12 +384,20 @@ class Tracker:
                         elif isinstance(matched_candidate, TrackedObject):
                             # Merge new TrackedObject with the old one
                             matched_object.merge(matched_candidate)
-                            # If we are matching TrackedObject instances we want to get rid of the
-                            # already matched candidate to avoid matching it again in future frames
-                            self.tracked_objects.remove(matched_candidate)
+                            candidates_to_remove.add(id(matched_candidate))
                     else:
-                        unmatched_candidates.append(matched_candidate)
+                        unmatched_candidates.append(
+                            matched_candidate  # pyrefly: ignore[bad-argument-type]
+                        )
                         unmatched_objects.append(matched_object)
+
+                # Remove merged TrackedObject candidates in a single pass
+                if candidates_to_remove:
+                    self.tracked_objects = [
+                        o
+                        for o in self.tracked_objects
+                        if id(o) not in candidates_to_remove
+                    ]
             else:
                 unmatched_candidates = list(candidates)
                 matched_objects = []
@@ -383,33 +412,35 @@ class Tracker:
     def match_dets_and_objs(self, distance_matrix: np.ndarray, distance_threshold):
         """Matches detections with tracked_objects from a distance matrix
 
-        I used to match by minimizing the global distances, but found several
-        cases in which this was not optimal. So now I just match by starting
-        with the global minimum distance and matching the det-obj corresponding
-        to that distance, then taking the second minimum, and so on until we
-        reach the distance_threshold.
+        Greedy matching: sort all pairwise distances, then iterate from
+        smallest to largest.  Each detection and object is matched at most
+        once; pairs above ``distance_threshold`` are skipped.
 
-        This avoids the the algorithm getting cute with us and matching things
+        This avoids the algorithm getting cute with us and matching things
         that shouldn't be matching just for the sake of minimizing the global
-        distance, which is what used to happen
+        distance, which is what used to happen with Hungarian-style matching.
         """
-        # NOTE: This implementation is terribly inefficient, but it doesn't
-        #       seem to affect the fps at all.
-        distance_matrix = distance_matrix.copy()
         if distance_matrix.size > 0:
+            n_cols = distance_matrix.shape[1]
+            flat = distance_matrix.ravel()
+            sorted_indices = np.argsort(flat, kind="quicksort")
+
             det_idxs = []
             obj_idxs = []
-            current_min = distance_matrix.min()
+            matched_dets: set[int] = set()
+            matched_objs: set[int] = set()
 
-            while current_min < distance_threshold:
-                flattened_arg_min = distance_matrix.argmin()
-                det_idx = flattened_arg_min // distance_matrix.shape[1]
-                obj_idx = flattened_arg_min % distance_matrix.shape[1]
+            for idx in sorted_indices:
+                if flat[idx] >= distance_threshold:
+                    break
+                det_idx = int(idx // n_cols)
+                obj_idx = int(idx % n_cols)
+                if det_idx in matched_dets or obj_idx in matched_objs:
+                    continue
                 det_idxs.append(det_idx)
                 obj_idxs.append(obj_idx)
-                distance_matrix[det_idx, :] = distance_threshold + 1
-                distance_matrix[:, obj_idx] = distance_threshold + 1
-                current_min = distance_matrix.min()
+                matched_dets.add(det_idx)
+                matched_objs.add(obj_idx)
 
             return det_idxs, obj_idxs
         else:
