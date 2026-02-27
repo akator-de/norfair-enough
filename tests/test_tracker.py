@@ -619,25 +619,27 @@ def test_global_id_thread_safety():
     assert len(set(results)) == len(results), "Duplicate global_ids detected"
 
 
-def test_detection_scores_broadcast():
+@pytest.mark.parametrize(
+    "score, num_points",
+    [
+        (5, 2),
+        (0.75, 2),
+        (0.8, 1),
+        (0.9, 3),
+    ],
+)
+def test_detection_scores_broadcast(score, num_points):
     """Test that scalar scores are broadcast to all points."""
     import numpy as np
 
     from norfair import Detection
 
-    # Test with integer score
-    det = Detection(points=np.array([[1, 2], [3, 4]]), scores=5)
+    points = np.array([[i, i + 1] for i in range(num_points)])
+    det = Detection(points=points, scores=score)
     assert det.scores is not None
-    assert len(det.scores) == 2
-    assert det.scores[0] == 5
-    assert det.scores[1] == 5
-
-    # Test with float score
-    det = Detection(points=np.array([[1, 2], [3, 4]]), scores=0.75)
-    assert det.scores is not None
-    assert len(det.scores) == 2
-    assert det.scores[0] == 0.75
-    assert det.scores[1] == 0.75
+    assert isinstance(det.scores, np.ndarray)
+    assert len(det.scores) == num_points
+    np.testing.assert_array_equal(det.scores, [score] * num_points)
 
 
 def test_tracked_object_scores_attribute():
@@ -686,7 +688,6 @@ def test_empty_candidates_and_objects():
 def test_isinstance_type_checking_in_vectorized_distance(mock_det, mock_obj):
     """Test that VectorizedDistance uses isinstance for type checking."""
     from norfair.distances import VectorizedDistance
-    from norfair.tracker import Detection
 
     def dist_func(cands, objs):
         return np.zeros((len(cands), len(objs)))
@@ -719,23 +720,3 @@ def test_iou_validates_both_candidates_and_objects():
 
     with pytest.raises(ValueError, match="must be defined as np.array with"):
         iou(invalid_candidates, valid_objects)
-
-
-def test_detection_with_single_float_score():
-    """Test Detection accepts single float/int score (not just np.ndarray)."""
-    import numpy as np
-
-    from norfair import Detection
-
-    # Single point with float score
-    det = Detection(points=np.array([[1, 2]]), scores=0.8)
-    assert det.scores is not None
-    assert isinstance(det.scores, np.ndarray)
-    assert len(det.scores) == 1
-    assert det.scores[0] == 0.8
-
-    # Multiple points with single float score (should broadcast)
-    det = Detection(points=np.array([[1, 2], [3, 4], [5, 6]]), scores=0.9)
-    assert det.scores is not None
-    assert len(det.scores) == 3
-    np.testing.assert_array_equal(det.scores, [0.9, 0.9, 0.9])

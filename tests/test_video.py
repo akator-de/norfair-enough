@@ -1,7 +1,6 @@
 import os
 import sys
-import tempfile
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import numpy as np
 import pytest
@@ -20,15 +19,15 @@ def mock_cv2():
     mock_capture.get.side_effect = lambda prop: {
         0: 10,  # CAP_PROP_FRAME_COUNT
         5: 30.0,  # CAP_PROP_FPS
-        3: 100.0,  # CAP_PROP_FRAME_HEIGHT
-        4: 100.0,  # CAP_PROP_FRAME_WIDTH
+        3: 100.0,  # CAP_PROP_FRAME_WIDTH
+        4: 100.0,  # CAP_PROP_FRAME_HEIGHT
     }.get(prop, 0)
     mock_capture.release = Mock()
     mock.VideoCapture.return_value = mock_capture
     mock.CAP_PROP_FRAME_COUNT = 0
     mock.CAP_PROP_FPS = 5
-    mock.CAP_PROP_FRAME_HEIGHT = 3
-    mock.CAP_PROP_FRAME_WIDTH = 4
+    mock.CAP_PROP_FRAME_WIDTH = 3
+    mock.CAP_PROP_FRAME_HEIGHT = 4
 
     # Mock VideoWriter
     mock_writer = Mock()
@@ -76,10 +75,14 @@ def test_video_requires_input_source():
     """Test that Video requires either camera or input_path."""
     from norfair.video import Video
 
-    with pytest.raises(ValueError, match="You must set either 'camera' or 'input_path'"):
+    with pytest.raises(
+        ValueError, match="You must set either 'camera' or 'input_path'"
+    ):
         Video()
 
-    with pytest.raises(ValueError, match="You must set either 'camera' or 'input_path'"):
+    with pytest.raises(
+        ValueError, match="You must set either 'camera' or 'input_path'"
+    ):
         Video(camera=0, input_path="video.mp4")
 
 
@@ -172,7 +175,7 @@ def test_video_context_manager_early_break(mock_cv2, tmp_path):
     with patch("os.path.isfile", return_value=True):
         with Video(input_path=str(input_file)) as video:
             # Break after first frame
-            for frame in video:
+            for _frame in video:
                 break
 
         # Resources should still be released
@@ -368,7 +371,7 @@ def test_video_expanduser_for_tilde_path(mock_cv2):
     with patch("os.path.expanduser") as mock_expanduser:
         mock_expanduser.return_value = "/home/user/video.mp4"
         with patch("os.path.isfile", return_value=True):
-            video = Video(input_path="~/video.mp4")
+            Video(input_path="~/video.mp4")
             mock_expanduser.assert_called_once_with("~/video.mp4")
 
 
@@ -376,9 +379,11 @@ def test_video_nonexistent_file_raises_error(mock_cv2):
     """Test that nonexistent input file raises error."""
     from norfair.video import Video
 
-    with patch("os.path.isfile", return_value=False):
-        with pytest.raises(RuntimeError, match="does not exist"):
-            Video(input_path="/nonexistent/video.mp4")
+    with (
+        patch("os.path.isfile", return_value=False),
+        pytest.raises(RuntimeError, match="does not exist"),
+    ):
+        Video(input_path="/nonexistent/video.mp4")
 
 
 def test_video_invalid_file_raises_error(mock_cv2, tmp_path):
@@ -449,7 +454,7 @@ def test_video_frame_counter_increments(mock_cv2, tmp_path):
         ]
 
         assert video.frame_counter == 0
-        for i, frame in enumerate(video, start=1):
+        for i, _frame in enumerate(video, start=1):
             assert video.frame_counter == i
 
 
