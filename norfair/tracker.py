@@ -191,6 +191,17 @@ class Tracker:
         -------
         List[TrackedObject]
             The list of active tracked objects.
+
+        Notes
+        -----
+        This method **mutates** the ``Detection`` objects passed in:
+
+        - ``absolute_points`` is overwritten with absolute coordinates when
+          *coord_transformations* is provided.
+        - ``age`` is set to the matched ``TrackedObject``'s age when the
+          detection is stored internally.
+
+        If you need the original detection unchanged, pass a copy.
         """
         if coord_transformations is not None and detections is not None:
             for det in detections:
@@ -837,6 +848,17 @@ class Detection:
         tracked objects with new detections. Label's type must be hashable for drawing purposes.
     embedding : Any, optional
         The embedding for the reid_distance.
+
+    Attributes
+    ----------
+    points : np.ndarray
+        The detection points, validated to shape ``(n_points, n_dimensions)``.
+    absolute_points : np.ndarray
+        Starts as a copy of ``points``. When ``coord_transformations`` is passed
+        to :meth:`Tracker.update`, this is overwritten with absolute coordinates.
+    age : Optional[int]
+        Set by the tracker to the matched ``TrackedObject``'s age when the
+        detection is stored as a past detection.  ``None`` until then.
     """
 
     def __init__(
