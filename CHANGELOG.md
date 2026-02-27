@@ -26,6 +26,8 @@ This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2
 - Fix various typos and placeholder docstrings
 
 ### Changed
+- Document `Detection` mutation behavior in `Tracker.update()` (`.absolute_points`, `.age`) and `Detection` docstrings
+- Replace fragile `hasattr` type dispatch with `isinstance` in vectorized distance functions
 - Add context manager support and `close()` method to `Video` for reliable resource cleanup
 - Protect `TrackedObject.global_id` counter with a lock for thread safety
 - Export all public API symbols (`TrackedObject`, `Distance`, `FilterFactory`, `ColorLike`, camera motion and metrics classes) from the top-level package
