@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from norfair.tracker import _TrackedObjectFactory
+from norfair.tracker import Detection, _TrackedObjectFactory
 from norfair.utils import validate_points
 
 
@@ -14,20 +14,12 @@ def reset_global_count():
 
 @pytest.fixture
 def mock_det():
-    class FakeDetection:
-        def __init__(self, points, scores=None, label=None) -> None:
-            if not isinstance(points, np.ndarray):
-                points = np.array(points)
-            self.points = points
+    def _make_detection(points, scores=None, label=None):
+        if not isinstance(points, np.ndarray):
+            points = np.array(points)
+        return Detection(points=points, scores=scores, label=label)
 
-            if scores is not None and not isinstance(scores, np.ndarray):
-                scores = np.array(scores)
-                if scores.ndim == 0 and points.shape[0] > 1:
-                    scores = np.full(points.shape[0], scores)
-            self.scores = scores
-            self.label = label
-
-    return FakeDetection
+    return _make_detection
 
 
 @pytest.fixture
@@ -37,7 +29,7 @@ def mock_obj(mock_det):
             if not isinstance(points, np.ndarray):
                 points = np.array(points)
 
-            self.estimate = points
+            self.estimate = validate_points(points)
             self.last_detection = mock_det(points, scores=scores)
             self.label = label
 
