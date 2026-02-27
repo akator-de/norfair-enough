@@ -187,6 +187,8 @@ class VectorizedDistance(Distance):
             dtype=np.float32,
         )
 
+        from .tracker import Detection
+
         object_labels = np.array([o.label for o in objects]).astype(str)
         candidate_labels = np.array([c.label for c in candidates]).astype(str)
 
@@ -207,17 +209,10 @@ class VectorizedDistance(Distance):
             stacked_candidates = []
             for c in candidates:
                 if str(c.label) == label:
-                    # Detection objects have 'points', TrackedObject has 'estimate'
-                    # Use hasattr to determine which attribute to access
-                    if hasattr(c, "points"):
-                        # This is a Detection object
-                        c_points = c.points
-                        stacked_candidates.append(c_points.ravel())
+                    if isinstance(c, Detection):
+                        stacked_candidates.append(c.points.ravel())
                     else:
-                        # This is a TrackedObject
-                        # pyrefly: ignore[missing-attribute]
-                        c_estimate = c.estimate
-                        stacked_candidates.append(c_estimate.ravel())
+                        stacked_candidates.append(c.estimate.ravel())
             stacked_candidates = np.stack(stacked_candidates)
 
             # calculate the pairwise distances between objects and candidates with this label
