@@ -85,7 +85,7 @@ jobs:
         run: uv run pytest tests/ --ignore=tests/mot_metrics.py --cov=norfair --cov-report=term-missing --cov-report=xml
 
       - name: Upload to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           files: coverage.xml
           fail_ci_if_error: false
@@ -115,7 +115,7 @@ jobs:
           mv "norfair_enough-${VERSION}" norfair-dist
 
       - name: Save artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: norfair-dist
           path: norfair-dist
@@ -134,7 +134,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Download a single artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: norfair-dist
           path: ./norfair-dist
