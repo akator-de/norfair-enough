@@ -1,3 +1,5 @@
+"""Draw detection / tracked-object bounding boxes onto a video frame."""
+
 from collections.abc import Sequence
 
 import numpy as np
@@ -29,69 +31,67 @@ def draw_boxes(
     label_size: int | None = None,  # Deprecated
     draw_scores: bool = False,
 ) -> np.ndarray:
-    """
-    Draw bounding boxes corresponding to Detections or TrackedObjects.
+    """Draw bounding boxes for ``Detection`` or ``TrackedObject``.
 
     Parameters
     ----------
     frame : np.ndarray
         The OpenCV frame to draw on. Modified in place.
-    drawables : Union[Sequence[Detection], Sequence[TrackedObject]], optional
-        List of objects to draw, Detections and TrackedObjects are accepted.
-        This objects are assumed to contain 2 bi-dimensional points defining
-        the bounding box as `[[x0, y0], [x1, y1]]`.
+    drawables : Sequence[Detection] or Sequence[TrackedObject], optional
+        Objects to draw. Each object is assumed to contain two
+        two-dimensional points defining the bounding box as
+        ``[[x0, y0], [x1, y1]]``.
     color : ColorLike, optional
-        This parameter can take:
+        The color to use. May be:
 
-        1. A color as a tuple of ints describing the BGR `(0, 0, 255)`
-        2. A 6-digit hex string `"#FF0000"`
-        3. One of the defined color names `"red"`
-        4. A string defining the strategy to choose colors from the Palette:
+        1. A BGR int tuple like ``(0, 0, 255)``.
+        2. A 6-digit hex string such as ``"#FF0000"``.
+        3. One of the predefined color names (e.g. ``"red"``).
+        4. A palette strategy — ``"by_id"``, ``"by_label"`` or
+           ``"random"``.
 
-            1. based on the id of the objects `"by_id"`
-            2. based on the label of the objects `"by_label"`
-            3. random choice `"random"`
-
-        If using `by_id` or `by_label` strategy but your objects don't
-        have that field defined (Detections never have ids) the
-        selected color will be the same for all objects (Palette's default Color).
-    thickness : Optional[int], optional
-        Thickness or width of the line.
+        When ``"by_id"`` or ``"by_label"`` is used but the object lacks
+        that field (detections never have ``id``), every object is drawn
+        in the palette's default color.
+    thickness : int, optional
+        Thickness (width) of the box outline.
     random_color : bool, optional
-        **Deprecated**. Set color="random".
+        **Deprecated.** Set ``color="random"`` instead.
     color_by_label : bool, optional
-        **Deprecated**. Set color="by_label".
+        **Deprecated.** Set ``color="by_label"`` instead.
     draw_labels : bool, optional
-        If set to True, the label is added to a title that is drawn on top of the box.
-        If an object doesn't have a label this parameter is ignored.
+        If ``True``, the label is drawn above the box. Ignored when the
+        object has no label.
     draw_scores : bool, optional
-        If set to True, the score is added to a title that is drawn on top of the box.
-        If an object doesn't have a label this parameter is ignored.
-    text_size : Optional[float], optional
-        Size of the title, the value is used as a multiplier of the base size of the font.
-        By default the size is scaled automatically based on the frame size.
+        If ``True``, the detection score is drawn above the box. Ignored
+        when the object has no score.
+    text_size : float, optional
+        Size multiplier for the base font used for the text. By default,
+        the size is scaled automatically based on the frame size.
     draw_ids : bool, optional
-        If set to True, the id is added to a title that is drawn on top of the box.
-        If an object doesn't have an id this parameter is ignored.
-    text_color : Optional[ColorLike], optional
-        Color of the text. By default the same color as the box is used.
-    text_thickness : Optional[int], optional
-        Thickness of the font. By default it's scaled with the `text_size`.
+        If ``True``, the id is drawn above the box. Ignored when the
+        object has no id.
+    text_color : ColorLike, optional
+        Color of the text. Defaults to the same color as the box.
+    text_thickness : int, optional
+        Stroke thickness of the text. By default it scales with
+        ``text_size``.
     draw_box : bool, optional
-        Set to False to hide the box and just draw the text.
+        Set to ``False`` to hide the box and only draw the text.
     detections : Sequence[Detection], optional
-        **Deprecated**. Use drawables.
-    line_color: Optional[ColorLike], optional
-        **Deprecated**. Use color.
-    line_width: Optional[int], optional
-        **Deprecated**. Use thickness.
-    label_size: Optional[int], optional
-        **Deprecated**. Use text_size.
+        **Deprecated.** Use ``drawables``.
+    line_color : ColorLike, optional
+        **Deprecated.** Use ``color``.
+    line_width : int, optional
+        **Deprecated.** Use ``thickness``.
+    label_size : int, optional
+        **Deprecated.** Use ``text_size``.
 
     Returns
     -------
     np.ndarray
-        The resulting frame.
+        The ``frame`` passed in (drawn on in place).
+
     """
     #
     # handle deprecated parameters
@@ -194,7 +194,45 @@ def draw_tracked_boxes(
     label_size: int | None = None,
     label_width: int | None = None,
 ) -> np.ndarray:
-    "**Deprecated**. Use [`draw_boxes`][norfair.drawing.draw_boxes.draw_boxes]"
+    """Draw tracked-object bounding boxes onto ``frame``.
+
+    .. deprecated::
+        Use :func:`draw_boxes` instead. This function is kept for
+        backward compatibility and forwards its arguments to
+        :func:`draw_boxes`.
+
+    Parameters
+    ----------
+    frame : np.ndarray
+        The OpenCV frame to draw on. Modified in place.
+    objects : Sequence[TrackedObject]
+        The tracked objects to draw.
+    border_colors : tuple of int, optional
+        BGR border color. Ignored if ``color_by_label`` is ``True``.
+    border_width : int, optional
+        Thickness of the border line.
+    id_size : int, optional
+        Size of the id text. Set to ``0`` to disable id rendering.
+    id_thickness : int, optional
+        Stroke thickness of the id text.
+    draw_box : bool, optional
+        Set to ``False`` to hide the box and only draw the text.
+    color_by_label : bool, optional
+        If ``True``, color objects by label instead of by a fixed
+        ``border_colors``.
+    draw_labels : bool, optional
+        If ``True``, draw the label above the box.
+    label_size : int, optional
+        Size of the label text.
+    label_width : int, optional
+        Stroke thickness of the label text.
+
+    Returns
+    -------
+    np.ndarray
+        The ``frame`` passed in (drawn on in place).
+
+    """
     warn_once("draw_tracked_boxes is deprecated, use draw_boxes instead")
     # Determine color - default to "by_id" if border_colors is None
     selected_color: ColorLike = (

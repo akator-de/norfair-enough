@@ -1,3 +1,5 @@
+"""Draw a debugging grid in absolute coordinates over a video frame."""
+
 from functools import lru_cache
 
 import numpy as np
@@ -10,11 +12,13 @@ from .drawer import Drawer
 
 @lru_cache(maxsize=4)
 def _get_grid(size, w, h, polar=False):
-    """
-    Construct the grid of points.
+    """Build a cached grid of points in absolute coordinates.
 
-    Points are choosen
-    Results are cached since the grid in absolute coordinates doesn't change.
+    The points are sampled so that they lie on the intersection of
+    latitude/longitude lines on a unit sphere centered at the camera,
+    then projected onto the absolute plane and scaled to fit the frame.
+    Results are cached because in absolute coordinates the grid never
+    changes between frames.
     """
     # We need to get points on a semi-sphere of radious 1 centered around (0, 0)
 
@@ -55,31 +59,36 @@ def draw_absolute_grid(
     color: ColorType = Color.black,
     polar: bool = False,
 ):
-    """
-    Draw a grid of points in absolute coordinates.
+    """Draw a grid of points in absolute coordinates onto ``frame``.
 
-    Useful for debugging camera motion.
+    Useful for debugging camera-motion estimation: the grid stays put
+    in world space, so any apparent movement of the points reflects the
+    residual error of the estimated transformation.
 
-    The points are drawn as if the camera were in the center of a sphere and points are drawn in the intersection
-    of latitude and longitude lines over the surface of the sphere.
+    The points are drawn as if the camera sat at the center of a unit
+    sphere, at the intersection of latitude and longitude lines on that
+    sphere's surface.
 
     Parameters
     ----------
     frame : np.ndarray
-        The OpenCV frame to draw on.
+        The OpenCV frame to draw on. Modified in place.
     coord_transformations : CoordinatesTransformation
-        The coordinate transformation as returned by the [`MotionEstimator`][norfair.camera_motion.MotionEstimator]
+        The coordinate transformation as returned by a
+        [`MotionEstimator`][norfair.camera_motion.MotionEstimator].
     grid_size : int, optional
-        How many points to draw.
+        Number of grid subdivisions per axis.
     radius : int, optional
-        Size of each point.
+        Radius (in pixels) of each grid cross.
     thickness : int, optional
-        Thickness of each point
+        Stroke thickness of each grid cross.
     color : ColorType, optional
-        Color of the points.
-    polar : Bool, optional
-        If True, the points on the first frame are drawn as if the camera were pointing to a pole (viewed from the center of the earth).
-        By default, False is used which means the points are drawn as if the camera were pointing to the Equator.
+        BGR color of the grid crosses.
+    polar : bool, optional
+        If ``True``, on the first frame the points are drawn as if the
+        camera were pointing at a pole. When ``False`` (the default),
+        the camera is pointing at the equator.
+
     """
     h, w, _ = frame.shape
 

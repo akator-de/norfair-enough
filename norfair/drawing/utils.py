@@ -1,3 +1,5 @@
+"""Small private helpers shared by the drawing functions."""
+
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -7,6 +9,7 @@ if TYPE_CHECKING:
 
 
 def _centroid(tracked_points: np.ndarray) -> tuple[int, int]:
+    """Return the integer centroid of ``tracked_points``."""
     num_points = tracked_points.shape[0]
     sum_x = np.sum(tracked_points[:, 0])
     sum_y = np.sum(tracked_points[:, 1])
@@ -14,6 +17,7 @@ def _centroid(tracked_points: np.ndarray) -> tuple[int, int]:
 
 
 def _build_text(drawable: "Drawable", draw_labels, draw_ids, draw_scores):
+    """Assemble the ``label-id-score`` string displayed next to an object."""
     text = ""
     if draw_labels and drawable.label is not None:
         text = str(drawable.label)

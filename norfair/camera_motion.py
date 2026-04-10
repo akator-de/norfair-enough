@@ -1,4 +1,9 @@
-"Camera motion estimation module."
+"""Camera motion estimation module.
+
+Contains the abstract coordinate transformation interfaces, the built-in
+translation and homography implementations, and the :class:`MotionEstimator`
+that ties them to OpenCV's sparse optical flow.
+"""
 
 import contextlib
 import copy
@@ -21,85 +26,96 @@ logger = logging.getLogger(__name__)
 # Abstract interfaces
 #
 class CoordinatesTransformation(ABC):
-    """
-    Abstract class representing a coordinate transformation.
+    """Abstract base class representing a coordinate transformation.
 
-    Detections' and tracked objects' coordinates can be interpreted in 2 reference:
+    Detection and tracked-object coordinates can be interpreted in two
+    reference frames:
 
-    - _Relative_: their position on the current frame, (0, 0) is top left
-    - _Absolute_: their position on an fixed space, (0, 0)
-        is the top left of the first frame of the video.
+    - **Relative** — their position on the current frame, where ``(0, 0)``
+      is the top-left corner.
+    - **Absolute** — their position in a fixed space, where ``(0, 0)`` is
+      the top-left corner of the first frame of the video.
 
-    Therefore, coordinate transformation in this context is a class that can transform
-    coordinates in one reference to another.
+    A ``CoordinatesTransformation`` can map coordinates from one reference
+    to the other.
     """
 
     @abstractmethod
     def abs_to_rel(self, points: np.ndarray) -> np.ndarray:
-        pass
+        """Map absolute-frame points to the current relative frame."""
 
     @abstractmethod
     def rel_to_abs(self, points: np.ndarray) -> np.ndarray:
-        pass
+        """Map relative-frame points to the absolute frame."""
 
 
 class TransformationGetter(ABC):
-    """
-    Abstract class representing a method for finding CoordinatesTransformation between 2 sets of points
+    """Abstract base class for objects that infer a ``CoordinatesTransformation``.
+
+    Subclasses take two point clouds (previous and current frame
+    features) and return a flag indicating whether the reference frame
+    should be reset together with the inferred transformation.
     """
 
     @abstractmethod
     def __call__(
         self, curr_pts: np.ndarray, prev_pts: np.ndarray
     ) -> tuple[bool, CoordinatesTransformation | None]:
-        pass
+        """Return ``(update_reference, transformation)`` for the current pair."""
 
 
 #
 # Translation
 #
 class TranslationTransformation(CoordinatesTransformation):
-    """
-    Coordinate transformation between points using a simple translation
+    """Coordinate transformation using a simple 2D translation.
 
     Parameters
     ----------
     movement_vector : np.ndarray
         The vector representing the translation.
+
     """
 
     def __init__(self, movement_vector):
+        """Store the ``movement_vector`` used for the translation."""
         self.movement_vector = movement_vector
 
     def abs_to_rel(self, points: np.ndarray):
+        """Translate absolute points into the current relative frame."""
         return points + self.movement_vector
 
     def rel_to_abs(self, points: np.ndarray):
+        """Translate relative points back into the absolute frame."""
         return points - self.movement_vector
 
 
 class TranslationTransformationGetter(TransformationGetter):
-    """
-    Calculates TranslationTransformation between points.
+    """Compute a :class:`TranslationTransformation` from a pair of point clouds.
 
-    The camera movement is calculated as the mode of optical flow between the previous reference frame
-    and the current.
+    The camera movement is estimated as the mode of the optical flow
+    between the previous reference frame and the current one.
 
-    Comparing consecutive frames can make differences too small to correctly estimate the translation,
-    for this reason the reference frame is kept fixed as we progress through the video.
-    Eventually, if the transformation is no longer able to match enough points, the reference frame is updated.
+    Comparing consecutive frames can yield differences too small to
+    estimate the translation reliably, so the reference frame is kept
+    fixed as we progress through the video. Once the transformation can
+    no longer match enough points, the reference frame is reset.
 
     Parameters
     ----------
     bin_size : float
-        Before calculatin the mode, optiocal flow is bucketized into bins of this size.
-    proportion_points_used_threshold: float
-        Proportion of points that must be matched, otherwise the reference frame must be updated.
+        Before calculating the mode, optical-flow vectors are bucketized
+        into bins of this size.
+    proportion_points_used_threshold : float
+        Proportion of points that must be matched; if the ratio drops
+        below this value, the reference frame is updated.
+
     """
 
     def __init__(
         self, bin_size: float = 0.2, proportion_points_used_threshold: float = 0.9
     ) -> None:
+        """Store parameters and initialize the running flow accumulator."""
         self.bin_size = bin_size
         self.proportion_points_used_threshold = proportion_points_used_threshold
         self.data = None
@@ -107,6 +123,7 @@ class TranslationTransformationGetter(TransformationGetter):
     def __call__(
         self, curr_pts: np.ndarray, prev_pts: np.ndarray
     ) -> tuple[bool, TranslationTransformation]:
+        """Return the translation that best matches the optical flow."""
         # get flow
         flow = curr_pts - prev_pts
 
@@ -138,20 +155,22 @@ class TranslationTransformationGetter(TransformationGetter):
 # Homography
 #
 class HomographyTransformation(CoordinatesTransformation):
-    """
-    Coordinate transformation beweent points using an homography
+    """Coordinate transformation using a 3×3 homography matrix.
 
     Parameters
     ----------
     homography_matrix : np.ndarray
-        The matrix representing the homography
+        The matrix representing the homography.
+
     """
 
     def __init__(self, homography_matrix: np.ndarray):
+        """Store the homography and pre-compute its inverse."""
         self.homography_matrix = homography_matrix
         self.inverse_homography_matrix = np.linalg.inv(homography_matrix)
 
     def abs_to_rel(self, points: np.ndarray):
+        """Apply the forward homography to map absolute points to relative."""
         single_point = points.ndim == 1
         if single_point:
             points = points.reshape(1, -1)
@@ -167,6 +186,7 @@ class HomographyTransformation(CoordinatesTransformation):
         return result
 
     def rel_to_abs(self, points: np.ndarray):
+        """Apply the inverse homography to map relative points to absolute."""
         single_point = points.ndim == 1
         if single_point:
             points = points.reshape(1, -1)
@@ -183,33 +203,40 @@ class HomographyTransformation(CoordinatesTransformation):
 
 
 class HomographyTransformationGetter(TransformationGetter):
-    """
-    Calculates HomographyTransformation between points.
+    """Compute a :class:`HomographyTransformation` from a pair of point clouds.
 
-    The camera movement is represented as an homography that matches the optical flow between the previous reference frame
-    and the current.
+    The camera movement is represented as a homography that maps the
+    optical flow between the previous reference frame and the current one.
 
-    Comparing consecutive frames can make differences too small to correctly estimate the homography, often resulting in the identity.
-    For this reason the reference frame is kept fixed as we progress through the video.
-    Eventually, if the transformation is no longer able to match enough points, the reference frame is updated.
+    Comparing consecutive frames can make differences too small to
+    estimate the homography reliably, often collapsing to the identity.
+    The reference frame is therefore kept fixed as we progress through
+    the video; once the transformation can no longer match enough points,
+    it is reset.
 
     Parameters
     ----------
-    method : Optional[int], optional
-        One of openCV's method for finding homographies.
-        Valid options are: `[0, cv.RANSAC, cv.LMEDS, cv.RHO]`, by default `cv.RANSAC`
+    method : int, optional
+        One of OpenCV's methods for finding homographies. Valid options
+        are ``[0, cv2.RANSAC, cv2.LMEDS, cv2.RHO]``. Defaults to
+        ``cv2.RANSAC``.
     ransac_reproj_threshold : int, optional
-        Maximum allowed reprojection error to treat a point pair as an inlier. More info in links below.
+        Maximum allowed reprojection error to treat a point pair as an
+        inlier. See the OpenCV docs linked below for details.
     max_iters : int, optional
-        The maximum number of RANSAC iterations.  More info in links below.
+        The maximum number of RANSAC iterations. See the OpenCV docs
+        linked below for details.
     confidence : float, optional
-        Confidence level, must be between 0 and 1. More info in links below.
+        Confidence level, must be between 0 and 1. See the OpenCV docs
+        linked below for details.
     proportion_points_used_threshold : float, optional
-        Proportion of points that must be matched, otherwise the reference frame must be updated.
+        Proportion of points that must be matched; if the ratio drops
+        below this value, the reference frame is updated.
 
     See Also
     --------
-    [opencv.findHomography](https://docs.opencv.org/3.4/d9/d0c/group__calib3d.html#ga4abc2ece9fab9398f2e560d53c8c9780)
+    [`cv2.findHomography`](https://docs.opencv.org/3.4/d9/d0c/group__calib3d.html#ga4abc2ece9fab9398f2e560d53c8c9780)
+
     """
 
     def __init__(
@@ -220,6 +247,7 @@ class HomographyTransformationGetter(TransformationGetter):
         confidence: float = 0.995,
         proportion_points_used_threshold: float = 0.9,
     ) -> None:
+        """Store RANSAC parameters and initialize the running homography."""
         self.data = None
         if method is None:
             method = cv2.RANSAC
@@ -232,6 +260,7 @@ class HomographyTransformationGetter(TransformationGetter):
     def __call__(
         self, curr_pts: np.ndarray, prev_pts: np.ndarray
     ) -> tuple[bool, HomographyTransformation | None]:
+        """Return the homography that best matches the optical flow."""
         if not (
             isinstance(prev_pts, np.ndarray)
             and prev_pts.shape[0] >= 4
@@ -278,12 +307,12 @@ def _calc_optical_flow(
     next_img: np.ndarray,
     prev_pts: np.ndarray,
 ) -> tuple[np.ndarray | None, np.ndarray | None]:
-    """
-    Wrapper for cv2.calcOpticalFlowPyrLK with proper type handling.
+    """Typed wrapper around ``cv2.calcOpticalFlowPyrLK``.
 
-    OpenCV's calcOpticalFlowPyrLK can auto-initialize nextPts when it's empty.
-    We create an empty array of the correct type to satisfy the type checker
-    while maintaining the auto-initialization behavior.
+    OpenCV's ``calcOpticalFlowPyrLK`` can auto-initialize ``nextPts`` when
+    it is empty. We pass an empty array of the correct dtype/shape to
+    satisfy static type checkers while preserving the auto-initialization
+    behavior.
     """
     # Create an empty array for nextPts; OpenCV will auto-initialize it
     next_pts_init: np.ndarray = np.array([], dtype=np.float32).reshape(0, 1, 2)
@@ -303,6 +332,7 @@ def _get_sparse_flow(
     mask: np.ndarray | None = None,
     quality_level: float = 0.01,
 ) -> tuple[np.ndarray, np.ndarray]:
+    """Track a set of corner features between two grayscale frames."""
     if prev_pts is None:
         # get points
         prev_pts_result = cv2.goodFeaturesToTrack(
@@ -332,29 +362,33 @@ def _get_sparse_flow(
 
 
 class MotionEstimator:
-    """
-    Estimator of the motion of the camera.
+    """Camera motion estimator driven by sparse optical flow.
 
-    Uses optical flow to estimate the motion of the camera from frame to frame.
-    The optical flow is calculated on a sample of strong points (corners).
+    Uses OpenCV optical flow on a set of strong corner features to
+    estimate the motion of the camera from frame to frame and feeds the
+    result through a :class:`TransformationGetter` to recover a
+    :class:`CoordinatesTransformation`.
 
     Parameters
     ----------
     max_points : int, optional
-        Maximum amount of points sampled.
-        More points make the estimation process slower but more precise
+        Maximum number of points sampled. More points make the estimation
+        slower but more precise.
     min_distance : int, optional
-        Minimum distance between the sample points.
+        Minimum distance between sampled points.
     block_size : int, optional
-        Size of an average block when finding the corners. More info in links below.
+        Size of the averaging block used when finding corners. See the
+        OpenCV link below for details.
     transformations_getter : TransformationGetter, optional
-        An instance of TransformationGetter. By default [`HomographyTransformationGetter`][norfair.camera_motion.HomographyTransformationGetter]
+        The transformation estimator used on the sampled points. Defaults
+        to
+        [`HomographyTransformationGetter`][norfair.camera_motion.HomographyTransformationGetter].
     draw_flow : bool, optional
-        Draws the optical flow on the frame for debugging.
-    flow_color : Optional[Tuple[int, int, int]], optional
-        Color of the drawing, by default blue.
+        Draw the optical flow on the frame in place, for debugging.
+    flow_color : tuple[int, int, int], optional
+        BGR color for the flow drawing. Defaults to a dark blue.
     quality_level : float, optional
-        Parameter characterizing the minimal accepted quality of image corners.
+        Minimum accepted quality of the image corners.
 
     Examples
     --------
@@ -364,13 +398,16 @@ class MotionEstimator:
     >>> tracker = Tracker(...)
     >>> motion_estimator = MotionEstimator()
     >>> for frame in video:
-    >>>    detections = get_detections(frame)  # runs detector and returns Detections
-    >>>    coord_transformation = motion_estimator.update(frame)
-    >>>    tracked_objects = tracker.update(detections, coord_transformations=coord_transformation)
+    ...     detections = get_detections(frame)
+    ...     coord_transformation = motion_estimator.update(frame)
+    ...     tracked_objects = tracker.update(
+    ...         detections, coord_transformations=coord_transformation
+    ...     )
 
     See Also
     --------
-    For more infor on how the points are sampled: [OpenCV.goodFeaturesToTrack](https://docs.opencv.org/3.4/dd/d1a/group__imgproc__feature.html#ga1d6bb77486c8f92d79c8793ad995d541)
+    [`cv2.goodFeaturesToTrack`](https://docs.opencv.org/3.4/dd/d1a/group__imgproc__feature.html#ga1d6bb77486c8f92d79c8793ad995d541)
+
     """
 
     def __init__(
@@ -383,6 +420,7 @@ class MotionEstimator:
         flow_color: tuple[int, int, int] | None = None,
         quality_level: float = 0.01,
     ):
+        """Initialize sampling parameters and the transformation getter."""
         self.max_points = max_points
         self.min_distance = min_distance
         self.block_size = block_size
@@ -407,31 +445,32 @@ class MotionEstimator:
     def update(
         self, frame: np.ndarray, mask: np.ndarray | None = None
     ) -> CoordinatesTransformation | None:
-        """
-        Estimate camera motion for each frame
+        """Estimate the camera motion for one frame.
 
         Parameters
         ----------
         frame : np.ndarray
-            The frame.
+            The current video frame.
         mask : np.ndarray, optional
-            An optional mask to avoid areas of the frame when sampling the corner.
-            Must be an array of shape `(frame.shape[0], frame.shape[1])`, dtype same as frame,
-            and values in {0, 1}.
+            Optional mask excluding regions from corner sampling. Must
+            have shape ``(frame.shape[0], frame.shape[1])``, match the
+            frame's dtype, and contain values in ``{0, 1}``.
 
-            In general, the estimation will work best when it samples many points from the background;
-            with that intention, this parameters is usefull for masking out the detections/tracked objects,
-            forcing the MotionEstimator ignore the moving objects.
-            Can be used to mask static areas of the image, such as score overlays in sport transmisions or
-            timestamps in security cameras.
+            In general, the estimation works best when many points come
+            from the background, so this parameter is useful for masking
+            out detections or tracked objects and forcing the estimator
+            to ignore moving objects. It can also be used to mask static
+            overlays like sport scoreboards or security-camera
+            timestamps.
 
         Returns
         -------
-        CoordinatesTransformation
-            The CoordinatesTransformation that can transform coordinates on this frame to absolute coordinates
-            or vice versa.
-        """
+        CoordinatesTransformation or None
+            A coordinate transformation that can map coordinates on this
+            frame to absolute coordinates and vice versa, or ``None`` if
+            the transformation could not be recovered.
 
+        """
         self.gray_next = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         if self.gray_prvs is None:
             self.gray_prvs = self.gray_next

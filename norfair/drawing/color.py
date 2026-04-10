@@ -1,3 +1,5 @@
+"""Color palette utilities for Norfair drawing helpers."""
+
 import re
 from collections.abc import Hashable, Iterable
 
@@ -8,22 +10,24 @@ ColorLike = ColorType | str
 
 
 def hex_to_bgr(hex_value: str) -> ColorType:
-    """Converts conventional 6 digits hex colors to BGR tuples
+    """Convert a hex color string to a BGR tuple.
 
     Parameters
     ----------
     hex_value : str
-        hex value with leading `#` for instance `"#ff0000"`
+        Hex value with a leading ``#``. Both 6-digit (``"#ff0000"``)
+        and 3-digit (``"#f00"``) shorthand are accepted.
 
     Returns
     -------
-    Tuple[int, int, int]
-        BGR values
+    tuple of int
+        The ``(B, G, R)`` triple corresponding to ``hex_value``.
 
     Raises
     ------
     ValueError
-        if the string is invalid
+        If ``hex_value`` does not match a supported hex color format.
+
     """
     if re.match("#[a-fA-F0-9]{6}$", hex_value):
         return (
@@ -42,11 +46,12 @@ def hex_to_bgr(hex_value: str) -> ColorType:
 
 
 class Color:
-    """
-    Contains predefined colors.
+    """Namespace of predefined BGR color constants.
 
-    Colors are defined as a Tuple of integers between 0 and 255 expressing the values in BGR
-    This is the format opencv uses.
+    Colors are stored as ``(B, G, R)`` tuples of integers in the range
+    ``0-255`` — the format that OpenCV consumes. The set includes the
+    CSS/PIL named colors plus the Seaborn ``tab20`` and ``colorblind``
+    palettes (accessible as ``tab1``..``tab20`` and ``cb1``..``cb10``).
     """
 
     # from PIL.ImageColors.colormap
@@ -234,21 +239,30 @@ class Color:
 
 
 def parse_color(color_like: ColorLike) -> ColorType:
-    """Makes best effort to parse the given value to a Color
+    """Best-effort parse of a ``ColorLike`` value to a ``ColorType``.
 
     Parameters
     ----------
     color_like : ColorLike
-        Can be one of:
+        One of:
 
-        1. a string with the 6 digits hex value (`"#ff0000"`)
-        2. a string with one of the names defined in Colors (`"red"`)
-        3. a BGR tuple (`(0, 0, 255)`)
+        1. A 6-digit hex string (e.g. ``"#ff0000"``).
+        2. The name of one of the predefined colors on :class:`Color`
+           (e.g. ``"red"``).
+        3. A BGR tuple (e.g. ``(0, 0, 255)``).
 
     Returns
     -------
-    Color
-        The BGR tuple.
+    tuple of int
+        The resolved ``(B, G, R)`` triple.
+
+    Raises
+    ------
+    ValueError
+        If ``color_like`` is a malformed hex string.
+    AttributeError
+        If ``color_like`` is an unknown color name.
+
     """
     if isinstance(color_like, str):
         if color_like.startswith("#"):
@@ -317,17 +331,25 @@ PALETTES = {
 
 
 class Palette:
-    """
-    Class to control the color palette for drawing.
+    """Process-wide color palette used by the drawing helpers.
+
+    The palette powers the ``"by_id"`` and ``"by_label"`` color
+    strategies in functions like
+    [`draw_points`][norfair.drawing.draw_points.draw_points] and
+    [`draw_boxes`][norfair.drawing.draw_boxes.draw_boxes].
 
     Examples
     --------
-    Change palette:
-    >>> from norfair import Palette
-    >>> Palette.set("colorblind")
-    >>> # or a custom palette
-    >>> from norfair import Color
-    >>> Palette.set([Color.red, Color.blue, "#ffeeff"])
+    Change the active palette by name::
+
+        >>> from norfair import Palette
+        >>> Palette.set("colorblind")
+
+    Or supply a custom list of colors::
+
+        >>> from norfair import Color, Palette
+        >>> Palette.set([Color.red, Color.blue, "#ffeeff"])
+
     """
 
     _colors = PALETTES["tab10"]
@@ -335,15 +357,23 @@ class Palette:
 
     @classmethod
     def set(cls, palette: str | Iterable[ColorLike]):
-        """
-        Selects a color palette.
+        """Select the active color palette.
 
         Parameters
         ----------
-        palette : Union[str, Iterable[ColorLike]]
-            can be either
-            - the name of one of the predefined palettes `tab10`, `tab20`, or `colorblind`
-            - a list of ColorLike objects that can be parsed by [`parse_color`][norfair.drawing.color.parse_color]
+        palette : str or iterable of ColorLike
+            Either:
+
+            - The name of one of the predefined palettes: ``"tab10"``,
+              ``"tab20"`` or ``"colorblind"``.
+            - An iterable of ``ColorLike`` values that can be parsed by
+              [`parse_color`][norfair.drawing.color.parse_color].
+
+        Raises
+        ------
+        ValueError
+            If ``palette`` is an unknown palette name.
+
         """
         if isinstance(palette, str):
             try:
@@ -361,18 +391,32 @@ class Palette:
 
     @classmethod
     def set_default_color(cls, color: ColorLike):
-        """
-        Selects the default color of `choose_color` when hashable is None.
+        """Set the fallback color used when ``choose_color`` is called with ``None``.
 
         Parameters
         ----------
         color : ColorLike
             The new default color.
+
         """
         cls._default_color = parse_color(color)
 
     @classmethod
     def choose_color(cls, hashable: Hashable) -> ColorType:
+        """Deterministically pick a color for ``hashable`` from the palette.
+
+        Parameters
+        ----------
+        hashable : Hashable or None
+            Any hashable value (typically a tracked-object id or label).
+            When ``None``, the palette's default color is returned.
+
+        Returns
+        -------
+        tuple of int
+            A BGR triple from the active palette.
+
+        """
         if hashable is None:
             return cls._default_color
         return cls._colors[abs(hash(hashable)) % len(cls._colors)]
