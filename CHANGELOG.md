@@ -6,6 +6,26 @@ This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2
 
 ## [Unreleased]
 
+### Added
+- Add CodeRabbit-generated unit tests for `Video`, tracker, and package exports (#26)
+- Add CodeRabbit configuration for automated PR reviews (#3)
+
+### Changed
+- Document `Detection` mutation behavior in `Tracker.update()` (`.absolute_points`, `.age`) and `Detection` docstrings (#22)
+- Replace fragile `hasattr` type dispatch with `isinstance` in vectorized distance functions (#23)
+- Add context manager support and `close()` method to `Video` for reliable resource cleanup (#20)
+- Protect `TrackedObject.global_id` counter with a lock for thread safety (#18)
+- Export all public API symbols (`TrackedObject`, `Distance`, `FilterFactory`, `ColorLike`, camera motion and metrics classes) from the top-level package
+- Replace mutable default argument in `Tracker.__init__`
+- Unify logging to use `logging.getLogger(__name__)` across all modules
+- Replace `assert` with `ValueError` for input validation
+- Use `__getattr__` instead of `__getattribute__` in dummy import classes
+- Validate both candidates and objects in `iou` distance function
+- Improve test coverage for `NoFilterFactory`, label matching, and drawing (#15)
+- Improve CI pipeline: lint on push, release gates, coverage with extras (#16)
+- Update demos to use the `norfair-enough` package (#4)
+- Bump GitHub Actions dependencies: `actions/download-artifact` v6→v7, `actions/labeler` v5→v6 (#17)
+
 ### Fixed
 - Fix missing f-string for camera output filename (`video.py`)
 - Fix `draw_tracked_objects` not returning the frame
@@ -23,21 +43,7 @@ This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2
 - Fix typo "Extecting" in `Drawable` error message
 - Fix memory leak for destroyed objects in `AbsolutePaths`
 - Fix wrong function reference in `draw_tracked_boxes` docstring
-- Fix various typos and placeholder docstrings
-
-### Changed
-- Document `Detection` mutation behavior in `Tracker.update()` (`.absolute_points`, `.age`) and `Detection` docstrings
-- Replace fragile `hasattr` type dispatch with `isinstance` in vectorized distance functions
-- Add context manager support and `close()` method to `Video` for reliable resource cleanup
-- Protect `TrackedObject.global_id` counter with a lock for thread safety
-- Export all public API symbols (`TrackedObject`, `Distance`, `FilterFactory`, `ColorLike`, camera motion and metrics classes) from the top-level package
-- Replace mutable default argument in `Tracker.__init__`
-- Unify logging to use `logging.getLogger(__name__)` across all modules
-- Replace `assert` with `ValueError` for input validation
-- Use `__getattr__` instead of `__getattribute__` in dummy import classes
-- Validate both candidates and objects in `iou` distance function
-- Improve test coverage for `NoFilterFactory`, label matching, and drawing
-- Improve CI pipeline: lint on push, release gates, coverage with extras
+- Fix various typos and placeholder docstrings (#14)
 
 ## [2.4.0] - 2025-02-26
 
