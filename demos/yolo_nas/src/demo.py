@@ -148,6 +148,7 @@ for input_path in args.files:
             conf_threshold=args.conf_threshold,
             iou_threshold=args.iou_threshold,
             image_size=args.img_size,
+            classes=args.classes,
         )
 
         detections = yolo_detections_to_norfair_detections(

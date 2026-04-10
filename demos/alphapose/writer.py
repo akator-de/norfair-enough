@@ -271,12 +271,7 @@ class DataWriter:
                         for p in result["result"]
                     ]
                     tracked_objects = self.tracker.update(detections=detections)
-                    norfair.draw_tracked_objects(img, tracked_objects)
-
-                    if hm_data.size()[1] == 49 or self.opt.vis_fast:
-                        pass
-                    else:
-                        pass
+                    norfair.draw_points(img, tracked_objects)
 
                     self.write_image(
                         img, im_name, stream=stream if self.save_video else None

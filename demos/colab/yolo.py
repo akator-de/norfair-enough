@@ -27,6 +27,8 @@ class YOLO:
         except Exception as err:
             raise Exception(f"Failed to load model from {model_path}") from err
 
+        self.model.to(device)
+
     def __call__(
         self,
         img: str | np.ndarray,
@@ -34,7 +36,7 @@ class YOLO:
         iou_threshold: float = 0.45,
         image_size: int = 720,
         classes: list[int] | None = None,
-    ) -> torch.tensor:
+    ) -> torch.Tensor:
         self.model.conf = conf_threshold
         self.model.iou = iou_threshold
         if classes is not None:
@@ -44,7 +46,7 @@ class YOLO:
 
 
 def yolo_detections_to_norfair_detections(
-    yolo_detections: torch.tensor,
+    yolo_detections: torch.Tensor,
     track_points: str = "centroid",  # bbox or centroid
 ) -> list[Detection]:
     """convert detections_as_xywh to norfair detections"""

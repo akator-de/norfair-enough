@@ -1,11 +1,9 @@
 """Test that public API exports are accessible from the top-level package."""
 
-import pytest
-
 
 def test_tracker_exports():
     """Test that tracker classes are exported."""
-    from norfair import Detection, Tracker, TrackedObject
+    from norfair import Detection, TrackedObject, Tracker
 
     assert Detection is not None
     assert Tracker is not None
@@ -223,7 +221,6 @@ def test_distance_function_from_name():
 
 def test_video_context_manager_from_top_level():
     """Test that Video context manager works from top-level import."""
-    from unittest.mock import patch
 
     from norfair import Video
 
