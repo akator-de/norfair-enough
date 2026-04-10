@@ -260,8 +260,8 @@ class ScipyDistance(VectorizedDistance):
     metric : str, optional
         Defines the specific Scipy metric to use to calculate the pairwise distances between
         new candidates and objects.
-
-    Other kwargs are passed through to cdist
+    **kwargs
+        Additional keyword arguments passed through to `scipy.spatial.distance.cdist`.
 
     See Also
     --------

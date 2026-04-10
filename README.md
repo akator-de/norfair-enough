@@ -60,7 +60,7 @@ Norfair was originally built by [Tryolabs](https://tryolabs.com).
 
 ## Examples & demos
 
-We provide several examples of how Norfair can be used to add tracking capabilities to different detectors, and also showcase more advanced features. All demos are available in the upstream repository at [tryolabs/norfair](https://github.com/tryolabs/norfair/tree/master/demos).
+We provide several examples of how Norfair can be used to add tracking capabilities to different detectors, and also showcase more advanced features. All demos are available in the [`demos/`](https://github.com/akator-de/norfair-enough/tree/main/demos) directory of this repository (originally adapted from [tryolabs/norfair](https://github.com/tryolabs/norfair/tree/master/demos)).
 
 > Note: for ease of reproducibility, the demos provide Dockerfiles. Even though Norfair does not need a GPU, the default configuration of most demos requires a GPU to be able to run the detectors. For this, make sure you install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) so that your GPU can be shared with Docker.
 >
@@ -70,28 +70,28 @@ We provide several examples of how Norfair can be used to add tracking capabilit
 
 Most tracking demos are showcased with vehicles and pedestrians, but the detectors are generally trained with many more classes from the [COCO dataset](https://cocodataset.org/).
 
-1. [YOLOv7](https://github.com/tryolabs/norfair/tree/master/demos/yolov7): tracking object centroids or bounding boxes.
-2. [YOLOv5](https://github.com/tryolabs/norfair/tree/master/demos/yolov5): tracking object centroids or bounding boxes.
-3. [YOLOv4](https://github.com/tryolabs/norfair/tree/master/demos/yolov4): tracking object centroids.
-4. [Detectron2](https://github.com/tryolabs/norfair/tree/master/demos/detectron2): tracking object centroids.
-5. [AlphaPose](https://github.com/tryolabs/norfair/tree/master/demos/alphapose): tracking human keypoints (pose estimation) and inserting Norfair into a complex existing pipeline.
-6. [OpenPose](https://github.com/tryolabs/norfair/tree/master/demos/openpose): tracking human keypoints.
-7. [YOLOPv2](https://github.com/CAIC-AD/YOLOPv2): tracking with a model for traffic object detection, drivable road area segmentation, and lane line detection.
-8. [YOLO-NAS](https://github.com/tryolabs/norfair/tree/master/demos/yolo_nas): tracking object centroids or bounding boxes.
+1. [YOLOv7](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov7): tracking object centroids or bounding boxes.
+2. [YOLOv5](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov5): tracking object centroids or bounding boxes.
+3. [YOLOv4](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov4): tracking object centroids.
+4. [Detectron2](https://github.com/akator-de/norfair-enough/tree/main/demos/detectron2): tracking object centroids.
+5. [AlphaPose](https://github.com/akator-de/norfair-enough/tree/main/demos/alphapose): tracking human keypoints (pose estimation) and inserting Norfair into a complex existing pipeline.
+6. [OpenPose](https://github.com/akator-de/norfair-enough/tree/main/demos/openpose): tracking human keypoints.
+7. [YOLOPv2](https://github.com/akator-de/norfair-enough/tree/main/demos/yolopv2): tracking with a model for traffic object detection, drivable road area segmentation, and lane line detection.
+8. [YOLO-NAS](https://github.com/akator-de/norfair-enough/tree/main/demos/yolo_nas): tracking object centroids or bounding boxes.
 
 ### Advanced features
 
-1. [Speed up pose estimation by extrapolating detections](https://github.com/tryolabs/norfair/tree/master/demos/openpose) using [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose).
-2. [Track both bounding boxes and human keypoints](https://github.com/tryolabs/norfair/tree/master/demos/keypoints_bounding_boxes) (multi-class), unifying the detections from a YOLO model and OpenPose.
-3. [Re-identification (ReID)](https://github.com/tryolabs/norfair/tree/master/demos/reid) of tracked objects using appearance embeddings. This is a good starting point for scenarios with a lot of occlusion, in which the Kalman filter alone would struggle.
-4. [Accurately track objects even if the camera is moving](https://github.com/tryolabs/norfair/tree/master/demos/camera_motion), by estimating camera motion potentially accounting for pan, tilt, rotation, movement in any direction, and zoom.
-5. [Track points in 3D](https://github.com/tryolabs/norfair/tree/master/demos/3d_track), using [MediaPipe Objectron](https://google.github.io/mediapipe/solutions/objectron.html).
-6. [Tracking of small objects](https://github.com/tryolabs/norfair/tree/master/demos/sahi), using [SAHI: Slicing Aided Hyper Inference](https://github.com/obss/sahi).
+1. [Speed up pose estimation by extrapolating detections](https://github.com/akator-de/norfair-enough/tree/main/demos/openpose) using [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose).
+2. [Track both bounding boxes and human keypoints](https://github.com/akator-de/norfair-enough/tree/main/demos/keypoints_bounding_boxes) (multi-class), unifying the detections from a YOLO model and OpenPose.
+3. [Re-identification (ReID)](https://github.com/akator-de/norfair-enough/tree/main/demos/reid) of tracked objects using appearance embeddings. This is a good starting point for scenarios with a lot of occlusion, in which the Kalman filter alone would struggle.
+4. [Accurately track objects even if the camera is moving](https://github.com/akator-de/norfair-enough/tree/main/demos/camera_motion), by estimating camera motion potentially accounting for pan, tilt, rotation, movement in any direction, and zoom.
+5. [Track points in 3D](https://github.com/akator-de/norfair-enough/tree/main/demos/3d_track), using [MediaPipe Objectron](https://google.github.io/mediapipe/solutions/objectron.html).
+6. [Tracking of small objects](https://github.com/akator-de/norfair-enough/tree/main/demos/sahi), using [SAHI: Slicing Aided Hyper Inference](https://github.com/obss/sahi).
 
 ### Benchmarking and profiling
 
-1. [Kalman filter and distance function profiling](https://github.com/tryolabs/norfair/tree/master/demos/profiling) using [TRT pose estimator](https://github.com/NVIDIA-AI-IOT/trt_pose).
-2. Computation of [MOT17](https://motchallenge.net/data/MOT17/) scores using [motmetrics4norfair](https://github.com/tryolabs/norfair/tree/master/demos/motmetrics4norfair).
+1. [Kalman filter and distance function profiling](https://github.com/akator-de/norfair-enough/tree/main/demos/profiling) using [TRT pose estimator](https://github.com/NVIDIA-AI-IOT/trt_pose).
+2. Computation of [MOT17](https://motchallenge.net/data/MOT17/) scores using [motmetrics4norfair](https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair).
 
 ## How it works
 
@@ -111,7 +111,7 @@ import numpy as np
 from detectron2.config import get_cfg
 from detectron2.engine import DefaultPredictor
 
-from norfair import Detection, Tracker, Video, draw_tracked_objects
+from norfair import Detection, Tracker, Video, draw_points
 
 # Set up Detectron2 object detector
 cfg = get_cfg()
@@ -128,7 +128,7 @@ for frame in video:
     detections = detector(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
     detections = [Detection(p) for p in detections['instances'].pred_boxes.get_centers().cpu().numpy()]
     tracked_objects = tracker.update(detections=detections)
-    draw_tracked_objects(frame, tracked_objects)
+    draw_points(frame, drawables=tracked_objects)
     video.write(frame)
 ```
 
@@ -153,7 +153,7 @@ If you are looking for a tracker, here are some other projects worth noting:
 
 ## Benchmarks
 
-[MOT17](https://motchallenge.net/data/MOT17/) and [MOT20](https://motchallenge.net/data/MOT17/) results obtained using [motmetrics4norfair](https://github.com/tryolabs/norfair/tree/master/demos/motmetrics4norfair) demo script on the `train` split. We used detections obtained with [ByteTrack's](https://github.com/ifzhang/ByteTrack) YOLOX object detection model.
+[MOT17](https://motchallenge.net/data/MOT17/) and [MOT20](https://motchallenge.net/data/MOT17/) results obtained using [motmetrics4norfair](https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair) demo script on the `train` split. We used detections obtained with [ByteTrack's](https://github.com/ifzhang/ByteTrack) YOLOX object detection model.
 
 | MOT17 Train |   IDF1 IDP IDR    | Rcll  | Prcn  |  MOTA MOTP  |
 | :---------: | :---------------: | :---: | :---: | :---------: |
