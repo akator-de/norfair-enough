@@ -553,6 +553,13 @@ class TrackedObject:
         self.point_hit_counter: np.ndarray = self.detected_at_least_once_points.astype(
             int
         )
+        # Per-point mask tracking which points were matched in the current frame.
+        # On creation, the initial detection counts as the current-frame match.
+        # tracker_step() clears this mask before each new frame, and hit() sets
+        # it for points that were matched this frame. See GH#2.
+        self._point_matched_in_current_frame: np.ndarray = (
+            self.detected_at_least_once_points.copy()
+        )
         initial_detection.age = self.age
         self.past_detections_length = past_detections_length
         self.past_detections: list[Detection]
@@ -578,6 +585,10 @@ class TrackedObject:
         self.hit_counter -= 1
         self.point_hit_counter -= 1
         self.age += 1
+        # Clear the current-frame match mask. hit() will set entries back to
+        # True for points that get matched this frame; points that remain
+        # unmatched stay False so live_points correctly reports them as dead.
+        self._point_matched_in_current_frame = np.zeros(self.num_points, dtype=bool)
         # Advances the tracker's state
         self.filter.predict()
         self.scores = None
@@ -646,7 +657,14 @@ class TrackedObject:
 
     @property
     def live_points(self):
-        return self.point_hit_counter > 0
+        # A point is "live" only if it was matched to a detection in the
+        # current frame AND its pointwise hit counter is still positive.
+        # Previously this relied solely on `point_hit_counter > 0`, which
+        # produced stale True values: an unmatched track still reported
+        # live_points=True because tracker_step() only decrements the
+        # counter by one per frame, while hit() could have pushed it well
+        # above 1 (GH#2, tryolabs/norfair#328).
+        return (self.point_hit_counter > 0) & self._point_matched_in_current_frame
 
     def hit(self, detection: "Detection", period: int = 1):
         """Update tracked object with a new detection
@@ -699,6 +717,12 @@ class TrackedObject:
             self.point_hit_counter >= self.pointwise_hit_counter_max
         ] = self.pointwise_hit_counter_max
         self.point_hit_counter[self.point_hit_counter < 0] = 0
+        # Record which points were matched in the current frame so that
+        # `live_points` reflects the match state of *this* frame. See GH#2.
+        self._point_matched_in_current_frame = np.logical_or(
+            self._point_matched_in_current_frame,
+            points_over_threshold_mask,
+        )
         H_vel = np.zeros(H_pos.shape)  # But we don't directly measure velocity
         H = np.hstack([H_pos, H_vel])
         self.filter.update(
@@ -775,6 +799,11 @@ class TrackedObject:
         self.reid_hit_counter = None
         self.hit_counter = self.initial_period * 2
         self.point_hit_counter = tracked_object.point_hit_counter
+        # The not-yet-initialized tracked object was just matched this frame,
+        # so adopt its current-frame match mask as well (GH#2).
+        self._point_matched_in_current_frame = (
+            tracked_object._point_matched_in_current_frame
+        )
         self.last_distance = tracked_object.last_distance
         self.current_min_distance = tracked_object.current_min_distance
         self.last_detection = tracked_object.last_detection
