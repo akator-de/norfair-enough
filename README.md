@@ -180,6 +180,6 @@ For citations in academic publications, please export your desired citation form
 
 ## License
 
-Copyright © 2022, [Tryolabs](https://tryolabs.com). Released under the [BSD 3-Clause](https://github.com/akator-de/norfair-enough/blob/main/LICENSE).
+Copyright © 2022, [Tryolabs](https://tryolabs.com) and © 2026, Akator GmbH and contributors. Released under the [BSD 3-Clause](https://github.com/akator-de/norfair-enough/blob/main/LICENSE).
 
 This project is a fork of [tryolabs/norfair](https://github.com/tryolabs/norfair).
