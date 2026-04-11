@@ -121,7 +121,11 @@ class TranslationTransformationGetter(TransformationGetter):
 
         flow_mode = unique_flows[max_index]
 
-        with contextlib.suppress(TypeError):
+        # Accumulate against the previously stored mode so we report the total
+        # translation since the first frame. On the very first call `self.data`
+        # is still None and there is nothing to accumulate against — leave the
+        # freshly computed mode untouched.
+        if self.data is not None:
             flow_mode += self.data
 
         if update_prvs:

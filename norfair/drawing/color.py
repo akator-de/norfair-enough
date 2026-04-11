@@ -253,8 +253,14 @@ def parse_color(color_like: ColorLike) -> ColorType:
     if isinstance(color_like, str):
         if color_like.startswith("#"):
             return hex_to_bgr(color_like)
-        else:
+        try:
             return getattr(Color, color_like)
+        except AttributeError as exc:
+            raise ValueError(
+                f"Unknown color name {color_like!r}. Pass a 6-digit hex "
+                f"string like '#ff0000', a BGR tuple, or one of the names "
+                f"defined in norfair.drawing.Color."
+            ) from exc
     # color_like is already a ColorType tuple at this point
     # Ensure it's properly typed as tuple[int, int, int]
     return (int(color_like[0]), int(color_like[1]), int(color_like[2]))

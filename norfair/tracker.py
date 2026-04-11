@@ -749,6 +749,12 @@ class TrackedObject:
         It does so by keeping a fixed amount of past detections saved into each
         TrackedObject, while maintaining them distributed uniformly through the object's
         lifetime.
+
+        Note
+        ----
+        This method sets ``detection.age`` on the caller's ``Detection`` object.
+        Callers that retain references to their detections will observe this
+        mutation. See the issue tracker for the plan to make this non-mutating.
         """
         detection.age = self.age
         if self.past_detections_length == 0:
