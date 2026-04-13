@@ -1095,7 +1095,9 @@ class KalmanFilter:
         covariances_p = zeros((n, self.dim_x, self.dim_x))
 
         if update_first:
-            for i, (z, F, Q, H, R, B, u) in enumerate(zip(zs, Fs, Qs, Hs, Rs, Bs, us)):
+            for i, (z, F, Q, H, R, B, u) in enumerate(
+                zip(zs, Fs, Qs, Hs, Rs, Bs, us)
+            ):  # pyrefly: ignore[bad-argument-type]
                 self.update(z, R=R, H=H)
                 means[i, :] = self.x
                 covariances[i, :, :] = self.P
@@ -1107,7 +1109,9 @@ class KalmanFilter:
                 if saver is not None:
                     saver.save()
         else:
-            for i, (z, F, Q, H, R, B, u) in enumerate(zip(zs, Fs, Qs, Hs, Rs, Bs, us)):
+            for i, (z, F, Q, H, R, B, u) in enumerate(
+                zip(zs, Fs, Qs, Hs, Rs, Bs, us)
+            ):  # pyrefly: ignore[bad-argument-type]
                 self.predict(u=u, B=B, F=F, Q=Q)
                 means_p[i, :] = self.x
                 covariances_p[i, :, :] = self.P
