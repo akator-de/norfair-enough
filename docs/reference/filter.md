@@ -1,7 +1,7 @@
 # Filter
 
-Each [`TrackedObject`][norfair.tracker.TrackedObject] uses a Kalman filter to
-smooth its estimated position and velocity over time. The `filter_factory`
+Each [`TrackedObject`][norfair.tracker.TrackedObject] uses a predictive filter
+to smooth its estimated position and velocity over time. The `filter_factory`
 argument on [`Tracker`][norfair.tracker.Tracker] decides which filter is built
 for every new track.
 
