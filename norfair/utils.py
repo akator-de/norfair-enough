@@ -46,12 +46,14 @@ def print_objects_as_table(tracked_objects: Sequence):
     table.add_column("Last distance", justify="right")
     table.add_column("Init Id", justify="center")
     for obj in tracked_objects:
+        last_dist = getattr(obj, "last_distance", None)
+        last_dist_str = f"{last_dist:.4f}" if last_dist is not None else "?"
         table.add_row(
-            str(obj.id),
-            str(obj.age),
-            str(obj.hit_counter),
-            f"{obj.last_distance:.4f}",
-            str(obj.initializing_id),
+            str(getattr(obj, "id", "?")),
+            str(getattr(obj, "age", "?")),
+            str(getattr(obj, "hit_counter", "?")),
+            last_dist_str,
+            str(getattr(obj, "initializing_id", "?")),
         )
     console.print(table)
 
@@ -73,11 +75,46 @@ def get_terminal_size(default: tuple[int, int] = (80, 24)) -> tuple[int, int]:
 
 
 def get_cutout(points, image):
-    """Return the axis-aligned bounding-box cutout of ``points`` in ``image``."""
-    max_x = int(max(points[:, 0]))
-    min_x = int(min(points[:, 0]))
-    max_y = int(max(points[:, 1]))
-    min_y = int(min(points[:, 1]))
+    """Return the axis-aligned bounding-box cutout of ``points`` in ``image``.
+
+    Parameters
+    ----------
+    points : np.ndarray
+        Array of shape ``(N, 2)`` with x/y coordinates.
+    image : np.ndarray
+        Image array with at least two spatial dimensions (height, width, ...).
+
+    Returns
+    -------
+    np.ndarray
+        The cropped region.  Returns an empty slice (with a warning) when the
+        bounding box is degenerate (zero width or height after clipping).
+
+    Raises
+    ------
+    ValueError
+        If *points* is empty or does not have shape ``(N, 2)``.
+    """
+    points = np.asarray(points)
+    if points.ndim != 2 or points.shape[1] != 2:
+        raise ValueError(f"points must have shape (N, 2), got {points.shape}")
+    if points.shape[0] == 0:
+        raise ValueError("points array is empty")
+
+    img_h, img_w = image.shape[:2]
+
+    min_x = int(np.clip(np.min(points[:, 0]), 0, img_w))
+    max_x = int(np.clip(np.max(points[:, 0]), 0, img_w))
+    min_y = int(np.clip(np.min(points[:, 1]), 0, img_h))
+    max_y = int(np.clip(np.max(points[:, 1]), 0, img_h))
+
+    if min_x == max_x or min_y == max_y:
+        warning(
+            "get_cutout: degenerate bounding box "
+            f"(x={min_x}..{max_x}, y={min_y}..{max_y}); "
+            "returning empty cutout"
+        )
+
     return image[min_y:max_y, min_x:max_x]
 
 
