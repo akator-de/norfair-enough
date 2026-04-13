@@ -177,6 +177,15 @@ class PredictionsTextFile:
         if hasattr(self, "text_file") and self.text_file and not self.text_file.closed:
             self.text_file.close()
 
+    def __enter__(self):
+        """Enter the runtime context and return ``self``."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Exit the runtime context, ensuring the file handle is closed."""
+        self.close()
+        return False
+
     def __del__(self):
         """Ensure the underlying file is closed on garbage collection."""
         self.close()
@@ -390,9 +399,8 @@ class Accumulators:
             os.makedirs(save_path)
 
         metrics_path = os.path.join(save_path, file_name)
-        metrics_file = open(metrics_path, "w+")
-        metrics_file.write(self.summary_text)
-        metrics_file.close()
+        with open(metrics_path, "w") as metrics_file:
+            metrics_file.write(self.summary_text)
 
     def print_metrics(self):
         """Print the rendered ``summary_text`` to stdout."""
