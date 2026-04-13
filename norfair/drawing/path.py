@@ -40,7 +40,7 @@ class Paths:
         >>> from norfair import Paths, Tracker, Video
         >>> tracker = Tracker(...)
         >>> path_drawer = Paths()
-        >>> with Video("video.mp4") as video:
+        >>> with Video(input_path="video.mp4") as video:
         ...     for frame in video:
         ...         detections = get_detections(frame)
         ...         tracked_objects = tracker.update(detections)
@@ -178,7 +178,7 @@ class AbsolutePaths:
         >>> tracker = Tracker(...)
         >>> motion_estimator = MotionEstimator()
         >>> path_drawer = AbsolutePaths()
-        >>> with Video("video.mp4") as video:
+        >>> with Video(input_path="video.mp4") as video:
         ...     for frame in video:
         ...         coord_transform = motion_estimator.update(frame)
         ...         detections = get_detections(frame)

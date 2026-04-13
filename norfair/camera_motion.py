@@ -394,7 +394,7 @@ class MotionEstimator:
     --------
     >>> from norfair import Tracker, Video
     >>> from norfair.camera_motion import MotionEstimator
-    >>> video = Video("video.mp4")
+    >>> video = Video(input_path="video.mp4")
     >>> tracker = Tracker(...)
     >>> motion_estimator = MotionEstimator()
     >>> for frame in video:
@@ -453,8 +453,9 @@ class MotionEstimator:
             The current video frame.
         mask : np.ndarray, optional
             Optional mask excluding regions from corner sampling. Must
-            have shape ``(frame.shape[0], frame.shape[1])``, match the
-            frame's dtype, and contain values in ``{0, 1}``.
+            have shape ``(frame.shape[0], frame.shape[1])``, dtype
+            ``np.uint8``, and contain values ``0`` (ignore) or ``255``
+            (consider), as required by ``cv2.goodFeaturesToTrack``.
 
             In general, the estimation works best when many points come
             from the background, so this parameter is useful for masking

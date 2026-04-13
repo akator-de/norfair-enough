@@ -52,7 +52,7 @@ def _get_grid(size, w, h, polar=False):
 
 def draw_absolute_grid(
     frame: np.ndarray,
-    coord_transformations: CoordinatesTransformation,
+    coord_transformations: CoordinatesTransformation | None,
     grid_size: int = 20,
     radius: int = 2,
     thickness: int = 1,
@@ -73,9 +73,11 @@ def draw_absolute_grid(
     ----------
     frame : np.ndarray
         The OpenCV frame to draw on. Modified in place.
-    coord_transformations : CoordinatesTransformation
+    coord_transformations : CoordinatesTransformation or None
         The coordinate transformation as returned by a
         [`MotionEstimator`][norfair.camera_motion.MotionEstimator].
+        If ``None``, no coordinate transformation is applied and the grid
+        points are drawn in their original absolute positions.
     grid_size : int, optional
         Number of grid subdivisions per axis.
     radius : int, optional
