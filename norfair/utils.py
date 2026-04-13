@@ -31,7 +31,7 @@ def raise_detection_error_message(points):
     message = "\n[red]INPUT ERROR:[/red]\n"
     message += f"Each `Detection` object should have a property `points` of shape (n_points, n_dimensions), not {points.shape}. Check your `Detection` list creation code.\n"
     message += "You can read the documentation for the `Detection` class here:\n"
-    message += "https://akator-de.github.io/norfair-enough/latest/reference/tracker/#norfair.tracker.Detection\n"
+    message += "https://akator-de.github.io/norfair-enough/dev/reference/tracker/#norfair.tracker.Detection\n"
     raise ValueError(message)
 
 
