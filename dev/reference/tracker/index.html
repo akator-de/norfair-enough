@@ -3443,7 +3443,7 @@ which needs to reach a certain match rate to be converted into a full blown <cod
         <span class="c1"># Clear the current-frame match mask. hit() will set entries back to</span>
         <span class="c1"># True for points that get matched this frame; points that remain</span>
         <span class="c1"># unmatched stay False so live_points correctly reports them as dead.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_point_matched_in_current_frame</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_point_matched_in_current_frame</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="c1"># Advances the tracker&#39;s state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="o">.</span><span class="n">predict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="kc">None</span>
@@ -3657,7 +3657,7 @@ which needs to reach a certain match rate to be converted into a full blown <cod
         <span class="c1"># The not-yet-initialized tracked object was just matched this frame,</span>
         <span class="c1"># so adopt its current-frame match mask as well (GH#2).</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_point_matched_in_current_frame</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">tracked_object</span><span class="o">.</span><span class="n">_point_matched_in_current_frame</span>
+            <span class="n">tracked_object</span><span class="o">.</span><span class="n">_point_matched_in_current_frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">last_distance</span> <span class="o">=</span> <span class="n">tracked_object</span><span class="o">.</span><span class="n">last_distance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_min_distance</span> <span class="o">=</span> <span class="n">tracked_object</span><span class="o">.</span><span class="n">current_min_distance</span>
@@ -4233,7 +4233,7 @@ which needs to reach a certain match rate to be converted into a full blown <cod
     <span class="c1"># The not-yet-initialized tracked object was just matched this frame,</span>
     <span class="c1"># so adopt its current-frame match mask as well (GH#2).</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_point_matched_in_current_frame</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">tracked_object</span><span class="o">.</span><span class="n">_point_matched_in_current_frame</span>
+        <span class="n">tracked_object</span><span class="o">.</span><span class="n">_point_matched_in_current_frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">last_distance</span> <span class="o">=</span> <span class="n">tracked_object</span><span class="o">.</span><span class="n">last_distance</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">current_min_distance</span> <span class="o">=</span> <span class="n">tracked_object</span><span class="o">.</span><span class="n">current_min_distance</span>
