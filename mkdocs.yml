@@ -24,6 +24,7 @@ extra_javascript:
 nav:
   - Home: index.md
   - Getting Started: getting_started.md
+  - Migration Guide: migration.md
   - Reference:
     - reference/index.md
     - Tracker: reference/tracker.md
