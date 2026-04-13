@@ -1,6 +1,6 @@
 # Ultralytics YOLO-Pose Example
 
-Track human pose keypoints in video using [Ultralytics YOLO-Pose](https://docs.ultralytics.com/tasks/pose/) and Norfair.
+Track human pose keypoints in video using [Ultralytics YOLO-Pose](https://docs.ultralytics.com/tasks/pose/) and Norfair Enough.
 
 ## Instructions
 
@@ -20,4 +20,4 @@ For additional settings, run `python src/demo.py --help`.
 
 ## Explanation
 
-This demo uses a YOLO-Pose model to detect 17 COCO keypoints per person, converts them to Norfair `Detection` objects, and tracks them across frames using normalized mean Euclidean distance. Tracked keypoints are drawn on each frame.
+This demo uses a YOLO-Pose model to detect 17 COCO keypoints per person, converts them to `Detection` objects, and tracks them across frames using normalized mean Euclidean distance. Tracked keypoints are drawn on each frame.

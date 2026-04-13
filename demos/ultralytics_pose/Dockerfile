@@ -9,4 +9,4 @@ RUN pip install --no-cache-dir -r /demo/requirements.txt
 
 COPY src/ /demo/src/
 
-WORKDIR /demo
+WORKDIR /demo/src/

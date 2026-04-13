@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 
+import numpy as np
 from ultralytics import YOLO
 
 import norfair
@@ -20,7 +21,10 @@ def yolo_pose_to_detections(results) -> list[Detection]:
         return detections
 
     keypoints_xy = results[0].keypoints.xy.cpu().numpy()  # (N, 17, 2)
-    keypoints_conf = results[0].keypoints.conf.cpu().numpy()  # (N, 17)
+    conf = results[0].keypoints.conf
+    keypoints_conf = (
+        conf.cpu().numpy() if conf is not None else np.ones(keypoints_xy.shape[:2])
+    )  # (N, 17)
 
     for points, scores in zip(keypoints_xy, keypoints_conf):
         detections.append(Detection(points=points, scores=scores))
