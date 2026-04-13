@@ -394,6 +394,7 @@ class Tracker:
                     d for i, d in enumerate(objects) if i not in matched_obj_indices
                 ]
                 matched_objects = []
+                candidates_to_remove: set[int] = set()
 
                 # Handle matched people/detections
                 for match_cand_idx, match_obj_idx in zip(
@@ -410,12 +411,21 @@ class Tracker:
                         elif isinstance(matched_candidate, TrackedObject):
                             # Merge new TrackedObject with the old one
                             matched_object.merge(matched_candidate)
-                            # If we are matching TrackedObject instances we want to get rid of the
-                            # already matched candidate to avoid matching it again in future frames
-                            self.tracked_objects.remove(matched_candidate)
+                            # Collect for batch removal instead of O(n) per-call list.remove()
+                            candidates_to_remove.add(id(matched_candidate))
                     else:
-                        unmatched_candidates.append(matched_candidate)
+                        unmatched_candidates.append(
+                            matched_candidate  # pyrefly: ignore[bad-argument-type]
+                        )
                         unmatched_objects.append(matched_object)
+
+                # Batch-remove merged TrackedObject candidates in a single pass (O(n))
+                if candidates_to_remove:
+                    self.tracked_objects = [
+                        o
+                        for o in self.tracked_objects
+                        if id(o) not in candidates_to_remove
+                    ]
             else:
                 unmatched_candidates = list(candidates)
                 matched_objects = []
@@ -431,13 +441,17 @@ class Tracker:
         """Match detections with tracked objects from a distance matrix.
 
         Instead of minimizing the global distance, this greedy strategy
-        starts with the global minimum entry and matches the det–obj
+        starts with the global minimum entry and matches the det-obj
         corresponding to that distance, then takes the second minimum, and
         so on until ``distance_threshold`` is reached.
 
         This avoids pathological cases where minimizing the global distance
         forces matches that shouldn't happen just to bring the overall sum
         down.
+
+        The distances are pre-sorted with ``np.argsort`` so the scan is
+        O(n*m*log(n*m) + n*m) instead of the previous O(min(n,m)*n*m)
+        repeated-argmin approach.
 
         Parameters
         ----------
@@ -452,23 +466,25 @@ class Tracker:
             Matched detection and object indices, in matching order.
 
         """
-        # NOTE: This implementation is terribly inefficient, but it doesn't
-        #       seem to affect the fps at all.
-        distance_matrix = distance_matrix.copy()
         if distance_matrix.size > 0:
-            det_idxs = []
-            obj_idxs = []
-            current_min = distance_matrix.min()
+            flat = distance_matrix.ravel()
+            order = np.argsort(flat, kind="stable")
+            ncols = distance_matrix.shape[1]
 
-            while current_min < distance_threshold:
-                flattened_arg_min = distance_matrix.argmin()
-                det_idx = flattened_arg_min // distance_matrix.shape[1]
-                obj_idx = flattened_arg_min % distance_matrix.shape[1]
-                det_idxs.append(det_idx)
-                obj_idxs.append(obj_idx)
-                distance_matrix[det_idx, :] = distance_threshold + 1
-                distance_matrix[:, obj_idx] = distance_threshold + 1
-                current_min = distance_matrix.min()
+            det_idxs: list[int] = []
+            obj_idxs: list[int] = []
+            used_rows: set[int] = set()
+            used_cols: set[int] = set()
+
+            for idx in order:
+                if flat[idx] >= distance_threshold:
+                    break
+                r, c = divmod(int(idx), ncols)
+                if r not in used_rows and c not in used_cols:
+                    det_idxs.append(r)
+                    obj_idxs.append(c)
+                    used_rows.add(r)
+                    used_cols.add(c)
 
             return det_idxs, obj_idxs
         else:
