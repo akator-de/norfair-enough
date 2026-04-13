@@ -1292,7 +1292,7 @@ class KalmanFilter:
         except np.linalg.LinAlgError:
             _logger.warning(
                 "Singular innovation covariance S in "
-                "KalmanFilter.batch_filter; "
+                "KalmanFilter.get_update; "
                 "falling back to pseudo-inverse."
             )
             K = PHT @ np.linalg.pinv(S)
