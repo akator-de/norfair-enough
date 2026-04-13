@@ -1,4 +1,4 @@
-"""Predefined distances"""
+"""Predefined distance functions and the :class:`Distance` base class."""
 
 import logging
 from abc import ABC, abstractmethod
@@ -20,10 +20,11 @@ logger = logging.getLogger(__name__)
 
 
 class Distance(ABC):
-    """
-    Abstract class representing a distance.
+    """Abstract base class representing a tracker distance.
 
-    Subclasses must implement the method `get_distances`
+    Subclasses must implement :meth:`get_distances`, which returns a
+    distance matrix between tracked objects and candidates (detections or
+    other tracked objects, when ReID is in use).
     """
 
     @abstractmethod
@@ -32,34 +33,36 @@ class Distance(ABC):
         objects: Sequence["TrackedObject"],
         candidates: Sequence["Candidate"] | None,
     ) -> np.ndarray:
-        """
-        Method that calculates the distances between new candidates and objects.
+        """Return the distance matrix between ``objects`` and ``candidates``.
 
         Parameters
         ----------
         objects : Sequence[TrackedObject]
-            Sequence of [TrackedObject][norfair.tracker.TrackedObject] to be compared with potential [Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]
-            candidates.
-        candidates : Union[List[Detection], List[TrackedObject]], optional
-            List of candidates ([Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]) to be compared to [TrackedObject][norfair.tracker.TrackedObject].
+            Sequence of [TrackedObject][norfair.tracker.TrackedObject]
+            instances currently being tracked.
+        candidates : Sequence[Detection or TrackedObject], optional
+            Candidates to be compared against the tracked ``objects``.
+            Detections are used during the normal matching step; tracked
+            objects are used during ReID.
 
         Returns
         -------
         np.ndarray
-            A matrix containing the distances between objects and candidates.
+            A ``(n_candidates, n_objects)`` matrix of distances.
+
         """
 
 
 class ScalarDistance(Distance):
-    """
-    ScalarDistance class represents a distance that is calculated pointwise.
+    """Distance computed pointwise (one pair at a time).
 
     Parameters
     ----------
-    distance_function : Union[Callable[["Detection", "TrackedObject"], float], Callable[["TrackedObject", "TrackedObject"], float]]
-        Distance function used to determine the pointwise distance between new candidates and objects.
-        This function should take 2 input arguments, the first being a `Union[Detection, TrackedObject]`,
-        and the second [TrackedObject][norfair.tracker.TrackedObject]. It has to return a `float` with the distance it calculates.
+    distance_function : Callable
+        Function used to compute the distance between a pair. It must
+        accept two positional arguments — a ``Detection`` or
+        ``TrackedObject`` and a ``TrackedObject`` — and return a ``float``.
+
     """
 
     @overload
@@ -79,8 +82,11 @@ class ScalarDistance(Distance):
         distance_function: Callable[["Detection", "TrackedObject"], float]
         | Callable[["TrackedObject", "TrackedObject"], float],
     ):
-        # Store the function; at runtime both signatures work since the actual types
-        # are compatible (duck typing)
+        """Store the per-pair ``distance_function``.
+
+        The two overloads (detection→object and object→object) are both
+        valid at runtime — Python's duck typing handles the dispatch.
+        """
         self.distance_function: Callable = distance_function
 
     def get_distances(
@@ -88,21 +94,24 @@ class ScalarDistance(Distance):
         objects: Sequence["TrackedObject"],
         candidates: Sequence["Candidate"] | None,
     ) -> np.ndarray:
-        """
-        Method that calculates the distances between new candidates and objects.
+        """Return a distance matrix by calling ``distance_function`` for every pair.
+
+        Pairs with mismatched labels are skipped and their entries left at
+        ``np.inf``.
 
         Parameters
         ----------
         objects : Sequence[TrackedObject]
-            Sequence of [TrackedObject][norfair.tracker.TrackedObject] to be compared with potential [Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]
-            candidates.
-        candidates : Union[List[Detection], List[TrackedObject]], optional
-            List of candidates ([Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]) to be compared to [TrackedObject][norfair.tracker.TrackedObject].
+            Tracked objects to compare against ``candidates``.
+        candidates : Sequence[Detection or TrackedObject], optional
+            Candidates. ``None`` or empty sequences return a matrix filled
+            with ``np.inf``.
 
         Returns
         -------
         np.ndarray
-            A matrix containing the distances between objects and candidates.
+            A ``(n_candidates, n_objects)`` matrix of distances.
+
         """
         if not objects or not candidates:
             # Handle None or empty cases
@@ -138,23 +147,27 @@ class ScalarDistance(Distance):
 
 
 class VectorizedDistance(Distance):
-    """
-    VectorizedDistance class represents a distance that is calculated in a vectorized way. This means
-    that instead of going through every pair and explicitly calculating its distance, VectorizedDistance
-    uses the entire vectors to compare to each other in a single operation.
+    """Distance computed in a single vectorized operation.
+
+    Rather than iterating over every pair of candidate and tracked object,
+    ``VectorizedDistance`` stacks their coordinates and hands the whole
+    batch to ``distance_function`` in one call — much faster for large
+    numbers of objects.
 
     Parameters
     ----------
     distance_function : Callable[[np.ndarray, np.ndarray], np.ndarray]
-        Distance function used to determine the distances between new candidates and objects.
-        This function should take 2 input arguments, the first being a `np.ndarray` and the second
-        `np.ndarray`. It has to return a `np.ndarray` with the distance matrix it calculates.
+        Distance function that accepts two 2D arrays ``(candidates,
+        objects)`` and returns a ``(n_candidates, n_objects)`` distance
+        matrix.
+
     """
 
     def __init__(
         self,
         distance_function: Callable[[np.ndarray, np.ndarray], np.ndarray],
     ):
+        """Store the vectorized ``distance_function``."""
         self.distance_function = distance_function
 
     def get_distances(
@@ -162,21 +175,26 @@ class VectorizedDistance(Distance):
         objects: Sequence["TrackedObject"],
         candidates: Sequence["Candidate"] | None,
     ) -> np.ndarray:
-        """
-        Method that calculates the distances between new candidates and objects.
+        """Return the distance matrix computed per label group.
+
+        Objects and candidates are grouped by label; for each label the
+        corresponding sub-block of the distance matrix is filled by
+        ``distance_function`` called on the stacked coordinates. Entries
+        across different labels remain ``np.inf``.
 
         Parameters
         ----------
         objects : Sequence[TrackedObject]
-            Sequence of [TrackedObject][norfair.tracker.TrackedObject] to be compared with potential [Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]
-            candidates.
-        candidates : Union[List[Detection], List[TrackedObject]], optional
-            List of candidates ([Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]) to be compared to [TrackedObject][norfair.tracker.TrackedObject].
+            Tracked objects to compare against ``candidates``.
+        candidates : Sequence[Detection or TrackedObject], optional
+            Candidates. ``None`` or empty sequences return a matrix filled
+            with ``np.inf``.
 
         Returns
         -------
         np.ndarray
-            A matrix containing the distances between objects and candidates.
+            A ``(n_candidates, n_objects)`` matrix of distances.
+
         """
         if not objects or not candidates:
             # Handle None or empty cases
@@ -230,30 +248,29 @@ class VectorizedDistance(Distance):
     def _compute_distance(
         self, stacked_candidates: np.ndarray, stacked_objects: np.ndarray
     ) -> np.ndarray:
-        """
-        Method that computes the pairwise distances between new candidates and objects.
-        It is intended to use the entire vectors to compare to each other in a single operation.
+        """Compute the pairwise distance between stacked candidates and objects.
 
         Parameters
         ----------
         stacked_candidates : np.ndarray
-            np.ndarray containing a stack of candidates to be compared with the stacked_objects.
+            Stacked candidate coordinates.
         stacked_objects : np.ndarray
-            np.ndarray containing a stack of objects to be compared with the stacked_objects.
+            Stacked object coordinates.
 
         Returns
         -------
         np.ndarray
-            A matrix containing the distances between objects and candidates.
+            A ``(n_candidates, n_objects)`` matrix of distances.
+
         """
         return self.distance_function(stacked_candidates, stacked_objects)
 
 
 class ScipyDistance(VectorizedDistance):
-    """
-    ScipyDistance class extends VectorizedDistance for the use of Scipy's vectorized distances.
+    """Vectorized distance backed by ``scipy.spatial.distance.cdist``.
 
-    This class uses `scipy.spatial.distance.cdist` to calculate distances between two `np.ndarray`.
+    Uses [`scipy.spatial.distance.cdist`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html)
+    to calculate distances between two ``np.ndarray`` batches.
 
     Parameters
     ----------
@@ -261,21 +278,23 @@ class ScipyDistance(VectorizedDistance):
         Defines the specific Scipy metric to use to calculate the pairwise distances between
         new candidates and objects.
     **kwargs
-        Additional keyword arguments passed through to `scipy.spatial.distance.cdist`.
+        Additional keyword arguments forwarded to
+        `scipy.spatial.distance.cdist`.
 
     See Also
     --------
     [`scipy.spatial.distance.cdist`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html)
+
     """
 
     def __init__(self, metric: str = "euclidean", **kwargs):
+        """Configure the scipy metric and any extra ``cdist`` keyword arguments."""
         self.metric = metric
         super().__init__(distance_function=partial(cdist, metric=self.metric, **kwargs))
 
 
 def frobenius(detection: "Detection", tracked_object: "TrackedObject") -> float:
-    """
-    Frobernius norm on the difference of the points in detection and the estimates in tracked_object.
+    r"""Frobenius norm of the difference between detection points and tracked-object estimates.
 
     The Frobenius distance and norm are given by:
 
@@ -302,16 +321,16 @@ def frobenius(detection: "Detection", tracked_object: "TrackedObject") -> float:
     See Also
     --------
     [`np.linalg.norm`](https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html)
+
     """
     return float(np.linalg.norm(detection.points - tracked_object.estimate))
 
 
 def mean_euclidean(detection: "Detection", tracked_object: "TrackedObject") -> float:
-    """
-    Average euclidean distance between the points in detection and estimates in tracked_object.
+    r"""Average Euclidean distance between detection points and tracked-object estimates.
 
     $$
-    d(a, b) = \\frac{\\sum_{i=0}^N ||a_i - b_i||_2}{N}
+    d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_2}{N}
     $$
 
     Parameters
@@ -319,7 +338,7 @@ def mean_euclidean(detection: "Detection", tracked_object: "TrackedObject") -> f
     detection : Detection
         A detection.
     tracked_object : TrackedObject
-        A tracked object
+        A tracked object.
 
     Returns
     -------
@@ -329,28 +348,26 @@ def mean_euclidean(detection: "Detection", tracked_object: "TrackedObject") -> f
     See Also
     --------
     [`np.linalg.norm`](https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html)
+
     """
     return np.linalg.norm(detection.points - tracked_object.estimate, axis=1).mean()
 
 
 def mean_manhattan(detection: "Detection", tracked_object: "TrackedObject") -> float:
-    """
-    Average manhattan distance between the points in detection and the estimates in tracked_object
-
-    Given by:
+    r"""Average Manhattan distance between detection points and tracked-object estimates.
 
     $$
-    d(a, b) = \\frac{\\sum_{i=0}^N ||a_i - b_i||_1}{N}
+    d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_1}{N}
     $$
 
-    Where $||a||_1$ is the manhattan norm.
+    Where $||a||_1$ is the Manhattan norm.
 
     Parameters
     ----------
     detection : Detection
         A detection.
     tracked_object : TrackedObject
-        a tracked object.
+        A tracked object.
 
     Returns
     -------
@@ -360,6 +377,7 @@ def mean_manhattan(detection: "Detection", tracked_object: "TrackedObject") -> f
     See Also
     --------
     [`np.linalg.norm`](https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html)
+
     """
     return np.linalg.norm(
         detection.points - tracked_object.estimate, ord=1, axis=1
@@ -367,16 +385,12 @@ def mean_manhattan(detection: "Detection", tracked_object: "TrackedObject") -> f
 
 
 def _boxes_area(boxes: np.ndarray) -> np.ndarray:
-    """
-    Calculate the area of bounding boxes.
-    """
+    """Return the area of each bounding box in ``boxes``."""
     return (boxes[2] - boxes[0]) * (boxes[3] - boxes[1])
 
 
 def _validate_bboxes(bboxes: np.ndarray):
-    """
-    Validate that bounding boxes are well formed.
-    """
+    """Validate that ``bboxes`` is a well-formed ``(N, 4)`` array of boxes."""
     if not (
         isinstance(bboxes, np.ndarray)
         and len(bboxes.shape) == 2
@@ -393,24 +407,28 @@ def _validate_bboxes(bboxes: np.ndarray):
 
 
 def iou(candidates: np.ndarray, objects: np.ndarray) -> np.ndarray:
-    """
-    Calculate IoU between two sets of bounding boxes. Both sets of boxes are expected
-    to be in `[x_min, y_min, x_max, y_max]` format.
+    """Compute ``1 - IoU`` between two sets of bounding boxes.
 
-    Normal IoU is 1 when the boxes are the same and 0 when they don't overlap,
-    to transform that into a distance that makes sense we return `1 - iou`.
+    Both sets of boxes are expected to be in
+    ``[x_min, y_min, x_max, y_max]`` format.
+
+    Normal IoU is ``1`` when the boxes are identical and ``0`` when they
+    don't overlap; to turn this into a distance the function returns
+    ``1 - IoU``.
 
     Parameters
     ----------
-    candidates : numpy.ndarray
-        (N, 4) numpy.ndarray containing candidates bounding boxes.
-    objects : numpy.ndarray
-        (K, 4) numpy.ndarray containing objects bounding boxes.
+    candidates : np.ndarray
+        ``(N, 4)`` array of candidate bounding boxes.
+    objects : np.ndarray
+        ``(K, 4)`` array of object bounding boxes.
 
     Returns
     -------
-    numpy.ndarray
-        (N, K) numpy.ndarray of `1 - iou` between candidates and objects.
+    np.ndarray
+        ``(N, K)`` array of ``1 - IoU`` values between candidates and
+        objects.
+
     """
     _validate_bboxes(candidates)
     _validate_bboxes(objects)
@@ -471,20 +489,28 @@ AVAILABLE_VECTORIZED_DISTANCES = (
 
 
 def get_distance_by_name(name: str) -> Distance:
-    """
-    Select a distance by name.
+    """Return a predefined :class:`Distance` by name.
+
+    Accepts the names of Norfair's built-in scalar and vectorized
+    distances, as well as any metric supported by
+    [`scipy.spatial.distance.cdist`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html).
 
     Parameters
     ----------
     name : str
-        A string defining the metric to get.
+        Name of the distance to look up.
 
     Returns
     -------
     Distance
-        The distance object.
-    """
+        A distance object ready to be passed to ``Tracker``.
 
+    Raises
+    ------
+    ValueError
+        If ``name`` is not a known distance.
+
+    """
     distance_function: Distance
     if name in _SCALAR_DISTANCE_FUNCTIONS:
         logger.warning(
@@ -511,28 +537,30 @@ def get_distance_by_name(name: str) -> Distance:
 def create_keypoints_voting_distance(
     keypoint_distance_threshold: float, detection_threshold: float
 ) -> Callable[["Detection", "TrackedObject"], float]:
-    """
-    Construct a keypoint voting distance function configured with the thresholds.
+    """Build a keypoint-voting scalar distance bound to the given thresholds.
 
-    Count how many points in a detection match the with a tracked_object.
-    A match is considered when distance between the points is < `keypoint_distance_threshold`
-    and the score of the last_detection of the tracked_object is > `detection_threshold`.
-    Notice the if multiple points are tracked, the ith point in detection can only match the ith
-    point in the tracked object.
+    The returned distance counts how many points in a detection match the
+    points in a tracked object. A point counts as a match when the
+    distance between it and its peer is below
+    ``keypoint_distance_threshold`` and both detection and tracked-object
+    scores exceed ``detection_threshold``. The ``i``-th point in a
+    detection can only match the ``i``-th point in a tracked object.
 
-    Distance is 1 if no point matches and approximates 0 as more points are matched.
+    The distance is ``1`` when nothing matches and tends towards ``0`` as
+    more points match.
 
     Parameters
     ----------
-    keypoint_distance_threshold: float
-        Points closer than this threshold are considered a match.
-    detection_threshold: float
-        Detections and objects with score lower than this threshold are ignored.
+    keypoint_distance_threshold : float
+        Points closer than this threshold count as a match.
+    detection_threshold : float
+        Points with score at or below this threshold are ignored.
 
     Returns
     -------
     Callable
-        The distance funtion that must be passed to the Tracker.
+        A scalar distance function that can be passed to ``Tracker``.
+
     """
 
     def keypoints_voting_distance(
@@ -554,28 +582,29 @@ def create_keypoints_voting_distance(
 def create_normalized_mean_euclidean_distance(
     height: int, width: int
 ) -> Callable[["Detection", "TrackedObject"], float]:
-    """
-    Construct a normalized mean euclidean distance function configured with the max height and width.
+    """Build a normalized mean Euclidean distance bound to the image size.
 
-    The result distance is bound to [0, 1] where 1 indicates oposite corners of the image.
+    The returned distance is normalized so it lies in ``[0, 1]``, where
+    ``1`` corresponds to opposite corners of the image.
 
     Parameters
     ----------
-    height: int
+    height : int
         Height of the image.
-    width: int
+    width : int
         Width of the image.
 
     Returns
     -------
     Callable
-        The distance funtion that must be passed to the Tracker.
+        A scalar distance function that can be passed to ``Tracker``.
+
     """
 
     def normalized__mean_euclidean_distance(
         detection: "Detection", tracked_object: "TrackedObject"
     ) -> float:
-        """Normalized mean euclidean distance"""
+        """Normalized mean Euclidean distance between detection and tracked object."""
         # calculate distances and normalized it by width and height
         difference = (detection.points - tracked_object.estimate).astype(float)
         difference[:, 0] /= width

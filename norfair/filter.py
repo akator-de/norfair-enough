@@ -1,3 +1,5 @@
+"""Predictive filter factories used by ``Tracker`` to estimate object motion."""
+
 from abc import ABC, abstractmethod
 from typing import Protocol
 
@@ -11,7 +13,9 @@ class Filter(Protocol):
 
     x: np.ndarray
 
-    def predict(self) -> None: ...
+    def predict(self) -> None:
+        """Advance the internal state one step forward in time."""
+        ...
 
     def update(
         self,
@@ -19,42 +23,57 @@ class Filter(Protocol):
         /,
         R: np.ndarray | None = None,
         H: np.ndarray | None = None,
-    ) -> None: ...
+    ) -> None:
+        """Incorporate a new measurement ``z`` into the state."""
+        ...
 
 
 class FilterFactory(ABC):
-    """Abstract class representing a generic Filter factory
+    """Abstract base class for predictive-filter factories.
 
-    Subclasses must implement the method `create_filter`
+    Subclasses must implement :meth:`create_filter`, which returns a new
+    filter instance for each tracked object.
     """
 
     @abstractmethod
     def create_filter(self, initial_detection: np.ndarray) -> Filter:
-        pass
+        """Return a new filter seeded with ``initial_detection``."""
+        ...
 
 
 class FilterPyKalmanFilterFactory(FilterFactory):
-    """
-    This class can be used either to change some parameters of the [KalmanFilter](https://filterpy.readthedocs.io/en/latest/kalman/KalmanFilter.html)
-    that the tracker uses, or to fully customize the predictive filter implementation to use (as long as the methods and properties are compatible).
+    """Factory for filterpy-backed Kalman filters.
 
-    The former case only requires changing the default parameters upon tracker creation: `tracker = Tracker(..., filter_factory=FilterPyKalmanFilterFactory(R=100))`,
-    while the latter requires creating your own class extending `FilterPyKalmanFilterFactory`, and rewriting its `create_filter` method to return your own customized filter.
+    Use this factory to either tweak the parameters of the
+    [KalmanFilter](https://filterpy.readthedocs.io/en/latest/kalman/KalmanFilter.html)
+    that the tracker uses, or to fully customize the predictive filter
+    implementation (as long as the methods and properties are compatible).
+
+    In the first case, only the default parameters need to be tweaked at
+    tracker creation time::
+
+        tracker = Tracker(..., filter_factory=FilterPyKalmanFilterFactory(R=100))
+
+    In the second case, create your own subclass of
+    ``FilterPyKalmanFilterFactory`` and override :meth:`create_filter` to
+    return your customized filter.
 
     Parameters
     ----------
     R : float, optional
-        Multiplier for the sensor measurement noise matrix, by default 4.0.
-        Larger values make the filter trust measurements less and rely more
-        on its own predictions — useful when detections are noisy.
+        Multiplier for the sensor measurement noise matrix. Defaults to
+        ``4.0``. Larger values make the filter trust measurements less
+        and rely more on its own predictions — useful when detections
+        are noisy.
     Q : float, optional
-        Multiplier for the process uncertainty, by default 0.1.
-        Larger values let the filter react faster to real motion changes but
-        increase jitter; smaller values produce smoother but laggier tracks.
+        Multiplier for the process uncertainty. Defaults to ``0.1``.
+        Larger values let the filter react faster to real motion changes
+        but increase jitter; smaller values produce smoother but laggier
+        tracks.
     P : float, optional
-        Multiplier for the initial covariance matrix estimation, only in the
-        entries that correspond to position (not speed) variables, by default
-        10.0.
+        Multiplier for the initial covariance matrix estimation, only in
+        the entries that correspond to position (not speed) variables.
+        Defaults to ``10.0``.
 
     Notes
     -----
@@ -66,7 +85,8 @@ class FilterPyKalmanFilterFactory(FilterFactory):
 
     See Also
     --------
-    [`filterpy.KalmanFilter`](https://filterpy.readthedocs.io/en/latest/kalman/KalmanFilter.html).
+    [`filterpy.KalmanFilter`](https://filterpy.readthedocs.io/en/latest/kalman/KalmanFilter.html)
+
     """
 
     def __init__(self, R: float = 4.0, Q: float = 0.1, P: float = 10.0):
@@ -75,20 +95,25 @@ class FilterPyKalmanFilterFactory(FilterFactory):
         self.P = P
 
     def create_filter(self, initial_detection: np.ndarray) -> KalmanFilter:
-        """
-        This method returns a new predictive filter instance with the current setup, to be used by each new [`TrackedObject`][norfair.tracker.TrackedObject] that is created.
-        This predictive filter will be used to estimate speed and future positions of the object, to better match the detections during its trajectory.
+        """Return a new Kalman filter seeded with ``initial_detection``.
+
+        The returned filter is used by each new
+        [`TrackedObject`][norfair.tracker.TrackedObject] to estimate speed
+        and future positions so detections can be matched along the
+        trajectory.
 
         Parameters
         ----------
         initial_detection : np.ndarray
-            numpy array of shape `(number of points per object, 2)`, corresponding to the [`Detection.points`][norfair.tracker.Detection] of the tracked object being born,
-            which shall be used as initial position estimation for it.
+            Array of shape ``(n_points, n_dimensions)`` corresponding to
+            [`Detection.points`][norfair.tracker.Detection] of the tracked
+            object being born, used as the initial position estimate.
 
         Returns
         -------
         KalmanFilter
-            The kalman filter
+            A freshly initialized Kalman filter.
+
         """
         num_points = initial_detection.shape[0]
         dim_points = initial_detection.shape[1]
@@ -127,14 +152,34 @@ class FilterPyKalmanFilterFactory(FilterFactory):
 
 
 class NoFilter:
+    """Null filter that keeps the last observation as its state.
+
+    Used by :class:`NoFilterFactory` to disable predictive filtering.
+    """
+
     def __init__(self, dim_x, dim_z):
+        """Initialize the null filter with a zero state vector of length ``dim_x``."""
         self.dim_z = dim_z
         self.x = np.zeros((dim_x, 1))
 
     def predict(self):
+        """No-op predict step — the state does not evolve between updates."""
         return
 
     def update(self, detection_points_flatten, R=None, H=None):
+        """Overwrite the position portion of the state with the new detection.
+
+        Parameters
+        ----------
+        detection_points_flatten : np.ndarray
+            Column vector of flattened detection points.
+        R : np.ndarray, optional
+            Ignored. Kept for API compatibility with filterpy filters.
+        H : np.ndarray, optional
+            Measurement function. Only its diagonal is used, to mask out
+            points that were not observed in the current frame.
+
+        """
         if H is not None:
             diagonal = np.diagonal(H).reshape((self.dim_z, 1))
             one_minus_diagonal = 1 - diagonal
@@ -147,18 +192,20 @@ class NoFilter:
 
 
 class NoFilterFactory(FilterFactory):
-    """
-    This class allows the user to try Norfair without any predictive filter or velocity estimation.
+    """Factory producing a null filter with no velocity estimation.
 
-    This track only by comparing the position of the previous detections to the ones in the current frame.
+    Lets the user try Norfair without any predictive filtering: tracking is
+    performed only by comparing the position of previous detections to
+    those in the current frame.
 
-    The throughput of this class in FPS is similar to the one achieved by the
-    [`OptimizedKalmanFilterFactory`](#optimizedkalmanfilterfactory) class, so this class exists only for
-    comparative purposes and it is not advised to use it for tracking on a real application.
-
+    The throughput of this class in FPS is similar to that of
+    [`OptimizedKalmanFilterFactory`][norfair.filter.OptimizedKalmanFilterFactory],
+    so this class exists only for comparative purposes and is not advised
+    for real-world tracking.
     """
 
     def create_filter(self, initial_detection: np.ndarray):
+        """Return a :class:`NoFilter` seeded with ``initial_detection``."""
         num_points = initial_detection.shape[0]
         dim_points = initial_detection.shape[1]
         dim_z = dim_points * num_points  # flattened positions
@@ -173,6 +220,13 @@ class NoFilterFactory(FilterFactory):
 
 
 class OptimizedKalmanFilter:
+    """A Kalman filter specialized and vectorized for Norfair tracking.
+
+    This implementation exploits the structural properties of Norfair's
+    tracking problem (diagonal covariance, independent axes) to be faster
+    than the generic ``filterpy`` implementation.
+    """
+
     def __init__(
         self,
         dim_x: int,
@@ -183,6 +237,7 @@ class OptimizedKalmanFilter:
         q: float = 0.1,
         r: float = 4.0,
     ):
+        """Initialize the filter state and per-axis variance buffers."""
         self.dim_z = dim_z
         self.x = np.zeros((dim_x, 1))
 
@@ -196,9 +251,24 @@ class OptimizedKalmanFilter:
         self.default_r = r * np.ones((dim_z, 1))
 
     def predict(self):
+        """Advance positions by the current velocity estimate."""
         self.x[: self.dim_z] += self.x[self.dim_z :]
 
     def update(self, detection_points_flatten, R=None, H=None):
+        """Fold a new measurement into the filter state.
+
+        Parameters
+        ----------
+        detection_points_flatten : np.ndarray
+            Column vector of flattened detection points.
+        R : np.ndarray, optional
+            Measurement noise matrix. Only the diagonal is used; when
+            ``None``, falls back to the factory default.
+        H : np.ndarray, optional
+            Measurement function. Only the diagonal is used, to select
+            which points were actually observed.
+
+        """
         if H is not None:
             diagonal = np.diagonal(H).reshape((self.dim_z, 1))
             one_minus_diagonal = 1 - diagonal
@@ -254,10 +324,11 @@ class OptimizedKalmanFilter:
 
 
 class OptimizedKalmanFilterFactory(FilterFactory):
-    """
-    Creates faster Filters than [`FilterPyKalmanFilterFactory`][norfair.filter.FilterPyKalmanFilterFactory].
+    """Factory for the vectorized :class:`OptimizedKalmanFilter`.
 
-    It allows the user to create Kalman Filter optimized for tracking and set its parameters.
+    Produces filters that are faster than those returned by
+    [`FilterPyKalmanFilterFactory`][norfair.filter.FilterPyKalmanFilterFactory]
+    and exposes the most relevant tuning knobs.
 
     Parameters
     ----------
@@ -270,11 +341,15 @@ class OptimizedKalmanFilterFactory(FilterFactory):
         react faster to real motion changes but increase jitter; smaller
         values produce smoother but laggier tracks.
     pos_variance : float, optional
-        Multiplier for the initial covariance matrix estimation, only in the entries that correspond to position (not speed) variables.
+        Multiplier for the initial covariance matrix estimation in the
+        entries that correspond to position (not speed) variables.
     pos_vel_covariance : float, optional
-        Multiplier for the initial covariance matrix estimation, only in the entries that correspond to the covariance between position and speed.
+        Multiplier for the initial covariance matrix estimation in the
+        entries that correspond to the covariance between position and
+        velocity.
     vel_variance : float, optional
-        Multiplier for the initial covariance matrix estimation, only in the entries that correspond to velocity (not position) variables.
+        Multiplier for the initial covariance matrix estimation in the
+        entries that correspond to velocity (not position) variables.
 
     Notes
     -----
@@ -292,6 +367,7 @@ class OptimizedKalmanFilterFactory(FilterFactory):
         pos_vel_covariance: float = 0,
         vel_variance: float = 1,
     ):
+        """Store the factory-wide tuning parameters."""
         self.R = R
         self.Q = Q
 
@@ -301,6 +377,7 @@ class OptimizedKalmanFilterFactory(FilterFactory):
         self.vel_variance = vel_variance
 
     def create_filter(self, initial_detection: np.ndarray):
+        """Return an :class:`OptimizedKalmanFilter` seeded with ``initial_detection``."""
         num_points = initial_detection.shape[0]
         dim_points = initial_detection.shape[1]
         dim_z = dim_points * num_points  # flattened positions

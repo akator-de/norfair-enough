@@ -1,9 +1,8 @@
-"""
-A customizable lightweight Python library for real-time multi-object tracking.
+"""A customizable lightweight Python library for real-time multi-object tracking.
 
 Examples
 --------
->>> from norfair import Detection, Tracker, Video, draw_tracked_objects
+>>> from norfair import Detection, Tracker, Video, draw_points
 >>> detector = MyDetector()  # Set up a detector
 >>> tracker = Tracker(distance_function="euclidean", distance_threshold=50)
 >>> with Video(input_path="video.mp4") as video:
@@ -11,8 +10,9 @@ Examples
 ...         detections = detector(frame)
 ...         norfair_detections = [Detection(points) for points in detections]
 ...         tracked_objects = tracker.update(detections=norfair_detections)
-...         draw_tracked_objects(frame, tracked_objects)
+...         draw_points(frame, tracked_objects)
 ...         video.write(frame)
+
 """
 
 import importlib.metadata

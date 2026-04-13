@@ -1,3 +1,5 @@
+"""Video I/O helpers: frame iteration, display, and output writing."""
+
 import contextlib
 import os
 import time
@@ -25,57 +27,63 @@ from .utils import get_terminal_size
 
 
 def _get_fourcc(codec: str) -> int:
-    """Helper to get VideoWriter fourcc code with proper typing."""
+    """Return the integer fourcc code for ``codec``."""
     return cv2.VideoWriter_fourcc(*codec)  # type: ignore[attr-defined]
 
 
 class Video:
-    """
-    Class that provides a simple and pythonic way to interact with video.
+    """Simple pythonic wrapper around an OpenCV video source and sink.
 
-    It returns regular OpenCV frames which enables the usage of the huge number of tools OpenCV provides to modify images.
+    Yields raw OpenCV frames so the full OpenCV toolbox is available
+    for frame-level processing, while taking care of capture setup,
+    progress-bar rendering and writer initialization.
 
     Parameters
     ----------
-    camera : Optional[int], optional
-        An integer representing the device id of the camera to be used as the video source.
-
-        Webcams tend to have an id of `0`. Arguments `camera` and `input_path` can't be used at the same time, one must be chosen.
-    input_path : Optional[str], optional
-        A string consisting of the path to the video file to be used as the video source.
-
-        Arguments `camera` and `input_path` can't be used at the same time, one must be chosen.
+    camera : int, optional
+        Device id of the camera to read from. Webcams typically use
+        ``0``. Mutually exclusive with ``input_path``.
+    input_path : str, optional
+        Path to the video file to read. Mutually exclusive with
+        ``camera``.
     output_path : str, optional
-        The path to the output video to be generated.
-        Can be a folder were the file will be created or a full path with a file name.
-    output_fps : Optional[float], optional
-        The frames per second at which to encode the output video file.
-
-        If not provided it is set to be equal to the input video source's fps.
-        This argument is useful when using live video cameras as a video source,
-        where the user may know the input fps,
-        but where the frames are being fed to the output video at a rate that is lower than the video source's fps,
-        due to the latency added by the detector.
+        Where the output video should be written. May be a directory
+        (an output filename is then auto-generated) or a full file
+        path.
+    output_fps : float, optional
+        Frames per second for the output file. Defaults to the input
+        source's fps. This is useful with live cameras when the
+        effective processing rate is lower than the camera's native
+        rate.
     label : str, optional
-        Label to add to the progress bar that appears when processing the current video.
-    output_fourcc : Optional[str], optional
-        OpenCV encoding for output video file.
-        By default we use `mp4v` for `.mp4` and `XVID` for `.avi`. This is a combination that works on most systems but
-        it results in larger files. To get smaller files use `avc1` or `H264` if available.
-        Notice that some fourcc are not compatible with some extensions.
+        Optional label appended to the progress-bar description.
+    output_fourcc : str, optional
+        OpenCV codec for the output file. Defaults to ``"mp4v"`` for
+        ``.mp4`` outputs and ``"XVID"`` for ``.avi``. Try ``"avc1"``
+        or ``"H264"`` for smaller files when available.
     output_extension : str, optional
-        File extension used for the output video. Ignored if `output_path` is not a folder.
+        File extension used when ``output_path`` is a directory.
 
     Examples
     --------
-    >>> with Video(input_path="video.mp4") as video:
-    ...     for frame in video:
-    ...         # << Your modifications to the frame would go here >>
-    ...         video.write(frame)
+    Read, process and write a video::
 
-    The context manager ensures that video resources are released even if the
-    loop is interrupted early. Iterating without ``with`` still works — resources
-    are released when the iterator is exhausted or when ``close()`` is called.
+        >>> with Video(input_path="video.mp4") as video:
+        ...     for frame in video:
+        ...         # << your frame processing goes here >>
+        ...         video.write(frame)
+
+    The context manager releases the underlying ``VideoCapture`` and
+    ``VideoWriter`` even if the loop is interrupted. Iterating without
+    ``with`` also works — resources are freed when the iterator is
+    exhausted or when :meth:`close` is called.
+
+    Raises
+    ------
+    ValueError
+        If neither or both of ``camera`` / ``input_path`` are
+        supplied, or if ``camera`` is not an ``int``.
+
     """
 
     def __init__(
@@ -88,6 +96,7 @@ class Video:
         output_fourcc: str | None = None,
         output_extension: str = "mp4",
     ):
+        """Open the capture and set up the progress bar."""
         self.camera = camera
         self.input_path = input_path
         self.output_path = output_path
@@ -168,9 +177,11 @@ class Video:
         )
 
     def __enter__(self):
+        """Return ``self`` so ``Video`` can be used in a ``with`` block."""
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """Release video resources when leaving a ``with`` block."""
         self.close()
         return False
 
@@ -193,6 +204,18 @@ class Video:
 
     # This is a generator, note the yield keyword below.
     def __iter__(self):
+        """Yield successive OpenCV frames from the underlying capture.
+
+        The progress bar is updated for every frame. When the
+        generator is exhausted (or the consumer loop exits for any
+        reason), :meth:`close` is invoked to release resources.
+
+        Raises
+        ------
+        RuntimeError
+            If the ``Video`` has already been closed.
+
+        """
         if self._closed:
             raise RuntimeError("Cannot iterate over a closed Video")
         try:
@@ -215,11 +238,15 @@ class Video:
             self.close()
 
     def _fail(self, msg: str):
+        """Raise a ``RuntimeError`` with ``msg``."""
         raise RuntimeError(msg)
 
     def write(self, frame: np.ndarray) -> int:
-        """
-        Write one frame to the output video.
+        """Write one frame to the output video.
+
+        Lazily initializes the underlying ``cv2.VideoWriter`` on the
+        first call, using ``frame``'s shape to determine the output
+        resolution.
 
         Parameters
         ----------
@@ -230,6 +257,7 @@ class Video:
         -------
         int
             The key code from ``cv2.waitKey(1)``.
+
         """
         if self.output_video is None:
             # The user may need to access the output file path on their code
@@ -251,22 +279,25 @@ class Video:
         return cv2.waitKey(1)
 
     def show(self, frame: np.ndarray, downsample_ratio: float = 1.0) -> int:
-        """
-        Display a frame through a GUI. Usually used inside a video inference loop to show the output video.
+        """Display ``frame`` in a GUI window.
+
+        Typically called inside a video-inference loop to preview the
+        output.
 
         Parameters
         ----------
         frame : np.ndarray
             The OpenCV frame to be displayed.
         downsample_ratio : float, optional
-            How much to downsample the frame being show.
-
-            Useful when streaming the GUI video display through a slow internet connection using something like X11 forwarding on an ssh connection.
+            Factor by which to downsample the frame before displaying.
+            Useful when streaming the GUI video display over a slow
+            connection (e.g. X11 forwarding over SSH).
 
         Returns
         -------
         int
             The key code from ``cv2.waitKey(1)``.
+
         """
         # Resize to lower resolution for faster streaming over slow connections
         if downsample_ratio != 1.0:
@@ -281,15 +312,17 @@ class Video:
         return cv2.waitKey(1)
 
     def get_output_file_path(self) -> str:
-        """
-        Calculate the output path being used in case you are writing your frames to a video file.
+        """Return the resolved output-file path for written frames.
 
-        Useful if you didn't set `output_path`, and want to know what the autogenerated output file path by Norfair will be.
+        When ``output_path`` is a directory, Norfair auto-generates a
+        filename based on the input source. This method returns that
+        resolved path so callers can locate the rendered video.
 
         Returns
         -------
         str
-            The path to the file.
+            The absolute (or relative) path to the output file.
+
         """
         if not os.path.isdir(self.output_path):
             return self.output_path
@@ -303,6 +336,30 @@ class Video:
         return os.path.join(self.output_path, file_name)
 
     def get_codec_fourcc(self, filename: str) -> str:
+        """Resolve the fourcc codec name to use when writing ``filename``.
+
+        Returns :attr:`output_fourcc` when set; otherwise derives a
+        default from ``filename``'s extension (``"XVID"`` for
+        ``.avi``, ``"mp4v"`` for ``.mp4``).
+
+        Parameters
+        ----------
+        filename : str
+            Destination file whose extension is used for codec
+            auto-selection.
+
+        Returns
+        -------
+        str
+            Name of the fourcc codec to feed to
+            :class:`cv2.VideoWriter`.
+
+        Raises
+        ------
+        RuntimeError
+            If no codec can be resolved from ``filename``.
+
+        """
         if self.output_fourcc is not None:
             return self.output_fourcc
 
@@ -322,7 +379,7 @@ class Video:
             raise RuntimeError("Unreachable")
 
     def abbreviate_description(self, description: str) -> str:
-        """Conditionally abbreviate description so that progress bar fits in small terminals"""
+        """Shorten ``description`` so the progress bar fits small terminals."""
         terminal_columns, _ = get_terminal_size()
         space_for_description = (
             int(terminal_columns) - 25
@@ -334,9 +391,34 @@ class Video:
 
 
 class VideoFromFrames:
+    """Iterate over an MOT-style dataset that stores frames as images.
+
+    Reads ``seqinfo.ini`` to determine frame count, resolution and
+    file-naming convention, then yields successive frames via the
+    iterator protocol. Optionally encodes the frames into an ``.mp4``
+    file alongside the iteration via :meth:`update`.
+
+    Parameters
+    ----------
+    input_path : str
+        Path to the MOT sequence directory (containing
+        ``seqinfo.ini``).
+    save_path : str, optional
+        Directory where the rendered ``.mp4`` is written. A nested
+        ``videos/`` folder is created if ``make_video`` is ``True``.
+    information_file : metrics.InformationFile, optional
+        Pre-parsed ``seqinfo.ini`` wrapper. Loaded from ``input_path``
+        when not provided.
+    make_video : bool, optional
+        If ``True`` (the default), open a ``cv2.VideoWriter`` into
+        which :meth:`update` will write frames.
+
+    """
+
     def __init__(
         self, input_path, save_path=".", information_file=None, make_video=True
     ):
+        """Parse ``seqinfo.ini`` and optionally open the output writer."""
         if information_file is None:
             information_file = metrics.InformationFile(
                 file_path=os.path.join(input_path, "seqinfo.ini")
@@ -376,10 +458,12 @@ class VideoFromFrames:
         self.image_directory = str(dir_val) if not isinstance(dir_val, str) else dir_val
 
     def __iter__(self):
+        """Reset the frame counter and return ``self`` as an iterator."""
         self.frame_number = 1
         return self
 
     def __next__(self):
+        """Return the next image frame from the sequence."""
         if self.frame_number <= self.length:
             frame_path = os.path.join(
                 self.input_path,
@@ -392,6 +476,7 @@ class VideoFromFrames:
         raise StopIteration()
 
     def update(self, frame):
+        """Append ``frame`` to the output video and release on the last frame."""
         self.video.write(frame)
         cv2.waitKey(1)
 

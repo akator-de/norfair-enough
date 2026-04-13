@@ -1,3 +1,5 @@
+"""Video stabilization drawer built on camera-motion estimates."""
+
 import numpy as np
 
 from norfair.camera_motion import TranslationTransformation
@@ -5,52 +7,64 @@ from norfair.utils import warn_once
 
 
 class FixedCamera:
-    """
-    Class used to stabilize video based on the camera motion.
+    """Stabilize the video by compensating for estimated camera motion.
 
-    Starts with a larger frame, where the original frame is drawn on top of a black background.
-    As the camera moves, the smaller frame moves in the opposite direction, stabilizing the objects in it.
-
-    Useful for debugging or demoing the camera motion.
-
-    !!! Warning
-        This only works with [`TranslationTransformation`][norfair.camera_motion.TranslationTransformation],
-        using [`HomographyTransformation`][norfair.camera_motion.HomographyTransformation] will result in
-        unexpected behaviour.
+    The drawer renders on a larger canvas and shifts the original
+    frame in the opposite direction of the camera motion, so stationary
+    objects in the world stay pinned in the output. Useful for
+    debugging or showcasing camera-motion estimation.
 
     !!! Warning
-        If using other drawers, always apply this one last. Using other drawers on the scaled up frame will not work as expected.
+        Only supports
+        [`TranslationTransformation`][norfair.camera_motion.TranslationTransformation].
+        Passing a
+        [`HomographyTransformation`][norfair.camera_motion.HomographyTransformation]
+        yields undefined behavior.
+
+    !!! Warning
+        If combined with other drawers, always apply ``FixedCamera``
+        last. Drawing on the scaled-up frame produced by this class
+        will not give the expected result.
 
     !!! Note
-        Sometimes the camera moves so far from the original point that the result won't fit in the scaled-up frame.
-        In this case, a warning will be logged and the frames will be cropped to avoid errors.
+        Sometimes the camera moves so far from the starting point that
+        the shifted frame no longer fits inside the scaled-up canvas.
+        In that case, a warning is logged and the frame is cropped.
 
     Parameters
     ----------
     scale : float, optional
-        The resulting video will have a resolution of `scale * (H, W)` where HxW is the resolution of the original video.
-        Use a bigger scale if the camera is moving too much.
+        The output resolution is ``scale * (H, W)`` where ``H, W`` is
+        the resolution of the input frame. Increase this when the
+        camera moves a lot.
     attenuation : float, optional
-        Controls how fast the older frames fade to black.
+        Controls how quickly older content fades toward black.
 
     Examples
     --------
-    >>> # setup
-    >>> tracker = Tracker("frobenious", 100)
-    >>> motion_estimator = MotionEstimator()
-    >>> video = Video(input_path="video.mp4")
-    >>> fixed_camera = FixedCamera()
-    >>> # process video
-    >>> for frame in video:
-    >>>     coord_transformations = motion_estimator.update(frame)
-    >>>     detections = get_detections(frame)
-    >>>     tracked_objects = tracker.update(detections, coord_transformations)
-    >>>     draw_tracked_objects(frame, tracked_objects)  # fixed_camera should always be the last drawer
-    >>>     bigger_frame = fixed_camera.adjust_frame(frame, coord_transformations)
-    >>>     video.write(bigger_frame)
+    Stabilize a video using ``FixedCamera`` alongside a tracker::
+
+        >>> tracker = Tracker("frobenius", 100)
+        >>> motion_estimator = MotionEstimator()
+        >>> fixed_camera = FixedCamera()
+        >>> with Video(input_path="video.mp4") as video:
+        ...     for frame in video:
+        ...         coord_transformations = motion_estimator.update(frame)
+        ...         detections = get_detections(frame)
+        ...         tracked_objects = tracker.update(
+        ...             detections, coord_transformations=coord_transformations
+        ...         )
+        ...         # apply fixed_camera last
+        ...         draw_points(frame, tracked_objects)
+        ...         bigger_frame = fixed_camera.adjust_frame(
+        ...             frame, coord_transformations
+        ...         )
+        ...         video.write(bigger_frame)
+
     """
 
     def __init__(self, scale: float = 2, attenuation: float = 0.05):
+        """Initialize the background canvas parameters."""
         self.scale = scale
         self._background: np.ndarray | None = None
         self._attenuation_factor = 1 - attenuation
@@ -58,20 +72,24 @@ class FixedCamera:
     def adjust_frame(
         self, frame: np.ndarray, coord_transformation: TranslationTransformation
     ) -> np.ndarray:
-        """
-        Render scaled up frame.
+        """Render the next frame onto the stabilized background canvas.
 
         Parameters
         ----------
         frame : np.ndarray
-            The OpenCV frame.
+            The OpenCV frame for this time step.
         coord_transformation : TranslationTransformation
-            The coordinate transformation as returned by the [`MotionEstimator`][norfair.camera_motion.MotionEstimator]
+            The coordinate transformation as returned by the
+            [`MotionEstimator`][norfair.camera_motion.MotionEstimator]
+            for this frame.
 
         Returns
         -------
         np.ndarray
-            The new bigger frame with the original frame drawn on it.
+            The scaled-up background canvas with ``frame`` drawn onto
+            it at the position that compensates for the estimated
+            camera motion.
+
         """
 
         # initialize background if necessary

@@ -1,3 +1,5 @@
+"""Tracking primitives: ``Tracker``, ``TrackedObject`` and ``Detection``."""
+
 import logging
 import threading
 from collections.abc import Callable, Hashable, Sequence
@@ -20,66 +22,98 @@ logger = logging.getLogger(__name__)
 
 
 class Tracker:
-    """
-    The class in charge of performing the tracking of the detections produced by a detector.
+    """Tracks detections produced by a detector across frames.
 
     Parameters
     ----------
-    distance_function : Union[str, Callable[[Detection, TrackedObject], float]]
-        Function used by the tracker to determine the distance between newly detected objects and the objects that are currently being tracked.
-        This function should take 2 input arguments, the first being a [Detection][norfair.tracker.Detection], and the second a [TrackedObject][norfair.tracker.TrackedObject].
-        It has to return a `float` with the distance it calculates.
-        Some common distances are implemented in [distances][], as a shortcut the tracker accepts the name of these [predefined distances][norfair.distances.get_distance_by_name].
-        Scipy's predefined distances are also accepted. A `str` with one of the available metrics in
+    distance_function : str or Callable[[Detection, TrackedObject], float]
+        Function used by the tracker to determine the distance between newly
+        detected objects and the objects that are currently being tracked.
+        This function should take 2 input arguments, the first being a
+        [Detection][norfair.tracker.Detection], and the second a
+        [TrackedObject][norfair.tracker.TrackedObject]. It has to return a
+        `float` with the distance it calculates.
+
+        Some common distances are implemented in [distances][]; as a shortcut
+        the tracker accepts the name of one of these
+        [predefined distances][norfair.distances.get_distance_by_name]. Scipy's
+        predefined distances are also accepted — pass a `str` with one of the
+        available metrics in
         [`scipy.spatial.distance.cdist`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html).
     distance_threshold : float
-        Defines what is the maximum distance that can constitute a match.
-        Detections and tracked objects whose distances are above this threshold won't be matched by the tracker.
+        Maximum distance that can constitute a match. Detections and tracked
+        objects whose distance is above this threshold won't be matched by
+        the tracker.
     hit_counter_max : int, optional
-        Each tracked objects keeps an internal hit counter which tracks how often it's getting matched to a detection,
-        each time it gets a match this counter goes up, and each time it doesn't it goes down.
+        Each tracked object keeps an internal hit counter which tracks how
+        often it gets matched to a detection; each time it gets a match the
+        counter goes up, and each time it doesn't the counter goes down.
 
-        If it goes below 0 the object gets destroyed. This argument defines how large this inertia can grow,
-        and therefore defines how long an object can live without getting matched to any detections, before it is displaced as a dead object, if no ReID distance function is implemented it will be destroyed.
-    initialization_delay : Optional[int], optional
-         Determines how large the object's hit counter must be in order to be considered as initialized, and get returned to the user as a real object.
-         It must be smaller than `hit_counter_max` or otherwise the object would never be initialized.
+        If the counter goes below 0 the object gets destroyed. This argument
+        defines how large this inertia can grow, and therefore how long an
+        object can live without getting matched to any detections before it
+        is displaced as a dead object. If no ReID distance function is
+        provided the object will then be destroyed.
+    initialization_delay : int, optional
+        Determines how large the object's hit counter must be in order to be
+        considered initialized and be returned to the user as a real object.
+        It must be smaller than ``hit_counter_max`` or otherwise the object
+        would never be initialized.
 
-         If set to 0, objects will get returned to the user as soon as they are detected for the first time,
-         which can be problematic as this can result in objects appearing and immediately dissapearing.
+        If set to 0, objects will be returned to the user as soon as they are
+        detected for the first time, which can be problematic because it can
+        result in objects appearing and immediately disappearing.
 
-         Defaults to `hit_counter_max / 2`
+        Defaults to ``hit_counter_max // 2``.
     pointwise_hit_counter_max : int, optional
-        Each tracked object keeps track of how often the points it's tracking have been getting matched.
-        Points that are getting matched (`pointwise_hit_counter > 0`) are said to be live, and points which aren't (`pointwise_hit_counter = 0`)
-        are said to not be live.
+        Each tracked object keeps track of how often the points it is
+        tracking have been getting matched. Points that are getting matched
+        (``pointwise_hit_counter > 0``) are said to be *live*, while points
+        that aren't (``pointwise_hit_counter == 0``) are said to be stale.
 
-        This is used to determine things like which individual points in a tracked object get drawn by [`draw_tracked_objects`][norfair.drawing.draw_tracked_objects] and which don't.
-        This argument defines how large the inertia for each point of a tracker can grow.
+        This is used to determine things like which individual points in a
+        tracked object get drawn by
+        [`draw_points`][norfair.drawing.draw_points] and which don't.
+        This argument defines how large the inertia for each point of a
+        tracker can grow.
     detection_threshold : float, optional
-        Sets the threshold at which the scores of the points in a detection being fed into the tracker must dip below to be ignored by the tracker.
+        Threshold at which point scores in a detection must be above to be
+        considered by the tracker. Any point whose score is at or below this
+        value is ignored.
     filter_factory : FilterFactory, optional
-        This parameter can be used to change what filter the [`TrackedObject`][norfair.tracker.TrackedObject] instances created by the tracker will use.
-        Defaults to [`OptimizedKalmanFilterFactory()`][norfair.filter.OptimizedKalmanFilterFactory]
+        Selects which filter the
+        [`TrackedObject`][norfair.tracker.TrackedObject] instances created by
+        this tracker will use. Defaults to
+        [`OptimizedKalmanFilterFactory()`][norfair.filter.OptimizedKalmanFilterFactory].
     past_detections_length : int, optional
-        How many past detections to save for each tracked object.
-        Norfair tries to distribute these past detections uniformly through the object's lifetime so they're more representative.
-        Very useful if you want to add metric learning to your model, as you can associate an embedding to each detection and access them in your distance function.
-    reid_distance_function: Optional[Callable[["TrackedObject", "TrackedObject"], float]]
-        Function used by the tracker to determine the ReID distance between newly detected trackers and unmatched trackers by the distance function.
+        How many past detections to save for each tracked object. Norfair
+        tries to distribute these past detections uniformly through the
+        object's lifetime so they're more representative. Very useful if you
+        want to add metric learning to your model, because you can associate
+        an embedding to each detection and access them in your distance
+        function.
+    reid_distance_function : Callable[[TrackedObject, TrackedObject], float], optional
+        Function used by the tracker to determine the ReID distance between
+        newly detected trackers and unmatched trackers.
 
-        This function should take 2 input arguments, the first being tracked objects in the initialization phase of type [`TrackedObject`][norfair.tracker.TrackedObject],
-        and the second being tracked objects that have been unmatched of type [`TrackedObject`][norfair.tracker.TrackedObject]. It returns a `float` with the distance it
-        calculates.
-    reid_distance_threshold: float
-        Defines what is the maximum ReID distance that can constitute a match.
+        This function should take 2 input arguments, the first being a
+        tracked object in the initialization phase, and the second being a
+        tracked object that has been unmatched. Both are
+        [`TrackedObject`][norfair.tracker.TrackedObject] instances. It must
+        return a `float` with the distance it calculates.
+    reid_distance_threshold : float, optional
+        Maximum ReID distance that can constitute a match.
 
-        Tracked objects whose distance is above this threshold won't be merged, if they are the oldest tracked object will be maintained
+        Tracked objects whose distance is above this threshold won't be
+        merged. If they are merged, the oldest tracked object is maintained
         with the position of the new tracked object.
-    reid_hit_counter_max: Optional[int]
-        Each tracked object keeps an internal ReID hit counter which tracks how often it's getting recognized by another tracker,
-        each time it gets a match this counter goes up, and each time it doesn't it goes down. If it goes below 0 the object gets destroyed.
-        If used, this argument (`reid_hit_counter_max`) defines how long an object can live without getting matched to any detections, before it is destroyed.
+    reid_hit_counter_max : int, optional
+        Each tracked object keeps an internal ReID hit counter which tracks
+        how often it is getting recognized by another tracker; each time it
+        gets a match this counter goes up, and each time it doesn't it goes
+        down. If it goes below 0 the object is destroyed. When set, this
+        defines how long an object can live without being matched to any
+        detection before it is destroyed.
 
     Notes
     -----
@@ -87,6 +121,7 @@ class Tracker:
     ``update`` on the same instance from multiple threads. However, using
     separate ``Tracker`` instances in different threads is safe — the shared
     ``global_id`` counter is protected by a lock.
+
     """
 
     def __init__(
@@ -163,33 +198,40 @@ class Tracker:
         period: int = 1,
         coord_transformations: CoordinatesTransformation | None = None,
     ) -> list["TrackedObject"]:
-        """
-        Process detections found in each frame.
+        """Process detections found in the current frame.
 
-        The detections can be matched to previous tracked objects or new ones will be created
-        according to the configuration of the Tracker.
-        The currently alive and initialized tracked objects are returned
+        Detections can be matched to previous tracked objects, or new
+        tracked objects will be created according to the configuration of
+        this ``Tracker``. The currently alive and initialized tracked
+        objects are returned.
 
         Parameters
         ----------
-        detections : Optional[List[Detection]], optional
-            A list of [`Detection`][norfair.tracker.Detection] which represent the detections found in the current frame being processed.
+        detections : list[Detection], optional
+            The [`Detection`][norfair.tracker.Detection] instances found in
+            the current frame being processed.
 
-            If no detections have been found in the current frame, or the user is purposely skipping frames to improve video processing time,
-            this argument should be set to None or ignored, as the update function is needed to advance the state of the Kalman Filters inside the tracker.
+            If no detections were found in the current frame, or the user is
+            purposely skipping frames to improve processing time, this
+            argument should be set to ``None`` or omitted — the update
+            function still needs to be called to advance the state of the
+            Kalman filters inside the tracker.
         period : int, optional
-            The user can chose not to run their detector on all frames, so as to process video faster.
-            This parameter sets every how many frames the detector is getting ran,
-            so that the tracker is aware of this situation and can handle it properly.
+            Many users choose not to run their detector on every frame in
+            order to process video faster. This parameter sets how many
+            frames pass between detector invocations, so the tracker is
+            aware and can handle the situation properly.
 
-            This argument can be reset on each frame processed,
-            which is useful if the user is dynamically changing how many frames the detector is skipping on a video when working in real-time.
-        coord_transformations: Optional[CoordinatesTransformation]
-            The coordinate transformation calculated by the [MotionEstimator][norfair.camera_motion.MotionEstimator].
+            It can be reset on each frame processed, which is useful if you
+            are dynamically changing how many frames the detector skips in a
+            real-time video stream.
+        coord_transformations : CoordinatesTransformation, optional
+            The coordinate transformation calculated by the
+            [`MotionEstimator`][norfair.camera_motion.MotionEstimator].
 
         Returns
         -------
-        List[TrackedObject]
+        list[TrackedObject]
             The list of active tracked objects.
 
         Notes
@@ -202,6 +244,7 @@ class Tracker:
           detection is stored internally.
 
         If you need the original detection unchanged, pass a copy.
+
         """
         if coord_transformations is not None and detections is not None:
             for det in detections:
@@ -288,21 +331,25 @@ class Tracker:
 
     @property
     def current_object_count(self) -> int:
-        """Number of active TrackedObjects"""
+        """Number of currently active ``TrackedObject`` instances."""
         return len(self.get_active_objects())
 
     @property
     def total_object_count(self) -> int:
-        """Total number of TrackedObjects initialized in the by this Tracker"""
+        """Total number of ``TrackedObject`` instances ever initialized by this tracker."""
         return self._obj_factory.count
 
     def get_active_objects(self) -> list["TrackedObject"]:
-        """Get the list of active objects
+        """Return the list of currently active tracked objects.
+
+        An object is active if it has finished initializing and its hit
+        counter is still positive.
 
         Returns
         -------
-        List["TrackedObject"]
-            The list of active objects
+        list[TrackedObject]
+            The active tracked objects.
+
         """
         return [
             o
@@ -381,17 +428,29 @@ class Tracker:
         return unmatched_candidates, matched_objects, unmatched_objects
 
     def match_dets_and_objs(self, distance_matrix: np.ndarray, distance_threshold):
-        """Matches detections with tracked_objects from a distance matrix
+        """Match detections with tracked objects from a distance matrix.
 
-        I used to match by minimizing the global distances, but found several
-        cases in which this was not optimal. So now I just match by starting
-        with the global minimum distance and matching the det-obj corresponding
-        to that distance, then taking the second minimum, and so on until we
-        reach the distance_threshold.
+        Instead of minimizing the global distance, this greedy strategy
+        starts with the global minimum entry and matches the det–obj
+        corresponding to that distance, then takes the second minimum, and
+        so on until ``distance_threshold`` is reached.
 
-        This avoids the the algorithm getting cute with us and matching things
-        that shouldn't be matching just for the sake of minimizing the global
-        distance, which is what used to happen
+        This avoids pathological cases where minimizing the global distance
+        forces matches that shouldn't happen just to bring the overall sum
+        down.
+
+        Parameters
+        ----------
+        distance_matrix : np.ndarray
+            A matrix of shape ``(n_detections, n_objects)``.
+        distance_threshold : float
+            Entries greater than or equal to this value are not matched.
+
+        Returns
+        -------
+        tuple[list[int], list[int]]
+            Matched detection and object indices, in matching order.
+
         """
         # NOTE: This implementation is terribly inefficient, but it doesn't
         #       seem to affect the fps at all.
@@ -464,42 +523,50 @@ class _TrackedObjectFactory:
 
 
 class TrackedObject:
-    """
-    The objects returned by the tracker's `update` function on each iteration.
+    """Objects returned by the tracker's ``update`` method on each iteration.
 
     They represent the objects currently being tracked by the tracker.
 
-    Users should not instantiate TrackedObjects manually;
-    the Tracker will be in charge of creating them.
+    Users should not instantiate ``TrackedObject`` manually; the ``Tracker``
+    is in charge of creating them.
 
     Attributes
     ----------
     estimate : np.ndarray
-        Where the tracker predicts the point will be in the current frame based on past detections.
-        A numpy array with the same shape as the detections being fed to the tracker that produced it.
-    id : Optional[int]
-        The unique identifier assigned to this object by the tracker. Set to `None` if the object is initializing.
-    global_id : Optional[int]
-        The globally unique identifier assigned to this object. Set to `None` if the object is initializing
+        Where the tracker predicts the points will be in the current frame
+        based on past detections. A NumPy array with the same shape as the
+        detections being fed to the tracker that produced it.
+    id : int or None
+        The unique identifier assigned to this object by the tracker. Set to
+        ``None`` while the object is initializing.
+    global_id : int or None
+        The globally unique identifier assigned to this object. Set to
+        ``None`` while the object is initializing.
     last_detection : Detection
-        The last detection that matched with this tracked object.
-        Useful if you are storing embeddings in your detections and want to do metric learning, or for debugging.
-    last_distance : Optional[float]
+        The last detection that matched with this tracked object. Useful if
+        you are storing embeddings in your detections and want to do metric
+        learning, or for debugging.
+    last_distance : float or None
         The distance the tracker had with the last object it matched with.
     age : int
         The age of this object measured in number of frames.
-    live_points :
-        A boolean mask with shape `(n_points,)`. Points marked as `True` have recently been matched with detections.
-        Points marked as `False` haven't and are to be considered stale, and should be ignored.
+    live_points : np.ndarray
+        A boolean mask with shape ``(n_points,)``. Points marked as ``True``
+        have recently been matched with detections. Points marked as
+        ``False`` are stale and should be ignored.
 
-        Functions like [`draw_tracked_objects`][norfair.drawing.draw_tracked_objects] use this property to determine which points not to draw.
+        Functions like [`draw_points`][norfair.drawing.draw_points] use this
+        property to determine which points not to draw.
     initializing_id : int
-        On top of `id`, objects also have an `initializing_id` which is the id they are given internally by the `Tracker`;
-        this id is used solely for debugging.
+        On top of ``id``, objects also have an ``initializing_id`` assigned
+        internally by the ``Tracker``; this id is used solely for debugging.
 
-        Each new object created by the `Tracker` starts as an uninitialized `TrackedObject`,
-        which needs to reach a certain match rate to be converted into a full blown `TrackedObject`.
-        `initializing_id` is the id temporarily assigned to `TrackedObject` while they are getting initialized.
+        Each new object created by the ``Tracker`` starts as an
+        uninitialized ``TrackedObject`` which needs to reach a certain match
+        rate before it is converted into a full-fledged tracked object.
+        ``initializing_id`` is the id temporarily assigned to a
+        ``TrackedObject`` while it is being initialized.
+
     """
 
     def __init__(
@@ -577,6 +644,12 @@ class TrackedObject:
             self.update_coordinate_transformation(coord_transformations)
 
     def tracker_step(self):
+        """Advance the internal state of the tracker by one frame.
+
+        Decrements the hit counters, increments the age and steps the
+        Kalman filter prediction forward. Called by the ``Tracker`` once per
+        update cycle.
+        """
         if self.reid_hit_counter is None:
             if self.hit_counter <= 0:
                 self.reid_hit_counter = self.reid_hit_counter_max
@@ -595,51 +668,64 @@ class TrackedObject:
 
     @property
     def hit_counter_is_positive(self):
+        """Whether the hit counter is still non-negative (object is alive)."""
         return self.hit_counter >= 0
 
     @property
     def reid_hit_counter_is_positive(self):
+        """Whether the ReID hit counter is still non-negative (object can still be re-identified)."""
         return self.reid_hit_counter is None or self.reid_hit_counter >= 0
 
     @property
     def estimate_velocity(self) -> np.ndarray:
-        """Get the velocity estimate of the object from the Kalman filter. This velocity is in the absolute coordinate system.
+        """Return the velocity estimate of the object from the Kalman filter.
+
+        The velocity is expressed in the absolute coordinate system.
 
         Returns
         -------
         np.ndarray
-            An array of shape (self.num_points, self.dim_points) containing the velocity estimate of the object on each axis.
+            An array of shape ``(num_points, dim_points)`` containing the
+            velocity estimate of the object on each axis.
+
         """
         return self.filter.x.T.flatten()[self.dim_z :].reshape(-1, self.dim_points)
 
     @property
     def estimate(self) -> np.ndarray:
-        """Get the position estimate of the object from the Kalman filter.
+        """Return the position estimate of the object from the Kalman filter.
 
         Returns
         -------
         np.ndarray
-            An array of shape (self.num_points, self.dim_points) containing the position estimate of the object on each axis.
+            An array of shape ``(num_points, dim_points)`` containing the
+            position estimate of the object on each axis.
+
         """
         return self.get_estimate()
 
     def get_estimate(self, absolute=False) -> np.ndarray:
-        """Get the position estimate of the object from the Kalman filter in an absolute or relative format.
+        """Return the position estimate in either absolute or relative coordinates.
 
         Parameters
         ----------
         absolute : bool, optional
-            If true the coordinates are returned in absolute format, by default False, by default False.
+            If ``True`` return the estimate in absolute coordinates,
+            otherwise return it in the tracker's relative coordinate system.
+            Defaults to ``False``.
 
         Returns
         -------
         np.ndarray
-            An array of shape (self.num_points, self.dim_points) containing the position estimate of the object on each axis.
+            An array of shape ``(num_points, dim_points)`` containing the
+            position estimate of the object on each axis.
 
         Raises
         ------
         ValueError
-            Alert if the coordinates are requested in absolute format but the tracker has no coordinate transformation.
+            If absolute coordinates are requested but the tracker has no
+            coordinate transformation attached.
+
         """
         positions = self.filter.x.T.flatten()[: self.dim_z].reshape(-1, self.dim_points)
         if self.abs_to_rel is None:
@@ -657,24 +743,24 @@ class TrackedObject:
 
     @property
     def live_points(self):
-        # A point is "live" only if it was matched to a detection in the
-        # current frame AND its pointwise hit counter is still positive.
-        # Previously this relied solely on `point_hit_counter > 0`, which
-        # produced stale True values: an unmatched track still reported
-        # live_points=True because tracker_step() only decrements the
-        # counter by one per frame, while hit() could have pushed it well
-        # above 1 (GH#2, tryolabs/norfair#328).
+        """Boolean mask marking which tracked points are live in the current frame.
+
+        A point is live only if it was matched to a detection in the
+        current frame **and** its pointwise hit counter is still positive.
+        """
         return (self.point_hit_counter > 0) & self._point_matched_in_current_frame
 
     def hit(self, detection: "Detection", period: int = 1):
-        """Update tracked object with a new detection
+        """Update this tracked object with a new detection.
 
         Parameters
         ----------
         detection : Detection
-            the new detection matched to this tracked object
+            The new detection matched to this tracked object.
         period : int, optional
-            frames corresponding to the period of time since last update.
+            Frames corresponding to the period of time since the last
+            update. Defaults to ``1``.
+
         """
         self._conditionally_add_to_past_detections(detection)
 
@@ -755,6 +841,7 @@ class TrackedObject:
         )
 
     def __repr__(self):
+        """Return a human-readable representation of this tracked object."""
         if self.last_distance is None:
             placeholder_text = "\033[1mObject_{}\033[0m(age: {}, hit_counter: {}, last_distance: {}, init_id: {})"
         else:
@@ -768,11 +855,11 @@ class TrackedObject:
         )
 
     def _conditionally_add_to_past_detections(self, detection):
-        """Adds detections into (and pops detections away) from `past_detections`
+        """Maintain the rolling buffer of past detections for this object.
 
-        It does so by keeping a fixed amount of past detections saved into each
-        TrackedObject, while maintaining them distributed uniformly through the object's
-        lifetime.
+        Keeps a fixed number of past detections saved in each
+        ``TrackedObject`` while distributing them uniformly through the
+        object's lifetime.
 
         Note
         ----
@@ -795,7 +882,7 @@ class TrackedObject:
                 self.past_detections.append(detection)
 
     def merge(self, tracked_object):
-        """Merge with a not yet initialized TrackedObject instance"""
+        """Merge another (not-yet-initialized) ``TrackedObject`` into this one."""
         self.reid_hit_counter = None
         self.hit_counter = self.initial_period * 2
         self.point_hit_counter = tracked_object.point_hit_counter
@@ -820,49 +907,62 @@ class TrackedObject:
     def update_coordinate_transformation(
         self, coordinate_transformation: CoordinatesTransformation | None
     ):
+        """Attach (or refresh) the abs→rel converter from a new coordinate transformation."""
         if coordinate_transformation is not None:
             self.abs_to_rel = coordinate_transformation.abs_to_rel
 
     def _acquire_ids(self):
+        """Assign a concrete ``id`` and ``global_id`` from the factory."""
         self.id, self.global_id = self._obj_factory.get_ids()
 
 
 class Detection:
-    """Detections returned by the detector must be converted to a `Detection` object before being used by Norfair.
+    """A single detection produced by a detector, prepared for use by Norfair.
+
+    Detections returned by the detector must be converted to a ``Detection``
+    object before being passed to the ``Tracker``.
 
     Parameters
     ----------
     points : np.ndarray
-        Points detected. Must be a rank 2 array with shape `(n_points, n_dimensions)`.
-    scores : np.ndarray, optional
-        An array of length `n_points` which assigns a score to each of the points defined in `points`.
+        Points detected. Must be a rank-2 array with shape
+        ``(n_points, n_dimensions)``.
+    scores : np.ndarray or float, optional
+        A score per point, or a single scalar score applied to every point.
+        When an array is given, its length must match ``n_points``.
 
-        This is used to inform the tracker of which points to ignore;
-        any point with a score below `detection_threshold` will be ignored.
+        This is used to inform the tracker which points to ignore: any
+        point with a score at or below ``detection_threshold`` is skipped.
 
-        This useful for cases in which detections don't always have every point present, as is often the case in pose estimators.
+        Useful when detections don't always have every point present, as
+        is often the case in pose estimators.
     data : Any, optional
-        The place to store any extra data which may be useful when calculating the distance function.
-        Anything stored here will be available to use inside the distance function.
+        A place to store any extra data which may be useful when calculating
+        the distance function. Anything stored here will be available to use
+        inside the distance function.
 
-        This enables the development of more interesting trackers which can do things like assign an appearance embedding to each
-        detection to aid in its tracking.
+        This enables more interesting trackers that, for instance, attach an
+        appearance embedding to each detection to aid in tracking.
     label : Hashable, optional
-        When working with multiple classes the detection's label can be stored to be used as a matching condition when associating
-        tracked objects with new detections. Label's type must be hashable for drawing purposes.
+        When working with multiple classes, the detection's label can be
+        stored to be used as a matching condition when associating tracked
+        objects with new detections. The label's type must be hashable for
+        drawing purposes.
     embedding : Any, optional
-        The embedding for the reid_distance.
+        An embedding used by the ReID distance function, if any.
 
     Attributes
     ----------
     points : np.ndarray
         The detection points, validated to shape ``(n_points, n_dimensions)``.
     absolute_points : np.ndarray
-        Starts as a copy of ``points``. When ``coord_transformations`` is passed
-        to :meth:`Tracker.update`, this is overwritten with absolute coordinates.
-    age : Optional[int]
+        Starts as a copy of ``points``. When ``coord_transformations`` is
+        passed to [`Tracker.update`][norfair.tracker.Tracker.update], this
+        is overwritten with absolute coordinates.
+    age : int or None
         Set by the tracker to the matched ``TrackedObject``'s age when the
-        detection is stored as a past detection.  ``None`` until then.
+        detection is stored as a past detection. ``None`` until then.
+
     """
 
     def __init__(
@@ -895,6 +995,15 @@ class Detection:
     def update_coordinate_transformation(
         self, coordinate_transformation: CoordinatesTransformation
     ):
+        """Rewrite ``absolute_points`` into absolute coordinates.
+
+        Parameters
+        ----------
+        coordinate_transformation : CoordinatesTransformation
+            Transformation used to map relative points into the absolute
+            reference frame. When ``None``, this is a no-op.
+
+        """
         if coordinate_transformation is not None:
             self.absolute_points = coordinate_transformation.rel_to_abs(
                 self.absolute_points

@@ -1,3 +1,5 @@
+"""Thin wrapper around OpenCV primitives used by the drawing helpers."""
+
 from collections.abc import Sequence
 from typing import Any
 
@@ -15,11 +17,11 @@ except ImportError:
 
 
 class Drawer:
-    """
-    Basic drawing functionality.
+    """Basic drawing primitives used by the higher-level helpers.
 
-    This class encapsulates opencv drawing functions allowing for
-    different backends to be implemented following the same interface.
+    This class encapsulates OpenCV drawing calls behind a stable
+    interface so alternative backends can be swapped in without
+    touching the rest of the drawing module.
     """
 
     @classmethod
@@ -31,26 +33,27 @@ class Drawer:
         thickness: int | None = None,
         color: ColorType | None = None,
     ) -> np.ndarray:
-        """
-        Draw a circle.
+        """Draw a circle onto ``frame``.
 
         Parameters
         ----------
         frame : np.ndarray
             The OpenCV frame to draw on. Modified in place.
-        position : Tuple[int, int]
-            Position of the point. This will become the center of the circle.
-        radius : Optional[int], optional
-            Radius of the circle.
-        thickness : Optional[int], optional
-            Thickness or width of the line.
-        color : Color, optional
-            A tuple of ints describing the BGR color `(0, 0, 255)`.
+        position : tuple of int
+            Center of the circle in pixel coordinates.
+        radius : int, optional
+            Radius of the circle. By default a sensible value is picked
+            based on the frame size.
+        thickness : int, optional
+            Stroke thickness. By default it is derived from ``radius``.
+        color : ColorType, optional
+            BGR color. Defaults to black.
 
         Returns
         -------
         np.ndarray
-            The resulting frame.
+            The ``frame`` passed in (drawn on in place).
+
         """
         if radius is None:
             radius = int(max(max(frame.shape) * 0.005, 1))
@@ -80,8 +83,7 @@ class Drawer:
         shadow_color: ColorType = Color.black,
         shadow_offset: int = 1,
     ) -> np.ndarray:
-        """
-        Draw text
+        """Draw text onto ``frame``.
 
         Parameters
         ----------
@@ -89,26 +91,30 @@ class Drawer:
             The OpenCV frame to draw on. Modified in place.
         text : str
             The text to be written.
-        position : Tuple[int, int]
-            Position of the bottom-left corner of the text.
-            This value is adjusted considering the thickness automatically.
-        size : Optional[float], optional
-            Scale of the font, by default chooses a sensible value is picked based on the size of the frame.
-        color : Optional[ColorType], optional
-            Color of the text, by default is black.
-        thickness : Optional[int], optional
-            Thickness of the lines, by default a sensible value is picked based on the size.
+        position : tuple of int
+            Bottom-left corner of the text in pixel coordinates. The
+            value is automatically shifted to account for ``thickness``.
+        size : float, optional
+            Font scale. By default a sensible value is picked based on
+            the frame size.
+        color : ColorType, optional
+            Text color. Defaults to black.
+        thickness : int, optional
+            Stroke thickness. By default a sensible value is derived
+            from ``size``.
         shadow : bool, optional
-            If True, a shadow of the text is added which improves legibility.
-        shadow_color : Color, optional
+            If ``True``, a shadow is drawn behind the text to improve
+            legibility.
+        shadow_color : ColorType, optional
             Color of the shadow.
         shadow_offset : int, optional
-            Offset of the shadow.
+            Pixel offset of the shadow relative to the text.
 
         Returns
         -------
         np.ndarray
-            The resulting frame.
+            The ``frame`` passed in (drawn on in place).
+
         """
         font_size = (
             size if size is not None else min(max(max(frame.shape) / 4000, 0.5), 1.5)
@@ -150,27 +156,28 @@ class Drawer:
         color: ColorType | None = None,
         thickness: int | None = None,
     ) -> np.ndarray:
-        """
-        Draw a rectangle
+        """Draw a rectangle onto ``frame``.
 
         Parameters
         ----------
         frame : np.ndarray
             The OpenCV frame to draw on. Modified in place.
-        points : Sequence[Tuple[int, int]] | np.ndarray
-            Points describing the rectangle in the format `[[x0, y0], [x1, y1]]`.
+        points : Sequence[tuple[int, int]] | np.ndarray
+            Two opposite corners of the rectangle in the format
+            ``[[x0, y0], [x1, y1]]``.
             May be passed as a nested sequence or as a ``(2, 2)`` numpy array —
             both forms are normalised to plain ``(int, int)`` tuples before
             being handed to OpenCV.
-        color : Optional[ColorType], optional
-            Color of the lines, by default Black.
-        thickness : Optional[int], optional
-            Thickness of the lines, by default 1.
+        color : ColorType, optional
+            BGR outline color. Defaults to black.
+        thickness : int, optional
+            Stroke thickness of the outline.
 
         Returns
         -------
         np.ndarray
-            The resulting frame.
+            The ``frame`` passed in (drawn on in place).
+
         """
         if color is None:
             color = Color.black
@@ -194,26 +201,26 @@ class Drawer:
         color: ColorType,
         thickness: int,
     ) -> np.ndarray:
-        """
-        Draw a cross
+        """Draw a ``+``-shaped cross onto ``frame``.
 
         Parameters
         ----------
         frame : np.ndarray
             The OpenCV frame to draw on. Modified in place.
-        center : Tuple[int, int]
-            Center of the cross.
+        center : tuple of int
+            Center of the cross in pixel coordinates.
         radius : int
-            Size or radius of the cross.
-        color : Color
-            Color of the lines.
+            Half-length of each arm of the cross.
+        color : ColorType
+            BGR color of the lines.
         thickness : int
-            Thickness of the lines.
+            Stroke thickness of the lines.
 
         Returns
         -------
         np.ndarray
-            The resulting frame.
+            The ``frame`` passed in (drawn on in place).
+
         """
         middle_x, middle_y = center
         left = center[0] - radius
@@ -245,26 +252,26 @@ class Drawer:
         color: ColorType = Color.black,
         thickness: int = 1,
     ) -> np.ndarray:
-        """
-        Draw a line.
+        """Draw a straight line onto ``frame``.
 
         Parameters
         ----------
         frame : np.ndarray
             The OpenCV frame to draw on. Modified in place.
-        start : Tuple[int, int]
-            Starting point.
-        end : Tuple[int, int]
-            End point.
+        start : tuple of int
+            Starting point in pixel coordinates.
+        end : tuple of int
+            End point in pixel coordinates.
         color : ColorType, optional
-            Line color.
+            BGR line color. Defaults to black.
         thickness : int, optional
-            Line width.
+            Stroke thickness of the line.
 
         Returns
         -------
         np.ndarray
-            The resulting frame.
+            The ``frame`` passed in (drawn on in place).
+
         """
         return cv2.line(
             frame,
@@ -283,8 +290,7 @@ class Drawer:
         beta: float | None = None,
         gamma: float = 0,
     ) -> np.ndarray:
-        """
-        Blend 2 frames as a weighted sum.
+        """Blend two frames as a weighted sum.
 
         Parameters
         ----------
@@ -293,16 +299,17 @@ class Drawer:
         frame2 : np.ndarray
             An OpenCV frame.
         alpha : float, optional
-            Weight of frame1.
-        beta : Optional[float], optional
-            Weight of frame2, by default `1 - alpha`
+            Weight of ``frame1``.
+        beta : float, optional
+            Weight of ``frame2``. Defaults to ``1 - alpha``.
         gamma : float, optional
-            Scalar to add to the sum.
+            Scalar added to the weighted sum.
 
         Returns
         -------
         np.ndarray
-            The resulting frame.
+            The blended frame.
+
         """
         if beta is None:
             beta = 1 - alpha
@@ -312,30 +319,41 @@ class Drawer:
 
 
 class Drawable:
-    """
-    Class to standardize Drawable objects like Detections and TrackedObjects
+    """Adapter that exposes ``Detection`` and ``TrackedObject`` uniformly.
+
+    The drawing helpers accept either raw ``Detection`` /
+    ``TrackedObject`` instances or pre-built ``Drawable`` objects.
+    Wrapping an object lets you draw arbitrary point sets with a
+    uniform API.
 
     Parameters
     ----------
-    obj : Union[Detection, TrackedObject], optional
-        A [Detection][norfair.tracker.Detection] or a [TrackedObject][norfair.tracker.TrackedObject]
-        that will be used to initialized the drawable.
-        If this parameter is passed, all other arguments are ignored
+    obj : Detection or TrackedObject, optional
+        A [Detection][norfair.tracker.Detection] or
+        [TrackedObject][norfair.tracker.TrackedObject] used to
+        initialize the drawable. If given, all remaining arguments are
+        ignored.
     points : np.ndarray, optional
-        Points included in the drawable, shape is `(N_points, N_dimensions)`. Ignored if `obj` is passed
+        Point array of shape ``(n_points, n_dimensions)``. Ignored
+        when ``obj`` is supplied.
     id : Any, optional
-        Id of this object. Ignored if `obj` is passed
+        Object id. Ignored when ``obj`` is supplied.
     label : Any, optional
-        Label specifying the class of the object. Ignored if `obj` is passed
+        Label describing the class of the object. Ignored when ``obj``
+        is supplied.
     scores : np.ndarray, optional
-        Confidence scores of each point, shape is `(N_points,)`. Ignored if `obj` is passed
+        Per-point confidence scores of shape ``(n_points,)``. Ignored
+        when ``obj`` is supplied.
     live_points : np.ndarray, optional
-        Bolean array indicating which points are alive, shape is `(N_points,)`. Ignored if `obj` is passed
+        Boolean mask of shape ``(n_points,)`` marking which points are
+        still alive. Ignored when ``obj`` is supplied.
 
     Raises
     ------
     ValueError
-        If obj is not an instance of the supported classes.
+        If ``obj`` is not a ``Detection``, ``TrackedObject`` or
+        ``None``.
+
     """
 
     def __init__(
@@ -347,6 +365,7 @@ class Drawable:
         scores: np.ndarray | None = None,
         live_points: np.ndarray | None = None,
     ) -> None:
+        """Initialize the drawable from ``obj`` or explicit fields."""
         if isinstance(obj, Detection):
             self.points = obj.points
             self.id = None

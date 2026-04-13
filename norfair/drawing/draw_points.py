@@ -1,3 +1,5 @@
+"""Draw detection / tracked-object points onto a video frame."""
+
 from collections.abc import Sequence
 
 import numpy as np
@@ -28,69 +30,69 @@ def draw_points(
     label_size: int | None = None,  # deprecated
     draw_scores: bool = False,
 ) -> np.ndarray:
-    """
-    Draw the points included in a list of Detections or TrackedObjects.
+    """Draw the points of a list of ``Detection`` or ``TrackedObject``.
 
     Parameters
     ----------
     frame : np.ndarray
         The OpenCV frame to draw on. Modified in place.
-    drawables : Union[Sequence[Detection], Sequence[TrackedObject]], optional
-        List of objects to draw, Detections and TrackedObjects are accepted.
-    radius : Optional[int], optional
-        Radius of the circles representing each point.
-        By default a sensible value is picked considering the frame size.
-    thickness : Optional[int], optional
-        Thickness or width of the line.
+    drawables : Sequence[Detection] or Sequence[TrackedObject], optional
+        Objects to draw. Both ``Detection`` and ``TrackedObject`` are
+        accepted.
+    radius : int, optional
+        Radius of the circles representing each point. By default a
+        sensible value is picked based on the frame size.
+    thickness : int, optional
+        Thickness of the stroke. ``-1`` (the default) produces filled
+        circles.
     color : ColorLike, optional
-        This parameter can take:
+        The color to use. May be:
 
-        1. A color as a tuple of ints describing the BGR `(0, 0, 255)`
-        2. A 6-digit hex string `"#FF0000"`
-        3. One of the defined color names `"red"`
-        4. A string defining the strategy to choose colors from the Palette:
+        1. A BGR int tuple like ``(0, 0, 255)``.
+        2. A 6-digit hex string such as ``"#FF0000"``.
+        3. One of the predefined color names (e.g. ``"red"``).
+        4. A palette strategy — ``"by_id"``, ``"by_label"`` or
+           ``"random"``.
 
-            1. based on the id of the objects `"by_id"`
-            2. based on the label of the objects `"by_label"`
-            3. random choice `"random"`
-
-        If using `by_id` or `by_label` strategy but your objects don't
-        have that field defined (Detections never have ids) the
-        selected color will be the same for all objects (Palette's default Color).
+        When ``"by_id"`` or ``"by_label"`` is used but the object lacks
+        that field (detections never have ``id``), every object is drawn
+        in the palette's default color.
     color_by_label : bool, optional
-        **Deprecated**. set `color="by_label"`.
+        **Deprecated.** Set ``color="by_label"`` instead.
     draw_labels : bool, optional
-        If set to True, the label is added to a title that is drawn on top of the box.
-        If an object doesn't have a label this parameter is ignored.
+        If ``True``, the label is drawn above the points. Ignored when
+        the object has no label.
     draw_scores : bool, optional
-        If set to True, the score is added to a title that is drawn on top of the box.
-        If an object doesn't have a label this parameter is ignored.
-    text_size : Optional[int], optional
-        Size of the title, the value is used as a multiplier of the base size of the font.
-        By default the size is scaled automatically based on the frame size.
+        If ``True``, the detection score is drawn above the points.
+        Ignored when the object has no score.
+    text_size : int, optional
+        Size multiplier for the base font used for the text. By default,
+        the size is scaled automatically based on the frame size.
     draw_ids : bool, optional
-        If set to True, the id is added to a title that is drawn on top of the box.
-        If an object doesn't have an id this parameter is ignored.
+        If ``True``, the id is drawn above the points. Ignored when the
+        object has no id.
     draw_points : bool, optional
-        Set to False to hide the points and just draw the text.
-    text_thickness : Optional[int], optional
-        Thickness of the font. By default it's scaled with the `text_size`.
-    text_color : Optional[ColorLike], optional
-        Color of the text. By default the same color as the box is used.
+        Set to ``False`` to hide the points and only draw the text.
+    text_thickness : int, optional
+        Stroke thickness of the text. By default it scales with
+        ``text_size``.
+    text_color : ColorLike, optional
+        Color of the text. Defaults to the object's color.
     hide_dead_points : bool, optional
-        Set this param to False to always draw all points, even the ones considered "dead".
-        A point is "dead" when the corresponding value of `TrackedObject.live_points`
-        is set to False. If all objects are dead the object is not drawn.
-        All points of a detection are considered to be alive.
+        Set to ``False`` to draw all points, including "dead" ones. A
+        point is dead when the corresponding entry in
+        ``TrackedObject.live_points`` is ``False``. If every point is
+        dead the whole object is skipped. Detection points are always
+        treated as live.
     detections : Sequence[Detection], optional
-        **Deprecated**. use drawables.
-    label_size : Optional[int], optional
-        **Deprecated**. text_size.
+        **Deprecated.** Use ``drawables``.
+    label_size : int, optional
+        **Deprecated.** Use ``text_size``.
 
     Returns
     -------
     np.ndarray
-        The resulting frame.
+        The ``frame`` passed in (drawn on in place).
     """
     #
     # handle deprecated parameters
@@ -200,8 +202,42 @@ def draw_tracked_objects(
     draw_labels: bool = False,
     label_size: int | None = None,
 ):
-    """
-    **Deprecated** use [`draw_points`][norfair.drawing.draw_points.draw_points]
+    """Draw tracked objects onto ``frame``.
+
+    .. deprecated::
+        Use :func:`draw_points` instead. This function is kept for
+        backward compatibility and forwards its arguments to
+        :func:`draw_points`.
+
+    Parameters
+    ----------
+    frame : np.ndarray
+        The OpenCV frame to draw on. Modified in place.
+    objects : Sequence[TrackedObject]
+        The tracked objects to draw.
+    radius : int, optional
+        Radius of the circles representing each point.
+    color : ColorLike, optional
+        Color to use. See :func:`draw_points` for accepted formats.
+    id_size : float, optional
+        Size multiplier for the id text. Set to ``0`` to disable id
+        rendering.
+    id_thickness : int, optional
+        Stroke thickness of the id text.
+    draw_points : bool, optional
+        Set to ``False`` to hide the point circles and only draw text.
+    color_by_label : bool, optional
+        If ``True``, color objects by label instead of id.
+    draw_labels : bool, optional
+        If ``True``, draw the label above the points.
+    label_size : int, optional
+        Size of the label text.
+
+    Returns
+    -------
+    np.ndarray
+        The ``frame`` passed in (drawn on in place).
+
     """
     warn_once("draw_tracked_objects is deprecated, use draw_points instead")
 

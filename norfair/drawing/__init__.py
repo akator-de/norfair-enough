@@ -1,4 +1,4 @@
-"Collection of drawing functions"
+"""Collection of drawing helpers: detections, tracked objects, paths and overlays."""
 
 from .absolute_grid import draw_absolute_grid
 from .color import Color, ColorLike, ColorType, Palette

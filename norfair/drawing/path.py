@@ -1,3 +1,5 @@
+"""Drawers that trace the trajectories of tracked points across frames."""
+
 from collections import defaultdict
 from collections.abc import Callable, Sequence
 
@@ -10,37 +12,41 @@ from norfair.utils import warn_once
 
 
 class Paths:
-    """
-    Class that draws the paths taken by a set of points of interest defined from the coordinates of each tracker estimation.
+    """Draw the trajectories of points of interest on each tracked object.
 
     Parameters
     ----------
-    get_points_to_draw : Optional[Callable[[np.ndarray], np.ndarray]], optional
-        Function that takes a list of points (the `.estimate` attribute of a [`TrackedObject`][norfair.tracker.TrackedObject])
-        and returns a list of points for which we want to draw their paths.
-
-        By default it is the mean point of all the points in the tracker.
-    thickness : Optional[int], optional
-        Thickness of the circles representing the paths of interest.
-    color : Optional[Tuple[int, int, int]], optional
-        [Color][norfair.drawing.Color] of the circles representing the paths of interest.
-    radius : Optional[int], optional
-        Radius of the circles representing the paths of interest.
+    get_points_to_draw : callable, optional
+        Callable taking the ``.estimate`` of a
+        [`TrackedObject`][norfair.tracker.TrackedObject] and returning
+        a sequence of points whose paths should be drawn. By default
+        the mean of all points in the tracker is used.
+    thickness : int, optional
+        Thickness of the circles representing the path.
+    color : tuple of int, optional
+        BGR [Color][norfair.drawing.Color] of the path circles. By
+        default the color is selected from the active
+        [`Palette`][norfair.drawing.Palette] based on the object's id.
+    radius : int, optional
+        Radius of the circles representing the path.
     attenuation : float, optional
-        A float number in [0, 1] that dictates the speed at which the path is erased.
-        if it is `0` then the path is never erased.
+        Value in ``[0, 1]`` controlling how fast existing path pixels
+        fade between frames. Use ``0`` to keep the path forever.
 
     Examples
     --------
-    >>> from norfair import Tracker, Video, Path
-    >>> video = Video("video.mp4")
-    >>> tracker = Tracker(...)
-    >>> path_drawer = Path()
-    >>> for frame in video:
-    >>>    detections = get_detections(frame)  # runs detector and returns Detections
-    >>>    tracked_objects = tracker.update(detections)
-    >>>    frame = path_drawer.draw(frame, tracked_objects)
-    >>>    video.write(frame)
+    Overlay trajectories on top of tracked objects::
+
+        >>> from norfair import Paths, Tracker, Video
+        >>> tracker = Tracker(...)
+        >>> path_drawer = Paths()
+        >>> with Video(input_path="video.mp4") as video:
+        ...     for frame in video:
+        ...         detections = get_detections(frame)
+        ...         tracked_objects = tracker.update(detections)
+        ...         frame = path_drawer.draw(frame, tracked_objects)
+        ...         video.write(frame)
+
     """
 
     def __init__(
@@ -51,6 +57,7 @@ class Paths:
         radius: int | None = None,
         attenuation: float = 0.01,
     ):
+        """Configure the path drawer with its rendering knobs."""
         if get_points_to_draw is None:
 
             def default_get_points(points):
@@ -71,23 +78,26 @@ class Paths:
     def draw(
         self, frame: np.ndarray, tracked_objects: Sequence[TrackedObject]
     ) -> np.ndarray:
-        """
-        Draw the paths of the points interest on a frame.
+        """Update and render the accumulated path mask onto ``frame``.
 
         !!! warning
-            This method does **not** draw frames in place as other drawers do, the resulting frame is returned.
+            Unlike most other drawers, this method does **not** mutate
+            ``frame`` in place — the blended result is returned.
 
         Parameters
         ----------
         frame : np.ndarray
             The OpenCV frame to draw on.
         tracked_objects : Sequence[TrackedObject]
-            List of [`TrackedObject`][norfair.tracker.TrackedObject] to get the points of interest in order to update the paths.
+            The [`TrackedObject`][norfair.tracker.TrackedObject] list
+            whose points-of-interest are appended to the running path
+            mask for this frame.
 
         Returns
         -------
-        np.array
-            The resulting frame.
+        np.ndarray
+            A new frame with the current path mask blended on top.
+
         """
         if self.mask is None:
             frame_scale = frame.shape[0] / 100
@@ -129,42 +139,55 @@ class Paths:
 
 
 class AbsolutePaths:
-    """
-    Class that draws the absolute paths taken by a set of points.
+    """Draw tracked-object trajectories in absolute (world) coordinates.
 
-    Works just like [`Paths`][norfair.drawing.Paths] but supports camera motion.
+    Behaves like [`Paths`][norfair.drawing.Paths], but takes camera
+    motion into account so trajectories stay pinned to the world
+    frame.
 
     !!! warning
-        This drawer is not optimized so it can be stremely slow. Performance degrades linearly with
-        `max_history * number_of_tracked_objects`.
+        This drawer is not optimized and can be extremely slow:
+        rendering cost grows linearly with
+        ``max_history * number_of_tracked_objects``.
 
     Parameters
     ----------
-    get_points_to_draw : Optional[Callable[[np.ndarray], np.ndarray]], optional
-        Function that takes a list of points (the `.estimate` attribute of a [`TrackedObject`][norfair.tracker.TrackedObject])
-        and returns a list of points for which we want to draw their paths.
-
-        By default it is the mean point of all the points in the tracker.
-    thickness : Optional[int], optional
-        Thickness of the circles representing the paths of interest.
-    color : Optional[Tuple[int, int, int]], optional
-        [Color][norfair.drawing.Color] of the circles representing the paths of interest.
-    radius : Optional[int], optional
-        Radius of the circles representing the paths of interest.
+    get_points_to_draw : callable, optional
+        Callable taking the ``.estimate`` of a
+        [`TrackedObject`][norfair.tracker.TrackedObject] and returning
+        a sequence of points whose paths should be drawn. By default
+        the mean of all points in the tracker is used.
+    thickness : int, optional
+        Thickness of the circles / connecting lines.
+    color : tuple of int, optional
+        BGR [Color][norfair.drawing.Color] used for every object. By
+        default the color is selected from the active palette based on
+        the object's id.
+    radius : int, optional
+        Radius of the circles representing the latest point.
     max_history : int, optional
-        Number of past points to include in the path. High values make the drawing slower
+        Number of past samples to include in the path. Higher values
+        make the drawing slower.
 
     Examples
     --------
-    >>> from norfair import Tracker, Video, Path
-    >>> video = Video("video.mp4")
-    >>> tracker = Tracker(...)
-    >>> path_drawer = Path()
-    >>> for frame in video:
-    >>>    detections = get_detections(frame)  # runs detector and returns Detections
-    >>>    tracked_objects = tracker.update(detections)
-    >>>    frame = path_drawer.draw(frame, tracked_objects)
-    >>>    video.write(frame)
+    Overlay trajectories on top of tracked objects while accounting
+    for camera motion::
+
+        >>> from norfair import AbsolutePaths, MotionEstimator, Tracker, Video
+        >>> tracker = Tracker(...)
+        >>> motion_estimator = MotionEstimator()
+        >>> path_drawer = AbsolutePaths()
+        >>> with Video(input_path="video.mp4") as video:
+        ...     for frame in video:
+        ...         coord_transform = motion_estimator.update(frame)
+        ...         detections = get_detections(frame)
+        ...         tracked_objects = tracker.update(
+        ...             detections, coord_transformations=coord_transform
+        ...         )
+        ...         frame = path_drawer.draw(frame, tracked_objects, coord_transform)
+        ...         video.write(frame)
+
     """
 
     def __init__(
@@ -175,6 +198,7 @@ class AbsolutePaths:
         radius: int | None = None,
         max_history=20,
     ):
+        """Configure the absolute-coordinates path drawer."""
         if get_points_to_draw is None:
 
             def default_get_points(points):
@@ -194,6 +218,26 @@ class AbsolutePaths:
         self.alphas = np.linspace(0.99, 0.01, max_history)
 
     def draw(self, frame, tracked_objects, coord_transform=None):
+        """Render accumulated absolute paths onto ``frame``.
+
+        Parameters
+        ----------
+        frame : np.ndarray
+            The OpenCV frame to draw on. Modified in place.
+        tracked_objects : Sequence[TrackedObject]
+            Tracked objects whose absolute trajectories are updated
+            and rendered for this frame.
+        coord_transform : CoordinatesTransformation, optional
+            Transformation between absolute and relative coordinates
+            for the current frame. When ``None``, points are assumed
+            to already be in the frame's pixel coordinates.
+
+        Returns
+        -------
+        np.ndarray
+            The ``frame`` passed in, with the paths blended on top.
+
+        """
         frame_scale = frame.shape[0] / 100
 
         if self.radius is None:

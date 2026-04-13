@@ -1,3 +1,5 @@
+"""Miscellaneous helpers: point validation, terminal sizing, warnings."""
+
 import os
 from collections.abc import Sequence
 from functools import cache
@@ -10,6 +12,12 @@ from rich.table import Table
 
 
 def validate_points(points: np.ndarray) -> np.ndarray:
+    """Normalize ``points`` to ``(n_points, n_dimensions)`` shape.
+
+    A 1-D array is interpreted as a single point and reshaped to have
+    one row; anything with more than two dimensions is rejected via
+    :func:`raise_detection_error_message`.
+    """
     # If the user is tracking only a single point, reformat it slightly.
     if len(points.shape) == 1:
         points = points[np.newaxis, ...]
@@ -19,6 +27,7 @@ def validate_points(points: np.ndarray) -> np.ndarray:
 
 
 def raise_detection_error_message(points):
+    """Raise a ``ValueError`` describing a malformed ``Detection.points``."""
     message = "\n[red]INPUT ERROR:[/red]\n"
     message += f"Each `Detection` object should have a property `points` of shape (n_points, n_dimensions), not {points.shape}. Check your `Detection` list creation code.\n"
     message += "You can read the documentation for the `Detection` class here:\n"
@@ -27,7 +36,7 @@ def raise_detection_error_message(points):
 
 
 def print_objects_as_table(tracked_objects: Sequence):
-    """Used for helping in debugging"""
+    """Pretty-print a table summarizing ``tracked_objects`` for debugging."""
     print()
     console = Console()
     table = Table(show_header=True, header_style="bold magenta")
@@ -48,6 +57,11 @@ def print_objects_as_table(tracked_objects: Sequence):
 
 
 def get_terminal_size(default: tuple[int, int] = (80, 24)) -> tuple[int, int]:
+    """Return the terminal ``(columns, lines)``, falling back to ``default``.
+
+    Tries stdin, stdout and stderr in order, returning the first
+    successful query.
+    """
     columns, lines = default
     for fd in range(0, 3):  # First in order 0=Std In, 1=Std Out, 2=Std Error
         try:
@@ -59,7 +73,7 @@ def get_terminal_size(default: tuple[int, int] = (80, 24)) -> tuple[int, int]:
 
 
 def get_cutout(points, image):
-    """Returns a rectangular cut-out from a set of points on an image"""
+    """Return the axis-aligned bounding-box cutout of ``points`` in ``image``."""
     max_x = int(max(points[:, 0]))
     min_x = int(min(points[:, 0]))
     max_y = int(max(points[:, 1]))
@@ -68,7 +82,15 @@ def get_cutout(points, image):
 
 
 class DummyOpenCVImport:
+    """Placeholder that raises ``ImportError`` when OpenCV is missing.
+
+    Installed as ``cv2`` when the real module cannot be imported, so
+    the first attribute access from a video feature raises a clear
+    error describing how to install the optional dependency.
+    """
+
     def __getattr__(self, name):
+        """Raise ``ImportError`` prompting the user to install OpenCV."""
         raise ImportError(
             r"""[bold red]Missing dependency:[/bold red] You are trying to use Norfair's video features. However, OpenCV is not installed.
 
@@ -77,7 +99,14 @@ Please, make sure there is an existing installation of OpenCV or install Norfair
 
 
 class DummyMOTMetricsImport:
+    """Placeholder that raises ``ImportError`` when ``motmetrics`` is missing.
+
+    Used in the same way as :class:`DummyOpenCVImport` to gate the
+    metrics extra.
+    """
+
     def __getattr__(self, name):
+        """Raise ``ImportError`` prompting the user to install the metrics extra."""
         raise ImportError(
             r"""[bold red]Missing dependency:[/bold red] You are trying to use Norfair's metrics features without the required dependencies.
 
@@ -88,7 +117,5 @@ Please, install Norfair with `pip install norfair-enough\[metrics]`, or `pip ins
 # lru_cache will prevent re-run the function if the message is the same
 @cache
 def warn_once(message):
-    """
-    Write a warning message only once.
-    """
+    """Emit ``message`` via ``logging.warning`` at most once per process."""
     warning(message)
