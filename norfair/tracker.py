@@ -6,6 +6,7 @@ from collections.abc import Callable, Hashable, Sequence
 from typing import Any
 
 import numpy as np
+from scipy.optimize import linear_sum_assignment
 
 from norfair.camera_motion import CoordinatesTransformation
 
@@ -394,6 +395,7 @@ class Tracker:
                     d for i, d in enumerate(objects) if i not in matched_obj_indices
                 ]
                 matched_objects = []
+                candidates_to_remove: set[int] = set()
 
                 # Handle matched people/detections
                 for match_cand_idx, match_obj_idx in zip(
@@ -410,12 +412,19 @@ class Tracker:
                         elif isinstance(matched_candidate, TrackedObject):
                             # Merge new TrackedObject with the old one
                             matched_object.merge(matched_candidate)
-                            # If we are matching TrackedObject instances we want to get rid of the
-                            # already matched candidate to avoid matching it again in future frames
-                            self.tracked_objects.remove(matched_candidate)
+                            # Collect for batch removal instead of O(n) per-call list.remove()
+                            candidates_to_remove.add(id(matched_candidate))
                     else:
                         unmatched_candidates.append(matched_candidate)
                         unmatched_objects.append(matched_object)
+
+                # Batch-remove merged TrackedObject candidates in a single pass (O(n))
+                if candidates_to_remove:
+                    self.tracked_objects = [
+                        o
+                        for o in self.tracked_objects
+                        if id(o) not in candidates_to_remove
+                    ]
             else:
                 unmatched_candidates = list(candidates)
                 matched_objects = []
@@ -430,14 +439,10 @@ class Tracker:
     def match_dets_and_objs(self, distance_matrix: np.ndarray, distance_threshold):
         """Match detections with tracked objects from a distance matrix.
 
-        Instead of minimizing the global distance, this greedy strategy
-        starts with the global minimum entry and matches the det–obj
-        corresponding to that distance, then takes the second minimum, and
-        so on until ``distance_threshold`` is reached.
-
-        This avoids pathological cases where minimizing the global distance
-        forces matches that shouldn't happen just to bring the overall sum
-        down.
+        Uses the Hungarian algorithm (``scipy.optimize.linear_sum_assignment``)
+        to find the optimal minimum-cost assignment in O(n³) time, then
+        filters out any matches whose distance meets or exceeds
+        ``distance_threshold``.
 
         Parameters
         ----------
@@ -449,26 +454,18 @@ class Tracker:
         Returns
         -------
         tuple[list[int], list[int]]
-            Matched detection and object indices, in matching order.
+            Matched detection and object indices.
 
         """
-        # NOTE: This implementation is terribly inefficient, but it doesn't
-        #       seem to affect the fps at all.
-        distance_matrix = distance_matrix.copy()
         if distance_matrix.size > 0:
-            det_idxs = []
-            obj_idxs = []
-            current_min = distance_matrix.min()
+            # Clamp costs so entries above threshold don't influence the assignment
+            cost = np.clip(distance_matrix, None, distance_threshold)
+            row_indices, col_indices = linear_sum_assignment(cost)
 
-            while current_min < distance_threshold:
-                flattened_arg_min = distance_matrix.argmin()
-                det_idx = flattened_arg_min // distance_matrix.shape[1]
-                obj_idx = flattened_arg_min % distance_matrix.shape[1]
-                det_idxs.append(det_idx)
-                obj_idxs.append(obj_idx)
-                distance_matrix[det_idx, :] = distance_threshold + 1
-                distance_matrix[:, obj_idx] = distance_threshold + 1
-                current_min = distance_matrix.min()
+            # Keep only pairs whose original distance is below the threshold
+            mask = distance_matrix[row_indices, col_indices] < distance_threshold
+            det_idxs = row_indices[mask].tolist()
+            obj_idxs = col_indices[mask].tolist()
 
             return det_idxs, obj_idxs
         else:
