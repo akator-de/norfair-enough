@@ -75,21 +75,31 @@ Additional deprecated parameters on `draw_points`:
 - `detections=...`      → use `drawables=...`
 - `label_size=...`      → use `text_size=...`
 
+Additional deprecated parameters on `draw_boxes`:
+
+- `color_by_label=True` → use `color="by_label"`
+- `detections=...`      → use `drawables=...`
+- `label_size=...`      → use `text_size=...`
+- `random_color=True`   → use `color="random"`
+- `line_color=...`      → use `color=...`
+- `line_width=...`      → use `thickness=...`
+
 See the [Drawing reference][norfair.drawing] for the full current API.
 
 ## Behavior changes
 
-### `Tracker.update()` no longer mutates your `Detection` objects
+### `Tracker.update()` may mutate `Detection` objects -- behavior now documented
 
-In upstream `norfair`, `Tracker.update()` would mutate attributes on the `Detection`
-instances you passed in (for example `detection.absolute_points` and `detection.age`).
-Code that reused the same `Detection` objects after `Tracker.update()` — for drawing,
-logging, or further processing — could observe these mutations.
+In both upstream `norfair` and `norfair-enough`, `Tracker.update()` may mutate attributes
+on the `Detection` instances you pass in (for example `detection.absolute_points` when
+`coord_transformations` is provided, and `detection.age` when detections are mapped to
+tracked objects).
 
-In `norfair-enough`, this mutation behavior is documented explicitly on `Tracker.update()`
-and on `Detection`. If your code relies on reading those attributes *after* calling
-`Tracker.update()`, review it to make sure it still behaves as you expect. In most
-real-world pipelines this change is invisible.
+The difference in `norfair-enough` is that this mutation behavior is now documented
+explicitly in the docstrings for `Tracker.update()` and `Detection`. If your code reuses
+`Detection` objects after calling `Tracker.update()` -- for drawing, logging, or further
+processing -- be aware of these mutations and review your code accordingly. In most
+real-world pipelines this is invisible.
 
 ### Stricter input validation
 
@@ -107,12 +117,12 @@ the buggy behavior you may see different results:
 - `draw_tracked_objects` now returns the frame (previously returned `None`).
 - `distance_matrix.any()` no longer incorrectly skips zero distances during matching.
 - `hex_to_bgr` now accepts uppercase hex color strings.
-- `PredictionsTextFile` no longer leaks file handles.
-- `AbsolutePaths` no longer leaks memory for destroyed objects.
-- `Accumulators.update` no longer grows its arrays quadratically.
-- `Video` output filenames now handle paths and file extensions portably.
-- `Video` now supports the context manager protocol (`with Video(...) as v:`) and exposes
-  a `close()` method for reliable resource cleanup.
+- `PredictionsTextFile` fixes file-handle leaks.
+- `AbsolutePaths` fixes memory leaks for destroyed objects.
+- `Accumulators.update` fixes quadratic array growth.
+- `Video` output filenames now handle paths and file extensions portably; it also supports
+  the context manager protocol (`with Video(...) as v:`) and exposes a `close()` method
+  for reliable resource cleanup.
 - `TrackedObject.global_id` counter is now thread-safe.
 
 For the full list of fixes and changes, see
