@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import argparse
-from typing import List
 
-import numpy as np
 from ultralytics import YOLO
 
 import norfair
@@ -15,13 +13,13 @@ from norfair.distances import create_normalized_mean_euclidean_distance
 DISTANCE_THRESHOLD: float = 0.3
 
 
-def yolo_pose_to_detections(results) -> List[Detection]:
+def yolo_pose_to_detections(results) -> list[Detection]:
     """Convert Ultralytics pose results to Norfair Detections."""
-    detections: List[Detection] = []
+    detections: list[Detection] = []
     if results[0].keypoints is None:
         return detections
 
-    keypoints_xy = results[0].keypoints.xy.cpu().numpy()   # (N, 17, 2)
+    keypoints_xy = results[0].keypoints.xy.cpu().numpy()  # (N, 17, 2)
     keypoints_conf = results[0].keypoints.conf.cpu().numpy()  # (N, 17)
 
     for points, scores in zip(keypoints_xy, keypoints_conf):
@@ -30,9 +28,7 @@ def yolo_pose_to_detections(results) -> List[Detection]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Track human pose keypoints in video."
-    )
+    parser = argparse.ArgumentParser(description="Track human pose keypoints in video.")
     parser.add_argument("files", type=str, nargs="+", help="Video files to process")
     parser.add_argument(
         "--model", type=str, default="yolo11n-pose.pt", help="YOLO-Pose model name"

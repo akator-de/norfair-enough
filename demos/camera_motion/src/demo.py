@@ -2,7 +2,6 @@ import argparse
 from functools import partial
 
 import numpy as np
-
 from ultralytics import YOLO
 
 from norfair import (

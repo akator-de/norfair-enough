@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-from typing import List, Optional, Sequence
 
 import numpy as np
 from ultralytics import YOLO
@@ -18,9 +17,9 @@ DISTANCE_THRESHOLD_CENTROID: int = 30
 def detections_to_norfair(
     results,
     track_points: str = "bbox",
-) -> List[Detection]:
+) -> list[Detection]:
     """Convert Ultralytics results to Norfair Detection objects."""
-    detections: List[Detection] = []
+    detections: list[Detection] = []
     boxes = results[0].boxes
 
     for i in range(len(boxes)):

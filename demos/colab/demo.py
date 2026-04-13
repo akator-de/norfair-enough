@@ -1,5 +1,4 @@
 import argparse
-from typing import List, Optional
 
 import numpy as np
 from draw import draw
@@ -12,9 +11,9 @@ from norfair.distances import create_normalized_mean_euclidean_distance
 DISTANCE_THRESHOLD_CENTROID: float = 0.08
 
 
-def ultralytics_to_norfair(results, track_points: str = "bbox") -> List[Detection]:
+def ultralytics_to_norfair(results, track_points: str = "bbox") -> list[Detection]:
     """Convert Ultralytics detection results to Norfair Detections."""
-    norfair_detections: List[Detection] = []
+    norfair_detections: list[Detection] = []
     boxes = results[0].boxes
     if boxes is None or len(boxes) == 0:
         return norfair_detections
@@ -40,7 +39,7 @@ def inference(
     model_path: str,
     track_points: str,
     conf_threshold: float,
-    classes: Optional[List[int]],
+    classes: list[int] | None,
 ):
     model = YOLO(model_path)
     video = Video(input_path=input_video)

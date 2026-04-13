@@ -1,5 +1,3 @@
-from typing import List
-
 import numpy as np
 from sahi.predict import get_prediction, get_sliced_prediction
 from sahi.prediction import PredictionResult
@@ -9,7 +7,7 @@ from norfair import Detection, Tracker, Video, draw_boxes
 from norfair.filter import OptimizedKalmanFilterFactory
 
 
-def get_detections(object_prediction_list: PredictionResult) -> List[Detection]:
+def get_detections(object_prediction_list: PredictionResult) -> list[Detection]:
     detections = []
     for prediction in object_prediction_list:
         bbox = prediction.bbox
