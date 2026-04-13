@@ -1369,7 +1369,9 @@ class KalmanFilter:
         mahalanobis : float
         """
         if self._mahalanobis is None:
-            self._mahalanobis = sqrt(max(0.0, float(dot(dot(self.y.T, self.SI), self.y))))
+            self._mahalanobis = sqrt(
+                max(0.0, float(dot(dot(self.y.T, self.SI), self.y)))
+            )
         return self._mahalanobis
 
     @property
