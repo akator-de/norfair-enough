@@ -7,11 +7,11 @@ Norfair's goal is to easily track multiple objects in videos based on the frame-
 We recommend first deciding and setting up the model and then adding Norfair on top of it.
 Models trained for any form of [object detection](https://paperswithcode.com/task/object-detection) or [keypoint detection](https://paperswithcode.com/task/keypoint-detection) (including [pose estimation](https://paperswithcode.com/task/pose-estimation)) are all supported. You can check some of the integrations we have as examples:
 
-- [Yolov7](https://github.com/tryolabs/norfair/tree/master/demos/yolov7), [Yolov5](https://github.com/tryolabs/norfair/tree/master/demos/yolov5) and [Yolov4](https://github.com/tryolabs/norfair/tree/master/demos/yolov4)
-- [Detectron2](https://github.com/tryolabs/norfair/tree/master/demos/detectron2)
-- [Alphapose](https://github.com/tryolabs/norfair/tree/master/demos/alphapose)
-- [Openpose](https://github.com/tryolabs/norfair/tree/master/demos/openpose)
-- [MMDetection](https://github.com/tryolabs/norfair/tree/master/demos/mmdetection)
+- [Yolov7](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov7), [Yolov5](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov5) and [Yolov4](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov4)
+- [Detectron2](https://github.com/akator-de/norfair-enough/tree/main/demos/detectron2)
+- [Alphapose](https://github.com/akator-de/norfair-enough/tree/main/demos/alphapose)
+- [Openpose](https://github.com/akator-de/norfair-enough/tree/main/demos/openpose)
+- [MMDetection](https://github.com/akator-de/norfair-enough/tree/main/demos/mmdetection)
 
 Any other model trained on one of the supported tasks is also supported and should be easy to integrate with Norfair, regardless of whether it uses Pytorch, TensorFlow, or other.
 
@@ -40,7 +40,7 @@ Check the [Video class][norfair.video.Video] for more info on how to use it.
 Let's dive right into a simple example in the following snippet:
 
 ``` python
-from norfair import Detection, Tracker, Video, draw_tracked_objects
+from norfair import Detection, Tracker, Video, draw_points
 
 detector = MyDetector()  # Set up a detector
 video = Video(input_path="video.mp4")
@@ -50,7 +50,7 @@ for frame in video:
    detections = detector(frame)
    norfair_detections = [Detection(points) for points in detections]
    tracked_objects = tracker.update(detections=norfair_detections)
-   draw_tracked_objects(frame, tracked_objects)
+   draw_points(frame, drawables=tracked_objects)
    video.write(frame)
 ```
 
@@ -83,4 +83,4 @@ After inspecting the detections you might find issues with the tracking, several
 - **Incorrect matches** between Detections and TrackedObjects, a couple of scenarios can cause this:
     - `distance_threshold` is too big so the Tracker matches Detections to TrackedObjects that are simply too far. Lower the threshold until you fix the error, the correct value will depend on the distance function that you're using.
     - Mismatches when objects overlap. In this case, tracking becomes more challenging, usually, the quality of the detection degrades causing one of the objects to be missed or creating a single big detection that includes both objects. On top of the detection issues, the tracker needs to decide which detection should be matched to which TrackedObject which can be error-prone if only considering spatial information. The solution is not easy but incorporating the notion of the appearance similarity based on some kind of embedding to your distance_function can help.
-- Can't **recover** an object **after occlusions**. Use ReID distance, see [this demo](https://github.com/tryolabs/norfair/tree/master/demos/reid) for an example but for real-world use you will need a good ReID model that can provide good embeddings.
+- Can't **recover** an object **after occlusions**. Use ReID distance, see [this demo](https://github.com/akator-de/norfair-enough/tree/main/demos/reid) for an example but for real-world use you will need a good ReID model that can provide good embeddings.
