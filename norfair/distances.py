@@ -207,20 +207,17 @@ class VectorizedDistance(Distance):
             obj_mask = object_labels == label
             cand_mask = candidate_labels == label
 
-            stacked_objects = []
-            for o in objects:
-                if str(o.label) == label:
-                    stacked_objects.append(o.estimate.ravel())
-            stacked_objects = np.stack(stacked_objects)
-
-            stacked_candidates = []
-            for c in candidates:
-                if str(c.label) == label:
-                    if isinstance(c, Detection):
-                        stacked_candidates.append(c.points.ravel())
-                    else:
-                        stacked_candidates.append(c.estimate.ravel())
-            stacked_candidates = np.stack(stacked_candidates)
+            # Use the already-computed boolean masks instead of re-comparing labels
+            stacked_objects = np.stack(
+                [o.estimate.ravel() for o, m in zip(objects, obj_mask) if m]
+            )
+            stacked_candidates = np.stack(
+                [
+                    c.points.ravel() if isinstance(c, Detection) else c.estimate.ravel()
+                    for c, m in zip(candidates, cand_mask)
+                    if m
+                ]
+            )
 
             # calculate the pairwise distances between objects and candidates with this label
             # and assign the result to the correct positions inside distance_matrix
