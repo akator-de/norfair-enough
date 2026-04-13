@@ -15,18 +15,18 @@ Models trained for any form of [object detection](https://paperswithcode.com/tas
 
 > **Note:** These demos were originally written for [tryolabs/norfair](https://github.com/tryolabs/norfair) which is no longer actively maintained. Some demos may reference upstream resources that could become unavailable in the future. They remain compatible with norfair-enough — just replace `pip install norfair` with `pip install norfair-enough`.
 
-Any other model trained on one of the supported tasks is also supported and should be easy to integrate with Norfair Enough, regardless of whether it uses Pytorch, TensorFlow, or other.
+Any other model trained on one of the supported tasks is also supported and should be easy to integrate with the library, regardless of whether it uses Pytorch, TensorFlow, or other.
 
 If you are unsure of which model to use, [Yolov7](https://github.com/WongKinYiu/yolov7) is a good starting point since it's easy to set up and offers models of different sizes pre-trained on object detection and pose estimation.
 
 !!! Note
-    Norfair Enough is a Detection-Based-Tracker (DBT) and as such, its performance is highly dependent on the performance of the model of choice.
+    The library is a Detection-Based-Tracker (DBT) and as such, its performance is highly dependent on the performance of the model of choice.
 
 The detections from the model will need to be wrapped in an instance of [Detection][norfair.tracker.Detection] before passing them to the tracker.
 
 ## Install
 
-Installing Norfair Enough is extremely easy, simply run `pip install norfair-enough` to install the latest version from [PyPI](https://pypi.org/project/norfair-enough/).
+Installing the library is extremely easy, simply run `pip install norfair-enough` to install the latest version from [PyPI](https://pypi.org/project/norfair-enough/).
 
 You can also install the latest version from the main branch using `pip install git+https://github.com/akator-de/norfair-enough.git@main#egg=norfair-enough`
 

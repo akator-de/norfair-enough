@@ -48,7 +48,7 @@ If the needed dependencies are already present in the system, installing the min
 
 - Supports moving camera, re-identification with appearance embeddings, and n-dimensional object tracking (see [Advanced features](#advanced-features)).
 
-- Norfair Enough provides several predefined distance functions to compare tracked objects and detections. The distance functions can also be defined by the user, enabling the implementation of different tracking strategies.
+- The library provides several predefined distance functions to compare tracked objects and detections. The distance functions can also be defined by the user, enabling the implementation of different tracking strategies.
 
 - Fast. The only thing bounding inference speed will be the detection network feeding detections to the tracker.
 
@@ -60,7 +60,7 @@ If the needed dependencies are already present in the system, installing the min
 
 ## Examples & demos
 
-We provide several examples of how Norfair Enough can be used to add tracking capabilities to different detectors, and also showcase more advanced features. All demos are available in the [`demos/`](https://github.com/akator-de/norfair-enough/tree/main/demos) directory of this repository (originally adapted from [tryolabs/norfair](https://github.com/tryolabs/norfair/tree/master/demos)).
+We provide several examples of how the library can be used to add tracking capabilities to different detectors, and also showcase more advanced features. All demos are available in the [`demos/`](https://github.com/akator-de/norfair-enough/tree/main/demos) directory of this repository (originally adapted from [tryolabs/norfair](https://github.com/tryolabs/norfair/tree/master/demos)).
 
 > **Note:** The demo code was originally written in the [tryolabs/norfair](https://github.com/tryolabs/norfair) repository which is no longer actively maintained. Some demos may reference upstream resources that could become unavailable in the future. The demos remain compatible with norfair-enough — just replace `pip install norfair` with `pip install norfair-enough`.
 
@@ -95,13 +95,13 @@ Most tracking demos are showcased with vehicles and pedestrians, but the detecto
 
 ## How it works
 
-Norfair Enough works by estimating the future position of each point based on its past positions. It then tries to match these estimated positions with newly detected points provided by the detector. For this matching to occur, the tracker can rely on any distance function. There are some predefined distances already integrated in the library, and the users can also define their own custom distances. Therefore, each object tracker can be made as simple or as complex as needed.
+The tracker works by estimating the future position of each point based on its past positions. It then tries to match these estimated positions with newly detected points provided by the detector. For this matching to occur, the tracker can rely on any distance function. There are some predefined distances already integrated in the library, and the users can also define their own custom distances. Therefore, each object tracker can be made as simple or as complex as needed.
 
 As an example we use [Detectron2](https://github.com/facebookresearch/detectron2) to get the single point detections to use with this distance function. We just use the centroids of the bounding boxes it produces around cars as our detections, and get the following results.
 
 ![Tracking cars with Norfair Enough](https://media.githubusercontent.com/media/akator-de/norfair-enough/main/docs/videos/traffic.webp)
 
-On the left you can see the points we get from Detectron2, and on the right how Norfair Enough tracks them assigning a unique identifier through time. Even a straightforward distance function like this one can work when the tracking needed is simple.
+On the left you can see the points we get from Detectron2, and on the right how the tracker tracks them assigning a unique identifier through time. Even a straightforward distance function like this one can work when the tracking needed is simple.
 
 The library also provides several useful tools for creating a video inference loop. Here is what the full code for creating the previous example looks like, including the code needed to set up Detectron2:
 
