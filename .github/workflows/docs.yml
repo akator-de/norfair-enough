@@ -36,5 +36,5 @@ jobs:
         run: uv sync --locked --group docs
       - name: Deploy dev docs
         run: |
-          uv run mike deploy --push dev
-          uv run mike set-default --push dev
+          uv run mike deploy --push -u dev latest
+          uv run mike set-default --push latest
