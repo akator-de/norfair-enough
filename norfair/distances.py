@@ -348,7 +348,7 @@ def mean_euclidean(detection: "Detection", tracked_object: "TrackedObject") -> f
     Raises
     ------
     ValueError
-        If either input contains NaN values or if points are empty.
+        If either input is empty or contains non-finite (NaN/Inf) values.
 
     See Also
     --------
@@ -394,7 +394,7 @@ def mean_manhattan(detection: "Detection", tracked_object: "TrackedObject") -> f
     Raises
     ------
     ValueError
-        If either input contains NaN values or if points are empty.
+        If either input is empty or contains non-finite (NaN/Inf) values.
 
     See Also
     --------
@@ -475,9 +475,14 @@ def iou(candidates: np.ndarray, objects: np.ndarray) -> np.ndarray:
         np.clip(bottom_right - top_left, a_min=0, a_max=None), 2
     )
     union = area_candidates[:, None] + area_objects - area_intersection
-    # Guard against zero-area (degenerate) bounding boxes: when the union is
-    # zero the boxes have no area and no overlap, so the distance is 1.
-    iou_values = np.where(union > 0, area_intersection / union, 0.0)
+    # Guard against zero-area (degenerate) bounding boxes: use np.divide with
+    # where= to avoid evaluating the division when union is zero.
+    iou_values = np.divide(
+        area_intersection,
+        union,
+        out=np.zeros_like(area_intersection, dtype=float),
+        where=union > 0,
+    )
     return 1 - iou_values
 
 
