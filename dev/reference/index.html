@@ -4961,7 +4961,10 @@ new candidates and objects.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>norfair/distances.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">255</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
 <span class="normal">256</span>
 <span class="normal">257</span>
 <span class="normal">258</span>
@@ -4979,10 +4982,7 @@ new candidates and objects.</p>
 <span class="normal">270</span>
 <span class="normal">271</span>
 <span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span>
-<span class="normal">276</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ScipyDistance</span><span class="p">(</span><span class="n">VectorizedDistance</span><span class="p">):</span>
+<span class="normal">273</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ScipyDistance</span><span class="p">(</span><span class="n">VectorizedDistance</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    ScipyDistance class extends VectorizedDistance for the use of Scipy&#39;s vectorized distances.</span>
 
@@ -5200,10 +5200,7 @@ This function should take 2 input arguments, the first being a <code>np.ndarray<
 <span class="normal">246</span>
 <span class="normal">247</span>
 <span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VectorizedDistance</span><span class="p">(</span><span class="n">Distance</span><span class="p">):</span>
+<span class="normal">249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VectorizedDistance</span><span class="p">(</span><span class="n">Distance</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    VectorizedDistance class represents a distance that is calculated in a vectorized way. This means</span>
 <span class="sd">    that instead of going through every pair and explicitly calculating its distance, VectorizedDistance</span>
@@ -5273,20 +5270,17 @@ This function should take 2 input arguments, the first being a <code>np.ndarray<
             <span class="n">obj_mask</span> <span class="o">=</span> <span class="n">object_labels</span> <span class="o">==</span> <span class="n">label</span>
             <span class="n">cand_mask</span> <span class="o">=</span> <span class="n">candidate_labels</span> <span class="o">==</span> <span class="n">label</span>
 
-            <span class="n">stacked_objects</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">label</span><span class="p">)</span> <span class="o">==</span> <span class="n">label</span><span class="p">:</span>
-                    <span class="n">stacked_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">estimate</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
-            <span class="n">stacked_objects</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">stacked_objects</span><span class="p">)</span>
-
-            <span class="n">stacked_candidates</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">label</span><span class="p">)</span> <span class="o">==</span> <span class="n">label</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">Detection</span><span class="p">):</span>
-                        <span class="n">stacked_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="n">stacked_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">estimate</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
-            <span class="n">stacked_candidates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">stacked_candidates</span><span class="p">)</span>
+            <span class="c1"># Use the already-computed boolean masks instead of re-comparing labels</span>
+            <span class="n">stacked_objects</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">estimate</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">o</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">obj_mask</span><span class="p">)</span> <span class="k">if</span> <span class="n">m</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">stacked_candidates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">c</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">Detection</span><span class="p">)</span> <span class="k">else</span> <span class="n">c</span><span class="o">.</span><span class="n">estimate</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">candidates</span><span class="p">,</span> <span class="n">cand_mask</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">m</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
 
             <span class="c1"># calculate the pairwise distances between objects and candidates with this label</span>
             <span class="c1"># and assign the result to the correct positions inside distance_matrix</span>
@@ -5487,10 +5481,7 @@ candidates.</p>
 <span class="normal">225</span>
 <span class="normal">226</span>
 <span class="normal">227</span>
-<span class="normal">228</span>
-<span class="normal">229</span>
-<span class="normal">230</span>
-<span class="normal">231</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_distances</span><span class="p">(</span>
+<span class="normal">228</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_distances</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span>
     <span class="n">candidates</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Candidate&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
@@ -5540,20 +5531,17 @@ candidates.</p>
         <span class="n">obj_mask</span> <span class="o">=</span> <span class="n">object_labels</span> <span class="o">==</span> <span class="n">label</span>
         <span class="n">cand_mask</span> <span class="o">=</span> <span class="n">candidate_labels</span> <span class="o">==</span> <span class="n">label</span>
 
-        <span class="n">stacked_objects</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">objects</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">label</span><span class="p">)</span> <span class="o">==</span> <span class="n">label</span><span class="p">:</span>
-                <span class="n">stacked_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">estimate</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
-        <span class="n">stacked_objects</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">stacked_objects</span><span class="p">)</span>
-
-        <span class="n">stacked_candidates</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">label</span><span class="p">)</span> <span class="o">==</span> <span class="n">label</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">Detection</span><span class="p">):</span>
-                    <span class="n">stacked_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">stacked_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">estimate</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
-        <span class="n">stacked_candidates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">stacked_candidates</span><span class="p">)</span>
+        <span class="c1"># Use the already-computed boolean masks instead of re-comparing labels</span>
+        <span class="n">stacked_objects</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">estimate</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">for</span> <span class="n">o</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">obj_mask</span><span class="p">)</span> <span class="k">if</span> <span class="n">m</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">stacked_candidates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">c</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">Detection</span><span class="p">)</span> <span class="k">else</span> <span class="n">c</span><span class="o">.</span><span class="n">estimate</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">candidates</span><span class="p">,</span> <span class="n">cand_mask</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
 
         <span class="c1"># calculate the pairwise distances between objects and candidates with this label</span>
         <span class="c1"># and assign the result to the correct positions inside distance_matrix</span>
@@ -14666,7 +14654,10 @@ point in the tracked object.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">514</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">511</span>
+<span class="normal">512</span>
+<span class="normal">513</span>
+<span class="normal">514</span>
 <span class="normal">515</span>
 <span class="normal">516</span>
 <span class="normal">517</span>
@@ -14703,10 +14694,7 @@ point in the tracked object.</p>
 <span class="normal">548</span>
 <span class="normal">549</span>
 <span class="normal">550</span>
-<span class="normal">551</span>
-<span class="normal">552</span>
-<span class="normal">553</span>
-<span class="normal">554</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_keypoints_voting_distance</span><span class="p">(</span>
+<span class="normal">551</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_keypoints_voting_distance</span><span class="p">(</span>
     <span class="n">keypoint_distance_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">detection_threshold</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -14840,7 +14828,10 @@ point in the tracked object.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">557</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
 <span class="normal">558</span>
 <span class="normal">559</span>
 <span class="normal">560</span>
@@ -14870,10 +14861,7 @@ point in the tracked object.</p>
 <span class="normal">584</span>
 <span class="normal">585</span>
 <span class="normal">586</span>
-<span class="normal">587</span>
-<span class="normal">588</span>
-<span class="normal">589</span>
-<span class="normal">590</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_normalized_mean_euclidean_distance</span><span class="p">(</span>
+<span class="normal">587</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_normalized_mean_euclidean_distance</span><span class="p">(</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -15011,7 +14999,10 @@ d_f(a, b) = ||a - b||_F
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">279</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
 <span class="normal">280</span>
 <span class="normal">281</span>
 <span class="normal">282</span>
@@ -15038,10 +15029,7 @@ d_f(a, b) = ||a - b||_F
 <span class="normal">303</span>
 <span class="normal">304</span>
 <span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">frobenius</span><span class="p">(</span><span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">306</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">frobenius</span><span class="p">(</span><span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Frobernius norm on the difference of the points in detection and the estimates in tracked_object.</span>
 
@@ -15148,7 +15136,10 @@ d_f(a, b) = ||a - b||_F
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">476</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">473</span>
+<span class="normal">474</span>
+<span class="normal">475</span>
+<span class="normal">476</span>
 <span class="normal">477</span>
 <span class="normal">478</span>
 <span class="normal">479</span>
@@ -15180,10 +15171,7 @@ d_f(a, b) = ||a - b||_F
 <span class="normal">505</span>
 <span class="normal">506</span>
 <span class="normal">507</span>
-<span class="normal">508</span>
-<span class="normal">509</span>
-<span class="normal">510</span>
-<span class="normal">511</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_distance_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Distance</span><span class="p">:</span>
+<span class="normal">508</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_distance_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Distance</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Select a distance by name.</span>
 
@@ -15314,7 +15302,10 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">398</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
 <span class="normal">399</span>
 <span class="normal">400</span>
 <span class="normal">401</span>
@@ -15345,10 +15336,7 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
 <span class="normal">426</span>
 <span class="normal">427</span>
 <span class="normal">428</span>
-<span class="normal">429</span>
-<span class="normal">430</span>
-<span class="normal">431</span>
-<span class="normal">432</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">iou</span><span class="p">(</span><span class="n">candidates</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">objects</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">429</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">iou</span><span class="p">(</span><span class="n">candidates</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">objects</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate IoU between two sets of bounding boxes. Both sets of boxes are expected</span>
 <span class="sd">    to be in `[x_min, y_min, x_max, y_max]` format.</span>
@@ -15483,7 +15471,10 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_2}{N}
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">312</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
 <span class="normal">313</span>
 <span class="normal">314</span>
 <span class="normal">315</span>
@@ -15504,10 +15495,7 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_2}{N}
 <span class="normal">330</span>
 <span class="normal">331</span>
 <span class="normal">332</span>
-<span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
-<span class="normal">336</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean_euclidean</span><span class="p">(</span><span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">333</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean_euclidean</span><span class="p">(</span><span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Average euclidean distance between the points in detection and estimates in tracked_object.</span>
 
@@ -15634,7 +15622,10 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_1}{N}
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">339</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
 <span class="normal">340</span>
 <span class="normal">341</span>
 <span class="normal">342</span>
@@ -15661,10 +15652,7 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_1}{N}
 <span class="normal">363</span>
 <span class="normal">364</span>
 <span class="normal">365</span>
-<span class="normal">366</span>
-<span class="normal">367</span>
-<span class="normal">368</span>
-<span class="normal">369</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean_manhattan</span><span class="p">(</span><span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="normal">366</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean_manhattan</span><span class="p">(</span><span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Average manhattan distance between the points in detection and the estimates in tracked_object</span>
 
