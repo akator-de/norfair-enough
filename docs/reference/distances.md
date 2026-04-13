@@ -15,10 +15,10 @@ You can pass any of these to `Tracker(distance_function=...)` by name:
 
 | Name | Best for | Notes |
 |---|---|---|
-| `"euclidean"` | Single-point detections (centroids, keypoints). | Alias for `frobenius`. |
+| `"euclidean"` | Single-point detections (centroids, keypoints). | Vectorized via [`ScipyDistance`][norfair.distances.ScipyDistance] (`cdist`). Mathematically equivalent to `frobenius` for single-point detections, but faster because it avoids the per-pair Python loop. |
 | `"mean_euclidean"` | Multi-point detections (keypoints, polygons). | Averages per-point Euclidean distance. |
 | `"mean_manhattan"` | Multi-point detections, cheaper than Euclidean. | Averages per-point L1 distance. |
-| `"frobenius"` | Flattened L2 between all points. | Same as `"euclidean"` for single-point detections. |
+| `"frobenius"` | Flattened L2 between all points. | Loop-based [`ScalarDistance`][norfair.distances.ScalarDistance]. Equivalent to `"euclidean"` for single-point detections. |
 | `"iou"` | Bounding boxes. | `1 - IoU`, so smaller is better. Requires `(2, 2)` top-left / bottom-right point arrays. |
 | `"iou_opt"` | Bounding boxes, large detection counts. | Vectorized, faster variant of `"iou"`. |
 

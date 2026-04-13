@@ -5,7 +5,8 @@ smooth its estimated position and velocity over time. The `filter_factory`
 argument on [`Tracker`][norfair.tracker.Tracker] decides which filter is built
 for every new track.
 
-Norfair ships with two filter factories:
+Norfair ships with two Kalman filter factories (plus
+[`NoFilterFactory`][norfair.filter.NoFilterFactory] to disable filtering):
 
 - [`OptimizedKalmanFilterFactory`][norfair.filter.OptimizedKalmanFilterFactory] —
   the default. A NumPy-only constant-velocity Kalman filter tuned for speed.
