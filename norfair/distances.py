@@ -345,12 +345,29 @@ def mean_euclidean(detection: "Detection", tracked_object: "TrackedObject") -> f
     float
         The distance.
 
+    Raises
+    ------
+    ValueError
+        If either input is empty or contains non-finite (NaN/Inf) values.
+
     See Also
     --------
     [`np.linalg.norm`](https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html)
 
     """
-    return np.linalg.norm(detection.points - tracked_object.estimate, axis=1).mean()
+    points = detection.points
+    estimate = tracked_object.estimate
+    if points.size == 0 or estimate.size == 0:
+        raise ValueError(
+            "mean_euclidean received empty points array; "
+            "check that the detection/tracked object has valid points."
+        )
+    if not np.all(np.isfinite(points)) or not np.all(np.isfinite(estimate)):
+        raise ValueError(
+            "mean_euclidean received non-finite (NaN/Inf) input; "
+            "check that the detection/tracked object has valid points."
+        )
+    return np.linalg.norm(points - estimate, axis=1).mean()
 
 
 def mean_manhattan(detection: "Detection", tracked_object: "TrackedObject") -> float:
@@ -374,14 +391,29 @@ def mean_manhattan(detection: "Detection", tracked_object: "TrackedObject") -> f
     float
         The distance.
 
+    Raises
+    ------
+    ValueError
+        If either input is empty or contains non-finite (NaN/Inf) values.
+
     See Also
     --------
     [`np.linalg.norm`](https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html)
 
     """
-    return np.linalg.norm(
-        detection.points - tracked_object.estimate, ord=1, axis=1
-    ).mean()
+    points = detection.points
+    estimate = tracked_object.estimate
+    if points.size == 0 or estimate.size == 0:
+        raise ValueError(
+            "mean_manhattan received empty points array; "
+            "check that the detection/tracked object has valid points."
+        )
+    if not np.all(np.isfinite(points)) or not np.all(np.isfinite(estimate)):
+        raise ValueError(
+            "mean_manhattan received non-finite (NaN/Inf) input; "
+            "check that the detection/tracked object has valid points."
+        )
+    return np.linalg.norm(points - estimate, ord=1, axis=1).mean()
 
 
 def _boxes_area(boxes: np.ndarray) -> np.ndarray:
@@ -442,9 +474,16 @@ def iou(candidates: np.ndarray, objects: np.ndarray) -> np.ndarray:
     area_intersection = np.prod(
         np.clip(bottom_right - top_left, a_min=0, a_max=None), 2
     )
-    return 1 - area_intersection / (
-        area_candidates[:, None] + area_objects - area_intersection
+    union = area_candidates[:, None] + area_objects - area_intersection
+    # Guard against zero-area (degenerate) bounding boxes: use np.divide with
+    # where= to avoid evaluating the division when union is zero.
+    iou_values = np.divide(
+        area_intersection,
+        union,
+        out=np.zeros_like(area_intersection, dtype=float),
+        where=union > 0,
     )
+    return 1 - iou_values
 
 
 iou_opt = iou  # deprecated
@@ -599,7 +638,16 @@ def create_normalized_mean_euclidean_distance(
     Callable
         A scalar distance function that can be passed to ``Tracker``.
 
+    Raises
+    ------
+    ValueError
+        If ``height`` or ``width`` is not positive.
+
     """
+    if width <= 0 or height <= 0:
+        raise ValueError(
+            f"width and height must be positive, got width={width}, height={height}"
+        )
 
     def normalized__mean_euclidean_distance(
         detection: "Detection", tracked_object: "TrackedObject"
