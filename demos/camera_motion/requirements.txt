@@ -1,1 +1,1 @@
-yolov5==6.1.8
+ultralytics>=8.0
