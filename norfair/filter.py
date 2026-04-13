@@ -291,6 +291,8 @@ class OptimizedKalmanFilter:
             + self.q_Q
             + kalman_r
         )
+        # Guard against zero-variance division (see issue #46).
+        added_variances = np.maximum(added_variances, 1e-12)
 
         kalman_r_over_added_variances = np.divide(kalman_r, added_variances)
         vel_var_plus_pos_vel_cov_over_added_variances = np.divide(

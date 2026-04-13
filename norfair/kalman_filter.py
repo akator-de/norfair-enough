@@ -124,6 +124,7 @@ This version has been modified for integration into the Norfair tracking framewo
 Adaptation by [cl445], 2025.
 """
 
+import logging
 import sys
 from collections import deque
 from copy import deepcopy
@@ -132,6 +133,8 @@ from math import exp, log, sqrt
 import numpy as np
 from numpy import dot, eye, isscalar, linalg, shape, zeros
 from scipy.stats import multivariate_normal
+
+_logger = logging.getLogger(__name__)
 
 
 def logpdf(x, mean=None, cov=1, allow_singular=True):
@@ -642,7 +645,14 @@ class KalmanFilter:
         # S = HPH' + R
         # project system uncertainty into measurement space
         self.S = dot(H, PHT) + R
-        self.SI = self.inv(self.S)
+        try:
+            self.SI = self.inv(self.S)
+        except np.linalg.LinAlgError:
+            _logger.warning(
+                "Singular innovation covariance S in KalmanFilter.update; "
+                "falling back to pseudo-inverse."
+            )
+            self.SI = np.linalg.pinv(self.S)
         # K = PH'inv(S)
         # map system uncertainty into kalman gain
         self.K = dot(PHT, self.SI)
@@ -840,7 +850,15 @@ class KalmanFilter:
 
         # project system uncertainty into measurement space
         self.S = dot(H, PHT) + dot(H, self.M) + dot(self.M.T, H.T) + R
-        self.SI = self.inv(self.S)
+        try:
+            self.SI = self.inv(self.S)
+        except np.linalg.LinAlgError:
+            _logger.warning(
+                "Singular innovation covariance S in "
+                "KalmanFilter.update_correlated; "
+                "falling back to pseudo-inverse."
+            )
+            self.SI = np.linalg.pinv(self.S)
 
         # K = PH'inv(S)
         # map system uncertainty into kalman gain
@@ -1269,7 +1287,15 @@ class KalmanFilter:
         S = H @ PHT + R
 
         # Compute Kalman gain
-        K = PHT @ self.inv(S)
+        try:
+            K = PHT @ self.inv(S)
+        except np.linalg.LinAlgError:
+            _logger.warning(
+                "Singular innovation covariance S in "
+                "KalmanFilter.batch_filter; "
+                "falling back to pseudo-inverse."
+            )
+            K = PHT @ np.linalg.pinv(S)
 
         # Update state estimate with the scaled residual
         x = x + K @ y
@@ -1343,7 +1369,7 @@ class KalmanFilter:
         mahalanobis : float
         """
         if self._mahalanobis is None:
-            self._mahalanobis = sqrt(float(dot(dot(self.y.T, self.SI), self.y)))
+            self._mahalanobis = sqrt(max(0.0, float(dot(dot(self.y.T, self.SI), self.y))))
         return self._mahalanobis
 
     @property
