@@ -2836,8 +2836,7 @@ If this parameter is passed, all other arguments are ignored</p>
         <p>Class used to stabilize video based on the camera motion.</p>
 <p>Starts with a larger frame, where the original frame is drawn on top of a black background.
 As the camera moves, the smaller frame moves in the opposite direction, stabilizing the objects in it.</p>
-<p>Useful for debugging or demoing the camera motion.
-<img alt="Example GIF" src="../../videos/camera_stabilization.gif" /></p>
+<p>Useful for debugging or demoing the camera motion.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This only works with <a class="autorefs autorefs-internal" href="../camera_motion/#norfair.camera_motion.TranslationTransformation"><code>TranslationTransformation</code></a>,
@@ -3073,8 +3072,7 @@ Use a bigger scale if the camera is moving too much.</p>
 <span class="normal">137</span>
 <span class="normal">138</span>
 <span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">FixedCamera</span><span class="p">:</span>
+<span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">FixedCamera</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class used to stabilize video based on the camera motion.</span>
 
@@ -3082,7 +3080,6 @@ Use a bigger scale if the camera is moving too much.</p>
 <span class="sd">    As the camera moves, the smaller frame moves in the opposite direction, stabilizing the objects in it.</span>
 
 <span class="sd">    Useful for debugging or demoing the camera motion.</span>
-<span class="sd">    ![Example GIF](../../videos/camera_stabilization.gif)</span>
 
 <span class="sd">    !!! Warning</span>
 <span class="sd">        This only works with [`TranslationTransformation`][norfair.camera_motion.TranslationTransformation],</span>
@@ -3311,7 +3308,8 @@ Use a bigger scale if the camera is moving too much.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/drawing/fixed_camera.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 59</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 58</span>
+<span class="normal"> 59</span>
 <span class="normal"> 60</span>
 <span class="normal"> 61</span>
 <span class="normal"> 62</span>
@@ -3392,8 +3390,7 @@ Use a bigger scale if the camera is moving too much.</p>
 <span class="normal">137</span>
 <span class="normal">138</span>
 <span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">adjust_frame</span><span class="p">(</span>
+<span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">adjust_frame</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">coord_transformation</span><span class="p">:</span> <span class="n">TranslationTransformation</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -8990,8 +8987,7 @@ and returns a list of points for which we want to draw their paths.</p>
         <p>Class used to stabilize video based on the camera motion.</p>
 <p>Starts with a larger frame, where the original frame is drawn on top of a black background.
 As the camera moves, the smaller frame moves in the opposite direction, stabilizing the objects in it.</p>
-<p>Useful for debugging or demoing the camera motion.
-<img alt="Example GIF" src="../../videos/camera_stabilization.gif" /></p>
+<p>Useful for debugging or demoing the camera motion.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>This only works with <a class="autorefs autorefs-internal" href="../camera_motion/#norfair.camera_motion.TranslationTransformation"><code>TranslationTransformation</code></a>,
@@ -9227,8 +9223,7 @@ Use a bigger scale if the camera is moving too much.</p>
 <span class="normal">137</span>
 <span class="normal">138</span>
 <span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">FixedCamera</span><span class="p">:</span>
+<span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">FixedCamera</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class used to stabilize video based on the camera motion.</span>
 
@@ -9236,7 +9231,6 @@ Use a bigger scale if the camera is moving too much.</p>
 <span class="sd">    As the camera moves, the smaller frame moves in the opposite direction, stabilizing the objects in it.</span>
 
 <span class="sd">    Useful for debugging or demoing the camera motion.</span>
-<span class="sd">    ![Example GIF](../../videos/camera_stabilization.gif)</span>
 
 <span class="sd">    !!! Warning</span>
 <span class="sd">        This only works with [`TranslationTransformation`][norfair.camera_motion.TranslationTransformation],</span>
@@ -9465,7 +9459,8 @@ Use a bigger scale if the camera is moving too much.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/drawing/fixed_camera.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 59</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 58</span>
+<span class="normal"> 59</span>
 <span class="normal"> 60</span>
 <span class="normal"> 61</span>
 <span class="normal"> 62</span>
@@ -9546,8 +9541,7 @@ Use a bigger scale if the camera is moving too much.</p>
 <span class="normal">137</span>
 <span class="normal">138</span>
 <span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">adjust_frame</span><span class="p">(</span>
+<span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">adjust_frame</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">coord_transformation</span><span class="p">:</span> <span class="n">TranslationTransformation</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>

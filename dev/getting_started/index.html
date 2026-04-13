@@ -927,11 +927,11 @@
 <p>We recommend first deciding and setting up the model and then adding Norfair on top of it.
 Models trained for any form of <a href="https://paperswithcode.com/task/object-detection">object detection</a> or <a href="https://paperswithcode.com/task/keypoint-detection">keypoint detection</a> (including <a href="https://paperswithcode.com/task/pose-estimation">pose estimation</a>) are all supported. You can check some of the integrations we have as examples:</p>
 <ul>
-<li><a href="https://github.com/tryolabs/norfair/tree/master/demos/yolov7">Yolov7</a>, <a href="https://github.com/tryolabs/norfair/tree/master/demos/yolov5">Yolov5</a> and <a href="https://github.com/tryolabs/norfair/tree/master/demos/yolov4">Yolov4</a></li>
-<li><a href="https://github.com/tryolabs/norfair/tree/master/demos/detectron2">Detectron2</a></li>
-<li><a href="https://github.com/tryolabs/norfair/tree/master/demos/alphapose">Alphapose</a></li>
-<li><a href="https://github.com/tryolabs/norfair/tree/master/demos/openpose">Openpose</a></li>
-<li><a href="https://github.com/tryolabs/norfair/tree/master/demos/mmdetection">MMDetection</a></li>
+<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov7">Yolov7</a>, <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov5">Yolov5</a> and <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov4">Yolov4</a></li>
+<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/detectron2">Detectron2</a></li>
+<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/alphapose">Alphapose</a></li>
+<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/openpose">Openpose</a></li>
+<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/mmdetection">MMDetection</a></li>
 </ul>
 <p>Any other model trained on one of the supported tasks is also supported and should be easy to integrate with Norfair, regardless of whether it uses Pytorch, TensorFlow, or other.</p>
 <p>If you are unsure of which model to use, <a href="https://github.com/WongKinYiu/yolov7">Yolov7</a> is a good starting point since it's easy to set up and offers models of different sizes pre-trained on object detection and pose estimation.</p>
@@ -960,7 +960,7 @@ To use this functionality you need to install Norfair with the <code>video</code
 <span class="normal"> 9</span>
 <span class="normal">10</span>
 <span class="normal">11</span>
-<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Detection</span><span class="p">,</span> <span class="n">Tracker</span><span class="p">,</span> <span class="n">Video</span><span class="p">,</span> <span class="n">draw_tracked_objects</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Detection</span><span class="p">,</span> <span class="n">Tracker</span><span class="p">,</span> <span class="n">Video</span><span class="p">,</span> <span class="n">draw_points</span>
 
 <span class="n">detector</span> <span class="o">=</span> <span class="n">MyDetector</span><span class="p">()</span>  <span class="c1"># Set up a detector</span>
 <span class="n">video</span> <span class="o">=</span> <span class="n">Video</span><span class="p">(</span><span class="n">input_path</span><span class="o">=</span><span class="s2">&quot;video.mp4&quot;</span><span class="p">)</span>
@@ -970,7 +970,7 @@ To use this functionality you need to install Norfair with the <code>video</code
    <span class="n">detections</span> <span class="o">=</span> <span class="n">detector</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
    <span class="n">norfair_detections</span> <span class="o">=</span> <span class="p">[</span><span class="n">Detection</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="k">for</span> <span class="n">points</span> <span class="ow">in</span> <span class="n">detections</span><span class="p">]</span>
    <span class="n">tracked_objects</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">detections</span><span class="o">=</span><span class="n">norfair_detections</span><span class="p">)</span>
-   <span class="n">draw_tracked_objects</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">tracked_objects</span><span class="p">)</span>
+   <span class="n">draw_points</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">drawables</span><span class="o">=</span><span class="n">tracked_objects</span><span class="p">)</span>
    <span class="n">video</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <p>The tracker is created and then the detections are fed to it one frame at a time in order. This method is called <em>online tracking</em> and allows Norfair to be used in live feeds and real-time scenarios where future frames are not available.</p>
@@ -997,7 +997,7 @@ To use this functionality you need to install Norfair with the <code>video</code
 <li>Mismatches when objects overlap. In this case, tracking becomes more challenging, usually, the quality of the detection degrades causing one of the objects to be missed or creating a single big detection that includes both objects. On top of the detection issues, the tracker needs to decide which detection should be matched to which TrackedObject which can be error-prone if only considering spatial information. The solution is not easy but incorporating the notion of the appearance similarity based on some kind of embedding to your distance_function can help.</li>
 </ul>
 </li>
-<li>Can't <strong>recover</strong> an object <strong>after occlusions</strong>. Use ReID distance, see <a href="https://github.com/tryolabs/norfair/tree/master/demos/reid">this demo</a> for an example but for real-world use you will need a good ReID model that can provide good embeddings.</li>
+<li>Can't <strong>recover</strong> an object <strong>after occlusions</strong>. Use ReID distance, see <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/reid">this demo</a> for an example but for real-world use you will need a good ReID model that can provide good embeddings.</li>
 </ul>
 
 

@@ -2432,17 +2432,17 @@ new candidates and objects.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
-                <code>Other</code>
+                <code>**kwargs</code>
             </td>
             <td>
             </td>
             <td>
               <div class="doc-md-description">
-                
+                <p>Additional keyword arguments passed through to <code>scipy.spatial.distance.cdist</code>.</p>
               </div>
             </td>
             <td>
-                <em>required</em>
+                  <code>{}</code>
             </td>
           </tr>
       </tbody>
@@ -2494,8 +2494,8 @@ new candidates and objects.</p>
 <span class="sd">    metric : str, optional</span>
 <span class="sd">        Defines the specific Scipy metric to use to calculate the pairwise distances between</span>
 <span class="sd">        new candidates and objects.</span>
-
-<span class="sd">    Other kwargs are passed through to cdist</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">        Additional keyword arguments passed through to `scipy.spatial.distance.cdist`.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
