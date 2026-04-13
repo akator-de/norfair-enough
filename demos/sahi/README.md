@@ -1,7 +1,7 @@
 # SAHI: Slicing Aided Hyper Inference Demo
 
 An example of how to use Norfair along with [SAHI: Slicing Aided Hyper Inference](https://github.com/obss/sahi)
-to perform detection and tracking on small objects using [YOLOv5x](https://github.com/ultralytics/yolov5) as the detector.
+to perform detection and tracking on small objects using [YOLO11](https://docs.ultralytics.com/) (via Ultralytics) as the detector.
 
 Comparison of not using SAHI (left) vs using it (right)
 

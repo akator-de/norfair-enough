@@ -1,34 +1,16 @@
 import argparse
-import urllib.request
-from os import path
-from pathlib import Path
 
 import torch
 from sahi import AutoDetectionModel
-
-
-def download_yolov5_model(model_url: str, destination_path: str):
-    Path(destination_path).parent.mkdir(parents=True, exist_ok=True)
-
-    if not path.exists(destination_path):
-        urllib.request.urlretrieve(
-            model_url,
-            destination_path,
-        )
 
 
 def obtain_detection_model(confidence_threshold: float):
     device = (
         f"cuda:{torch.cuda.current_device()}" if torch.cuda.is_available() else "cpu"
     )
-    yolov5_model_path = "./models/yolov5x6.pt"
-    download_yolov5_model(
-        model_url="https://github.com/ultralytics/yolov5/releases/download/v5.0/yolov5x6.pt",
-        destination_path=yolov5_model_path,
-    )
     return AutoDetectionModel.from_pretrained(
-        model_type="yolov5",
-        model_path=yolov5_model_path,
+        model_type="ultralytics",
+        model_path="yolo11n.pt",
         confidence_threshold=confidence_threshold,
         device=device,
     )
