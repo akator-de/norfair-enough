@@ -1,6 +1,9 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
-language: "de-DE"
+language: "en-US"
 early_access: false
+tone_instructions: >-
+  Be concise and direct. Lead with the finding, skip filler.
+  One sentence per comment when possible.
 
 reviews:
   profile: "chill"
@@ -10,12 +13,28 @@ reviews:
   auto_title_placeholder: "@coderabbitai"
   review_status: true
   poem: false
-  collapse_walkthrough: false
+  collapse_walkthrough: true
   sequence_diagrams: true
   changed_files_summary: true
   labeling_instructions: []
   path_filters: []
-  path_instructions: []
+  path_instructions:
+    - path: "**"
+      instructions: >-
+        This repository (norfair-enough) is a BSD-licensed fork of
+        tryolabs/norfair. In prose, use "Norfair Enough" for the first
+        mention, then "the library" or "the tracker" for subsequent
+        references. Never use bare "Norfair" to refer to this project.
+    - path: "norfair/**"
+      instructions: >-
+        Core library code. Type checking uses pyrefly (not Pyright).
+        Linting and formatting use ruff. Do not suggest flake8/pylint
+        style fixes.
+    - path: "tests/**"
+      instructions: >-
+        Tests use pytest. MOT metrics regression tests compare against
+        tests/metrics.txt baseline. Do not suggest mocking the MOT
+        evaluation pipeline.
   abort_on_close: true
   auto_review:
     enabled: true
@@ -25,6 +44,22 @@ reviews:
     drafts: false
     base_branches:
       - main
+  finishing_touches:
+    unit_tests:
+      enabled: false
+    docstrings:
+      enabled: true
+  tools:
+    ruff:
+      enabled: true
+    actionlint:
+      enabled: true
+    markdownlint:
+      enabled: true
+    flake8:
+      enabled: false
+    pylint:
+      enabled: false
 
 chat:
   auto_reply: true
