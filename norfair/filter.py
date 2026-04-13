@@ -83,6 +83,10 @@ class FilterPyKalmanFilterFactory(FilterFactory):
     dimensionality. This layout is assumed by the rest of the tracker and
     should be preserved when subclassing.
 
+    When the innovation covariance matrix ``S`` is singular or
+    ill-conditioned (condition number > ``1e12``), the filter automatically
+    falls back to a pseudo-inverse to maintain numerical stability.
+
     See Also
     --------
     [`filterpy.KalmanFilter`](https://filterpy.readthedocs.io/en/latest/kalman/KalmanFilter.html)
@@ -359,6 +363,10 @@ class OptimizedKalmanFilterFactory(FilterFactory):
     [`FilterPyKalmanFilterFactory`][norfair.filter.FilterPyKalmanFilterFactory]:
     ``[pos[0], ..., pos[dim_z-1], vel[0], ..., vel[dim_z-1]]``, with
     ``dim_z = num_points * dim_points``.
+
+    Intermediate variances are clamped to a minimum of ``1e-12`` to prevent
+    zero-division in degenerate cases (e.g. perfectly stationary targets with
+    near-zero measurement noise).
     """
 
     def __init__(

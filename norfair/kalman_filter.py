@@ -646,11 +646,13 @@ class KalmanFilter:
         # project system uncertainty into measurement space
         self.S = dot(H, PHT) + R
         try:
+            if np.linalg.cond(self.S) > 1e12:
+                raise np.linalg.LinAlgError("ill-conditioned")
             self.SI = self.inv(self.S)
         except np.linalg.LinAlgError:
             _logger.warning(
-                "Singular innovation covariance S in KalmanFilter.update; "
-                "falling back to pseudo-inverse."
+                "Singular or ill-conditioned innovation covariance S in "
+                "KalmanFilter.update; falling back to pseudo-inverse."
             )
             self.SI = np.linalg.pinv(self.S)
         # K = PH'inv(S)
@@ -851,10 +853,12 @@ class KalmanFilter:
         # project system uncertainty into measurement space
         self.S = dot(H, PHT) + dot(H, self.M) + dot(self.M.T, H.T) + R
         try:
+            if np.linalg.cond(self.S) > 1e12:
+                raise np.linalg.LinAlgError("ill-conditioned")
             self.SI = self.inv(self.S)
         except np.linalg.LinAlgError:
             _logger.warning(
-                "Singular innovation covariance S in "
+                "Singular or ill-conditioned innovation covariance S in "
                 "KalmanFilter.update_correlated; "
                 "falling back to pseudo-inverse."
             )
@@ -1096,8 +1100,8 @@ class KalmanFilter:
 
         if update_first:
             for i, (z, F, Q, H, R, B, u) in enumerate(
-                zip(zs, Fs, Qs, Hs, Rs, Bs, us)
-            ):  # pyrefly: ignore[bad-argument-type]
+                zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
+            ):
                 self.update(z, R=R, H=H)
                 means[i, :] = self.x
                 covariances[i, :, :] = self.P
@@ -1110,8 +1114,8 @@ class KalmanFilter:
                     saver.save()
         else:
             for i, (z, F, Q, H, R, B, u) in enumerate(
-                zip(zs, Fs, Qs, Hs, Rs, Bs, us)
-            ):  # pyrefly: ignore[bad-argument-type]
+                zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
+            ):
                 self.predict(u=u, B=B, F=F, Q=Q)
                 means_p[i, :] = self.x
                 covariances_p[i, :, :] = self.P
@@ -1292,12 +1296,13 @@ class KalmanFilter:
 
         # Compute Kalman gain
         try:
+            if np.linalg.cond(S) > 1e12:
+                raise np.linalg.LinAlgError("ill-conditioned")
             K = PHT @ self.inv(S)
         except np.linalg.LinAlgError:
             _logger.warning(
-                "Singular innovation covariance S in "
-                "KalmanFilter.get_update; "
-                "falling back to pseudo-inverse."
+                "Singular or ill-conditioned innovation covariance S in "
+                "KalmanFilter.get_update; falling back to pseudo-inverse."
             )
             K = PHT @ np.linalg.pinv(S)
 
