@@ -8,7 +8,7 @@ from norfair.tracker import Detection, TrackedObject
 from norfair.utils import warn_once
 
 from .color import ColorLike, Palette, parse_color
-from .drawer import Drawable, Drawer
+from .drawer import Drawable, Drawer, _safe_int_point
 from .utils import _build_text
 
 
@@ -153,9 +153,12 @@ def draw_points(
         if draw_points:
             for point, live in zip(d.points, d.live_points):
                 if live or not hide_dead_points:
+                    safe_pos = _safe_int_point(point)
+                    if safe_pos is None:
+                        continue
                     Drawer.circle(
                         frame,
-                        tuple(point.astype(int)),  # pyrefly: ignore[bad-argument-type]
+                        safe_pos,
                         radius=radius,
                         color=obj_color,
                         thickness=thickness,
@@ -166,6 +169,9 @@ def draw_points(
             if len(live) > 0:
                 position = live.mean(axis=0)
                 position -= radius
+                text_pos = _safe_int_point(position)
+                if text_pos is None:
+                    continue
                 text = _build_text(
                     d,
                     draw_labels=draw_labels,
@@ -176,7 +182,7 @@ def draw_points(
                 Drawer.text(
                     frame,
                     text,
-                    tuple(position.astype(int)),  # pyrefly: ignore[bad-argument-type]
+                    text_pos,
                     size=text_size,
                     color=obj_text_color,
                     thickness=text_thickness,

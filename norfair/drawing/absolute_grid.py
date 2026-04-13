@@ -103,9 +103,11 @@ def draw_absolute_grid(
     else:
         points_transformed = coord_transformations.abs_to_rel(points)
 
-    # filter points that are not visible
+    # filter points that are not visible or contain non-finite values (#41)
+    finite_mask = np.all(np.isfinite(points_transformed), axis=1)
     visible_points = points_transformed[
-        (points_transformed <= np.array([w, h])).all(axis=1)
+        finite_mask
+        & (points_transformed <= np.array([w, h])).all(axis=1)
         & (points_transformed >= 0).all(axis=1)
     ]
     for point in visible_points:
