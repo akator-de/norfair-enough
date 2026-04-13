@@ -1127,7 +1127,7 @@ pip<span class="w"> </span>install<span class="w"> </span>norfair-enough<span cl
 <h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">#</a></h2>
 <ul>
 <li>
-<p>Any detector expressing its detections as a series of <code>(x, y)</code> coordinates can be used with Norfair Enough. This includes detectors performing tasks such as object or keypoint detection (see <a href="#examples-demos">examples</a>).</p>
+<p>Any detector expressing its detections as a series of <code>(x, y)</code> coordinates can be used with Norfair Enough. This includes detectors performing tasks such as object or keypoint detection (see <a href="#examples--demos">examples</a>).</p>
 </li>
 <li>
 <p>Modular. It can easily be inserted into complex video processing pipelines to add tracking to existing projects. At the same time, it is possible to build a video inference loop from scratch using just the library and a detector.</p>
@@ -1169,7 +1169,7 @@ pip<span class="w"> </span>install<span class="w"> </span>norfair-enough<span cl
 <li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/keypoints_bounding_boxes">Track both bounding boxes and human keypoints</a> (multi-class), unifying the detections from a YOLO model and OpenPose.</li>
 <li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/reid">Re-identification (ReID)</a> of tracked objects using appearance embeddings. This is a good starting point for scenarios with a lot of occlusion, in which the Kalman filter alone would struggle.</li>
 <li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/camera_motion">Accurately track objects even if the camera is moving</a>, by estimating camera motion potentially accounting for pan, tilt, rotation, movement in any direction, and zoom.</li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/3d_track">Track points in 3D</a>, using <a href="https://google.github.io/mediapipe/solutions/objectron.html">MediaPipe Objectron</a>.</li>
+<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/3d_track">Track points in 3D</a>, using <a href="https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/objectron.md">MediaPipe Objectron</a>.</li>
 <li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/sahi">Tracking of small objects</a>, using <a href="https://github.com/obss/sahi">SAHI: Slicing Aided Hyper Inference</a>.</li>
 </ol>
 <h3 id="benchmarking-and-profiling">Benchmarking and profiling<a class="headerlink" href="#benchmarking-and-profiling" title="Permanent link">#</a></h3>
