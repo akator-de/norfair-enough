@@ -42,15 +42,15 @@ If the needed dependencies are already present in the system, installing the min
 
 ## Features
 
-- Any detector expressing its detections as a series of `(x, y)` coordinates can be used with Norfair. This includes detectors performing tasks such as object or keypoint detection (see [examples](#examples--demos)).
+- Any detector expressing its detections as a series of `(x, y)` coordinates can be used with Norfair Enough. This includes detectors performing tasks such as object or keypoint detection (see [examples](#examples--demos)).
 
-- Modular. It can easily be inserted into complex video processing pipelines to add tracking to existing projects. At the same time, it is possible to build a video inference loop from scratch using just Norfair and a detector.
+- Modular. It can easily be inserted into complex video processing pipelines to add tracking to existing projects. At the same time, it is possible to build a video inference loop from scratch using just the library and a detector.
 
 - Supports moving camera, re-identification with appearance embeddings, and n-dimensional object tracking (see [Advanced features](#advanced-features)).
 
-- Norfair provides several predefined distance functions to compare tracked objects and detections. The distance functions can also be defined by the user, enabling the implementation of different tracking strategies.
+- The library provides several predefined distance functions to compare tracked objects and detections. The distance functions can also be defined by the user, enabling the implementation of different tracking strategies.
 
-- Fast. The only thing bounding inference speed will be the detection network feeding detections to Norfair.
+- Fast. The only thing bounding inference speed will be the detection network feeding detections to the tracker.
 
 ## Documentation
 
@@ -60,7 +60,7 @@ If the needed dependencies are already present in the system, installing the min
 
 ## Examples & demos
 
-We provide several examples of how Norfair can be used to add tracking capabilities to different detectors, and also showcase more advanced features. All demos are available in the [`demos/`](https://github.com/akator-de/norfair-enough/tree/main/demos) directory of this repository (originally adapted from [tryolabs/norfair](https://github.com/tryolabs/norfair/tree/master/demos)).
+We provide several examples of how the library can be used to add tracking capabilities to different detectors, and also showcase more advanced features. All demos are available in the [`demos/`](https://github.com/akator-de/norfair-enough/tree/main/demos) directory of this repository (originally adapted from [tryolabs/norfair](https://github.com/tryolabs/norfair/tree/master/demos)).
 
 > **Note:** The demo code was originally written in the [tryolabs/norfair](https://github.com/tryolabs/norfair) repository which is no longer actively maintained. Some demos may reference upstream resources that could become unavailable in the future. The demos remain compatible with norfair-enough — just replace `pip install norfair` with `pip install norfair-enough`.
 
@@ -74,7 +74,7 @@ Most tracking demos are showcased with vehicles and pedestrians, but the detecto
 2. [YOLOv5](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov5): tracking object centroids or bounding boxes.
 3. [YOLOv4](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov4): tracking object centroids.
 4. [Detectron2](https://github.com/akator-de/norfair-enough/tree/main/demos/detectron2): tracking object centroids.
-5. [AlphaPose](https://github.com/akator-de/norfair-enough/tree/main/demos/alphapose): tracking human keypoints (pose estimation) and inserting Norfair into a complex existing pipeline.
+5. [AlphaPose](https://github.com/akator-de/norfair-enough/tree/main/demos/alphapose): tracking human keypoints (pose estimation) and inserting the tracker into a complex existing pipeline.
 6. [OpenPose](https://github.com/akator-de/norfair-enough/tree/main/demos/openpose): tracking human keypoints.
 7. [YOLOPv2](https://github.com/akator-de/norfair-enough/tree/main/demos/yolopv2): tracking with a model for traffic object detection, drivable road area segmentation, and lane line detection.
 8. [YOLO-NAS](https://github.com/akator-de/norfair-enough/tree/main/demos/yolo_nas): tracking object centroids or bounding boxes.
@@ -95,15 +95,15 @@ Most tracking demos are showcased with vehicles and pedestrians, but the detecto
 
 ## How it works
 
-Norfair works by estimating the future position of each point based on its past positions. It then tries to match these estimated positions with newly detected points provided by the detector. For this matching to occur, Norfair can rely on any distance function. There are some predefined distances already integrated in Norfair, and the users can also define their own custom distances. Therefore, each object tracker can be made as simple or as complex as needed.
+The tracker works by estimating the future position of each point based on its past positions. It then tries to match these estimated positions with newly detected points provided by the detector. For this matching to occur, the tracker can rely on any distance function. There are some predefined distances already integrated in the library, and the users can also define their own custom distances. Therefore, each object tracker can be made as simple or as complex as needed.
 
 As an example we use [Detectron2](https://github.com/facebookresearch/detectron2) to get the single point detections to use with this distance function. We just use the centroids of the bounding boxes it produces around cars as our detections, and get the following results.
 
-![Tracking cars with Norfair](https://media.githubusercontent.com/media/akator-de/norfair-enough/main/docs/videos/traffic.webp)
+![Tracking cars with Norfair Enough](https://media.githubusercontent.com/media/akator-de/norfair-enough/main/docs/videos/traffic.webp)
 
-On the left you can see the points we get from Detectron2, and on the right how Norfair tracks them assigning a unique identifier through time. Even a straightforward distance function like this one can work when the tracking needed is simple.
+On the left you can see the points we get from Detectron2, and on the right how the tracker tracks them assigning a unique identifier through time. Even a straightforward distance function like this one can work when the tracking needed is simple.
 
-Norfair also provides several useful tools for creating a video inference loop. Here is what the full code for creating the previous example looks like, including the code needed to set up Detectron2:
+The library also provides several useful tools for creating a video inference loop. Here is what the full code for creating the previous example looks like, including the code needed to set up Detectron2:
 
 ```python
 import cv2
@@ -136,21 +136,21 @@ The video and drawing tools use OpenCV frames, so they are compatible with most 
 
 ## Motivation
 
-Modern object detectors are increasingly easy to use (e.g., Ultralytics YOLO), but adding robust multi-object tracking on top of them still requires stitching together detection, state estimation, and identity management. Norfair was born to fill that gap: a modular tracking layer that works with any detector outputting `(x, y)` coordinates, and can be plugged into existing pipelines with minimal effort.
+Modern object detectors are increasingly easy to use (e.g., Ultralytics YOLO), but adding robust multi-object tracking on top of them still requires stitching together detection, state estimation, and identity management. Norfair Enough was born to fill that gap: a modular tracking layer that works with any detector outputting `(x, y)` coordinates, and can be plugged into existing pipelines with minimal effort.
 
 ## Comparison to other trackers
 
-Norfair's contribution to Python's object tracker library repertoire is its ability to work with any object detector by being able to work with a variable number of points per detection, and the ability for the user to heavily customize the tracker by creating their own distance function.
+Norfair Enough's contribution to Python's object tracker library repertoire is its ability to work with any object detector by being able to work with a variable number of points per detection, and the ability for the user to heavily customize the tracker by creating their own distance function.
 
 If you are looking for a tracker, here are some other projects worth noting:
 
 - [**ByteTrack**](https://github.com/ifzhang/ByteTrack) and [**BoT-SORT**](https://github.com/NirAharon/BoT-SORT) are high-performance MOT trackers that achieve strong results on MOT benchmarks. They are tightly coupled to specific detection architectures.
 - [**Ultralytics built-in tracking**](https://docs.ultralytics.com/modes/track/) provides integrated tracking (ByteTrack, BoT-SORT) when using YOLO models. Convenient if you only use YOLO, but not detector-agnostic.
-- [**SORT**](https://github.com/abewley/sort) and [**Deep SORT**](https://github.com/nwojke/deep_sort) use Kalman filters like Norfair, but are hardcoded to bounding-box tracking with a fixed distance function. Both are released under the GPL.
+- [**SORT**](https://github.com/abewley/sort) and [**Deep SORT**](https://github.com/nwojke/deep_sort) use Kalman filters like Norfair Enough, but are hardcoded to bounding-box tracking with a fixed distance function. Both are released under the GPL.
 - [**OC-SORT**](https://github.com/noahcao/OC_SORT) improves on SORT with observation-centric momentum, handling occlusion better. Like SORT, it is box-only.
 - [**supervision**](https://github.com/roboflow/supervision) by Roboflow offers ByteTrack integration alongside annotation and dataset tools. Useful if you want a broader CV toolkit, but less customizable for tracking specifically.
 
-Norfair stands out by being **detector-agnostic**, supporting **any point geometry** (centroids, bounding boxes, keypoints, 3D points), and offering a **BSD-3 license** with no copyleft restrictions.
+Norfair Enough stands out by being **detector-agnostic**, supporting **any point geometry** (centroids, bounding boxes, keypoints, 3D points), and offering a **BSD-3 license** with no copyleft restrictions.
 
 ## Benchmarks
 
@@ -177,9 +177,9 @@ These benchmarks were produced using the [motmetrics4norfair](https://github.com
 |  MOT20-05   | 87.9% 88.9% 87.0% | 96.0% | 98.1% | 94.1% 13.0% |
 |   OVERALL   | 87.3% 88.4% 86.2% | 95.6% | 98.1% | 93.7% 13.2% |
 
-## Citing Norfair
+## Citing
 
-For citations in academic publications, please export your desired citation format (BibTeX or other) from the original [Zenodo entry](https://doi.org/10.5281/zenodo.5146253).
+For citations in academic publications, please reference the original Norfair project. Export your desired citation format (BibTeX or other) from the [Zenodo entry](https://doi.org/10.5281/zenodo.5146253).
 
 ## License
 

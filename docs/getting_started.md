@@ -1,10 +1,10 @@
 # Getting Started
 
-Norfair's goal is to easily track multiple objects in videos based on the frame-by-frame detections of a user-defined model.
+Norfair Enough's goal is to easily track multiple objects in videos based on the frame-by-frame detections of a user-defined model.
 
 ## Model or Detector
 
-We recommend first deciding and setting up the model and then adding Norfair on top of it.
+We recommend first deciding and setting up the model and then adding the tracker on top of it.
 Models trained for any form of [object detection](https://paperswithcode.com/task/object-detection) or [keypoint detection](https://paperswithcode.com/task/keypoint-detection) (including [pose estimation](https://paperswithcode.com/task/pose-estimation)) are all supported. You can check some of the integrations we have as examples:
 
 - [Yolov7](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov7), [Yolov5](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov5) and [Yolov4](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov4)
@@ -15,25 +15,25 @@ Models trained for any form of [object detection](https://paperswithcode.com/tas
 
 > **Note:** These demos were originally written for [tryolabs/norfair](https://github.com/tryolabs/norfair) which is no longer actively maintained. Some demos may reference upstream resources that could become unavailable in the future. They remain compatible with norfair-enough — just replace `pip install norfair` with `pip install norfair-enough`.
 
-Any other model trained on one of the supported tasks is also supported and should be easy to integrate with Norfair, regardless of whether it uses Pytorch, TensorFlow, or other.
+Any other model trained on one of the supported tasks is also supported and should be easy to integrate with the library, regardless of whether it uses Pytorch, TensorFlow, or other.
 
 If you are unsure of which model to use, [Yolov7](https://github.com/WongKinYiu/yolov7) is a good starting point since it's easy to set up and offers models of different sizes pre-trained on object detection and pose estimation.
 
 !!! Note
-    Norfair is a Detection-Based-Tracker (DBT) and as such, its performance is highly dependent on the performance of the model of choice.
+    The library is a Detection-Based-Tracker (DBT) and as such, its performance is highly dependent on the performance of the model of choice.
 
-The detections from the model will need to be wrapped in an instance of [Detection][norfair.tracker.Detection] before passing them to Norfair.
+The detections from the model will need to be wrapped in an instance of [Detection][norfair.tracker.Detection] before passing them to the tracker.
 
 ## Install
 
-Installing Norfair is extremely easy, simply run `pip install norfair-enough` to install the latest version from [PyPI](https://pypi.org/project/norfair-enough/).
+Installing the library is extremely easy, simply run `pip install norfair-enough` to install the latest version from [PyPI](https://pypi.org/project/norfair-enough/).
 
 You can also install the latest version from the main branch using `pip install git+https://github.com/akator-de/norfair-enough.git@main#egg=norfair-enough`
 
 ## Video
 
-Norfair offers optional functionality to process videos (mp4 and mov formats are supported) or capture a live feed from a camera.
-To use this functionality you need to install Norfair with the `video` extra using this command: `pip install norfair-enough[video]`.
+The library offers optional functionality to process videos (mp4 and mov formats are supported) or capture a live feed from a camera.
+To use this functionality you need to install the library with the `video` extra using this command: `pip install norfair-enough[video]`.
 
 Check the [Video class][norfair.video.Video] for more info on how to use it.
 
@@ -56,9 +56,9 @@ for frame in video:
    video.write(frame)
 ```
 
-The tracker is created and then the detections are fed to it one frame at a time in order. This method is called _online tracking_ and allows Norfair to be used in live feeds and real-time scenarios where future frames are not available.
+The tracker is created and then the detections are fed to it one frame at a time in order. This method is called _online tracking_ and allows the tracker to be used in live feeds and real-time scenarios where future frames are not available.
 
-Norfair includes functionality for creating an output video with drawings which is useful for evaluating and debugging. We usually start with this simple setup and move from there.
+The library includes functionality for creating an output video with drawings which is useful for evaluating and debugging. We usually start with this simple setup and move from there.
 
 ### Next Steps
 
