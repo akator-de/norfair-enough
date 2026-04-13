@@ -44,11 +44,25 @@ class FilterPyKalmanFilterFactory(FilterFactory):
     Parameters
     ----------
     R : float, optional
-        Multiplier for the sensor measurement noise matrix, by default 4.0
+        Multiplier for the sensor measurement noise matrix, by default 4.0.
+        Larger values make the filter trust measurements less and rely more
+        on its own predictions — useful when detections are noisy.
     Q : float, optional
-        Multiplier for the process uncertainty, by default 0.1
+        Multiplier for the process uncertainty, by default 0.1.
+        Larger values let the filter react faster to real motion changes but
+        increase jitter; smaller values produce smoother but laggier tracks.
     P : float, optional
-        Multiplier for the initial covariance matrix estimation, only in the entries that correspond to position (not speed) variables, by default 10.0
+        Multiplier for the initial covariance matrix estimation, only in the
+        entries that correspond to position (not speed) variables, by default
+        10.0.
+
+    Notes
+    -----
+    The generated Kalman filter uses a state vector of length ``2 * dim_z``
+    laid out as ``[pos[0], ..., pos[dim_z-1], vel[0], ..., vel[dim_z-1]]``,
+    where ``dim_z = num_points * dim_points`` is the flattened measurement
+    dimensionality. This layout is assumed by the rest of the tracker and
+    should be preserved when subclassing.
 
     See Also
     --------
@@ -248,15 +262,26 @@ class OptimizedKalmanFilterFactory(FilterFactory):
     Parameters
     ----------
     R : float, optional
-        Multiplier for the sensor measurement noise matrix.
+        Multiplier for the sensor measurement noise matrix. Larger values
+        make the filter trust measurements less — useful when detections
+        are noisy.
     Q : float, optional
-        Multiplier for the process uncertainty.
+        Multiplier for the process uncertainty. Larger values let the filter
+        react faster to real motion changes but increase jitter; smaller
+        values produce smoother but laggier tracks.
     pos_variance : float, optional
         Multiplier for the initial covariance matrix estimation, only in the entries that correspond to position (not speed) variables.
     pos_vel_covariance : float, optional
         Multiplier for the initial covariance matrix estimation, only in the entries that correspond to the covariance between position and speed.
     vel_variance : float, optional
         Multiplier for the initial covariance matrix estimation, only in the entries that correspond to velocity (not position) variables.
+
+    Notes
+    -----
+    The generated filter uses the same state vector layout as
+    [`FilterPyKalmanFilterFactory`][norfair.filter.FilterPyKalmanFilterFactory]:
+    ``[pos[0], ..., pos[dim_z-1], vel[0], ..., vel[dim_z-1]]``, with
+    ``dim_z = num_points * dim_points``.
     """
 
     def __init__(

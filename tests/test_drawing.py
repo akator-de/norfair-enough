@@ -53,7 +53,7 @@ class TestParseColor:
         assert parse_color((10, 20, 30)) == (10, 20, 30)
 
     def test_invalid_name_raises(self):
-        with pytest.raises(AttributeError):
+        with pytest.raises(ValueError, match="not_a_color_name"):
             parse_color("not_a_color_name")
 
 

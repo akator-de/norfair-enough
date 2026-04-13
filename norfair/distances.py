@@ -123,7 +123,14 @@ class ScalarDistance(Distance):
             for o, obj in enumerate(objects):
                 if candidate.label != obj.label:
                     if (candidate.label is None) or (obj.label is None):
-                        logger.warning("There are detections with and without label!")
+                        logger.warning(
+                            "Label mismatch between candidate and tracked "
+                            "object: candidate.label=%r, object.label=%r. "
+                            "Mixing labelled and unlabelled inputs prevents "
+                            "these pairs from ever matching.",
+                            candidate.label,
+                            obj.label,
+                        )
                     continue
                 distance = self.distance_function(candidate, obj)
                 distance_matrix[c, o] = distance

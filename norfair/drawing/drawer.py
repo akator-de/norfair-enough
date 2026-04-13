@@ -146,7 +146,7 @@ class Drawer:
     def rectangle(
         cls,
         frame: np.ndarray,
-        points: Sequence[tuple[int, int]],
+        points: Sequence[tuple[int, int]] | np.ndarray,
         color: ColorType | None = None,
         thickness: int | None = None,
     ) -> np.ndarray:
@@ -157,8 +157,11 @@ class Drawer:
         ----------
         frame : np.ndarray
             The OpenCV frame to draw on. Modified in place.
-        points : Sequence[Tuple[int, int]]
+        points : Sequence[Tuple[int, int]] | np.ndarray
             Points describing the rectangle in the format `[[x0, y0], [x1, y1]]`.
+            May be passed as a nested sequence or as a ``(2, 2)`` numpy array —
+            both forms are normalised to plain ``(int, int)`` tuples before
+            being handed to OpenCV.
         color : Optional[ColorType], optional
             Color of the lines, by default Black.
         thickness : Optional[int], optional
