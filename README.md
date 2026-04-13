@@ -146,7 +146,7 @@ If you are looking for a tracker, here are some other projects worth noting:
 
 - [**ByteTrack**](https://github.com/ifzhang/ByteTrack) and [**BoT-SORT**](https://github.com/NirAharon/BoT-SORT) are high-performance MOT trackers that achieve strong results on MOT benchmarks. They are tightly coupled to specific detection architectures.
 - [**Ultralytics built-in tracking**](https://docs.ultralytics.com/modes/track/) provides integrated tracking (ByteTrack, BoT-SORT) when using YOLO models. Convenient if you only use YOLO, but not detector-agnostic.
-- [**SORT**](https://github.com/abewley/sort) and [**Deep SORT**](https://github.com/nwojke/deep_sort) use Kalman filters like Norfair, but are hardcoded to bounding-box tracking with a fixed distance function. Both are released under the GPL license.
+- [**SORT**](https://github.com/abewley/sort) and [**Deep SORT**](https://github.com/nwojke/deep_sort) use Kalman filters like Norfair, but are hardcoded to bounding-box tracking with a fixed distance function. Both are released under the GPL.
 - [**OC-SORT**](https://github.com/noahcao/OC_SORT) improves on SORT with observation-centric momentum, handling occlusion better. Like SORT, it is box-only.
 - [**supervision**](https://github.com/roboflow/supervision) by Roboflow offers ByteTrack integration alongside annotation and dataset tools. Useful if you want a broader CV toolkit, but less customizable for tracking specifically.
 
