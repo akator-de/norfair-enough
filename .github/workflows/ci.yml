@@ -91,7 +91,7 @@ jobs:
         run: uv run pytest tests/ --ignore=tests/mot_metrics.py --cov=norfair --cov-report=term-missing --cov-report=xml
 
       - name: Upload to Codecov
-        uses: codecov/codecov-action@v6.1.0
+        uses: codecov/codecov-action@v6.0.0
         with:
           files: coverage.xml
           fail_ci_if_error: true
