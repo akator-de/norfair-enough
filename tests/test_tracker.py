@@ -720,3 +720,83 @@ def test_iou_validates_both_candidates_and_objects():
 
     with pytest.raises(ValueError, match="must be defined as np.array with"):
         iou(invalid_candidates, valid_objects)
+
+
+@pytest.mark.parametrize(
+    "filter_factory", [FilterPyKalmanFilterFactory(), OptimizedKalmanFilterFactory()]
+)
+def test_live_points_false_for_unmatched_track(filter_factory):
+    """Regression test for GH#2 (tryolabs/norfair#328).
+
+    An unmatched track must report ``live_points`` as all ``False``. Before
+    the fix, ``live_points`` was derived solely from ``point_hit_counter > 0``
+    and could remain ``True`` for several frames after the last match because
+    ``tracker_step()`` only decrements the counter by one per frame while
+    ``hit()`` can push it well above 1.
+    """
+    tracker = Tracker(
+        "euclidean",
+        initialization_delay=0,
+        distance_threshold=10,
+        hit_counter_max=10,
+        pointwise_hit_counter_max=5,
+        filter_factory=filter_factory,
+    )
+
+    # Build up point_hit_counter with three matched frames so that a single
+    # unmatched frame cannot pull it back to zero.
+    for _ in range(3):
+        tracked = tracker.update([Detection(points=np.array([[1.0, 1.0]]))])
+        assert len(tracked) == 1
+        assert tracked[0].live_points.all()
+
+    # Unmatched frame: point_hit_counter is still > 0 but live_points must
+    # reflect that the track was not matched in the current frame.
+    tracked = tracker.update()
+    assert len(tracked) == 1
+    obj = tracked[0]
+    assert obj.point_hit_counter[0] > 0, (
+        "precondition for regression: counter must still be positive so the "
+        "bug can manifest"
+    )
+    assert not obj.live_points.any(), (
+        f"unmatched track must have live_points=False, got {obj.live_points}"
+    )
+
+    # Re-match on the next frame: live_points must recover.
+    tracked = tracker.update([Detection(points=np.array([[1.0, 1.0]]))])
+    assert len(tracked) == 1
+    assert tracked[0].live_points.all()
+
+
+@pytest.mark.parametrize(
+    "filter_factory", [FilterPyKalmanFilterFactory(), OptimizedKalmanFilterFactory()]
+)
+def test_live_points_partial_match_with_scores(filter_factory):
+    """``live_points`` must be per-point: only points actually matched this
+    frame should be live, even when the object has multiple keypoints."""
+    tracker = Tracker(
+        "euclidean",
+        initialization_delay=0,
+        distance_threshold=100,
+        hit_counter_max=10,
+        pointwise_hit_counter_max=5,
+        detection_threshold=0.5,
+        filter_factory=filter_factory,
+    )
+
+    points = np.array([[1.0, 1.0], [2.0, 2.0]])
+
+    # Warm up with both points scoring above threshold so both counters climb.
+    for _ in range(3):
+        tracker.update([Detection(points=points, scores=np.array([0.9, 0.9]))])
+
+    # Current frame: only the first point is matched (second drops below
+    # detection_threshold). The second point must be reported as not-live even
+    # though its pointwise hit counter is still positive.
+    tracked = tracker.update([Detection(points=points, scores=np.array([0.9, 0.1]))])
+    assert len(tracked) == 1
+    live = tracked[0].live_points
+    assert live[0]
+    assert not live[1]
+    assert tracked[0].point_hit_counter[1] > 0
