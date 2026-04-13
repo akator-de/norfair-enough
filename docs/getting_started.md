@@ -7,17 +7,13 @@ Norfair Enough's goal is to easily track multiple objects in videos based on the
 We recommend first deciding and setting up the model and then adding the tracker on top of it.
 Models trained for any form of [object detection](https://paperswithcode.com/task/object-detection) or [keypoint detection](https://paperswithcode.com/task/keypoint-detection) (including [pose estimation](https://paperswithcode.com/task/pose-estimation)) are all supported. You can check some of the integrations we have as examples:
 
-- [Yolov7](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov7), [Yolov5](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov5) and [Yolov4](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov4)
-- [Detectron2](https://github.com/akator-de/norfair-enough/tree/main/demos/detectron2)
-- [Alphapose](https://github.com/akator-de/norfair-enough/tree/main/demos/alphapose)
-- [Openpose](https://github.com/akator-de/norfair-enough/tree/main/demos/openpose)
-- [MMDetection](https://github.com/akator-de/norfair-enough/tree/main/demos/mmdetection)
-
-> **Note:** These demos were originally written for [tryolabs/norfair](https://github.com/tryolabs/norfair) which is no longer actively maintained. Some demos may reference upstream resources that could become unavailable in the future. They remain compatible with norfair-enough — just replace `pip install norfair` with `pip install norfair-enough`.
+- [Ultralytics YOLO](https://github.com/akator-de/norfair-enough/tree/main/demos/ultralytics) — object detection with YOLO11 (centroids and bounding boxes)
+- [Ultralytics YOLO Pose](https://github.com/akator-de/norfair-enough/tree/main/demos/ultralytics_pose) — pose estimation with YOLO11-Pose
+- [Camera motion compensation](https://github.com/akator-de/norfair-enough/tree/main/demos/camera_motion), [SAHI](https://github.com/akator-de/norfair-enough/tree/main/demos/sahi), and [ReID](https://github.com/akator-de/norfair-enough/tree/main/demos/reid) demos for advanced features
 
 Any other model trained on one of the supported tasks is also supported and should be easy to integrate with the library, regardless of whether it uses Pytorch, TensorFlow, or other.
 
-If you are unsure of which model to use, [Yolov7](https://github.com/WongKinYiu/yolov7) is a good starting point since it's easy to set up and offers models of different sizes pre-trained on object detection and pose estimation.
+If you are unsure of which model to use, [Ultralytics YOLO](https://docs.ultralytics.com/) (v8+/v11) is a good starting point since it's easy to set up and offers models of different sizes pre-trained on object detection and pose estimation.
 
 !!! Note
     The library is a Detection-Based-Tracker (DBT) and as such, its performance is highly dependent on the performance of the model of choice.
