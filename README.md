@@ -1,4 +1,6 @@
-# norfair-enough
+<p align="center">
+  <img src="docs/img/banner.svg" alt="norfair-enough" width="100%">
+</p>
 
 [![CI](https://github.com/akator-de/norfair-enough/actions/workflows/ci.yml/badge.svg)](https://github.com/akator-de/norfair-enough/actions/workflows/ci.yml)
 [![Lint](https://github.com/akator-de/norfair-enough/actions/workflows/lint.yml/badge.svg)](https://github.com/akator-de/norfair-enough/actions/workflows/lint.yml)
@@ -50,8 +52,6 @@ If the needed dependencies are already present in the system, installing the min
 
 - Fast. The only thing bounding inference speed will be the detection network feeding detections to Norfair.
 
-Norfair was originally built by [Tryolabs](https://tryolabs.com).
-
 ## Documentation
 
 [Getting started guide](https://akator-de.github.io/norfair-enough/dev/getting_started/).
@@ -64,9 +64,7 @@ We provide several examples of how Norfair can be used to add tracking capabilit
 
 > **Note:** The demo code was originally written in the [tryolabs/norfair](https://github.com/tryolabs/norfair) repository which is no longer actively maintained. Some demos may reference upstream resources that could become unavailable in the future. The demos remain compatible with norfair-enough — just replace `pip install norfair` with `pip install norfair-enough`.
 
-> Note: for ease of reproducibility, the demos provide Dockerfiles. Even though Norfair does not need a GPU, the default configuration of most demos requires a GPU to be able to run the detectors. For this, make sure you install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) so that your GPU can be shared with Docker.
->
-> It is possible to run several demos with a CPU, but you will have to modify the scripts or tinker with the installation of their dependencies.
+> Some demos include Dockerfiles for reproducibility. If you have a GPU, install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) for GPU passthrough. CPU-only usage is possible but may require dependency adjustments.
 
 ### Adding tracking to different detectors
 
@@ -138,9 +136,7 @@ The video and drawing tools use OpenCV frames, so they are compatible with most 
 
 ## Motivation
 
-Trying out the latest state-of-the-art detectors normally requires running repositories that weren't intended to be easy to use. These tend to be repositories associated with a research paper describing a novel new way of doing detection, and they are therefore intended to be run as a one-off evaluation script to get some result metric to publish on a particular research paper. This explains why they tend to not be easy to run as inference scripts, or why extracting the core model to use in another standalone script isn't always trivial.
-
-Norfair was born out of the need to quickly add a simple layer of tracking over a wide range of newly released SOTA detectors. It was designed to seamlessly be plugged into a complex, highly coupled code base, with minimum effort. Norfair provides a series of modular but compatible tools, which you can pick and choose to use in your project.
+Modern object detectors are increasingly easy to use (e.g., Ultralytics YOLO), but adding robust multi-object tracking on top of them still requires stitching together detection, state estimation, and identity management. Norfair was born to fill that gap: a modular tracking layer that works with any detector outputting `(x, y)` coordinates, and can be plugged into existing pipelines with minimal effort.
 
 ## Comparison to other trackers
 
@@ -148,12 +144,17 @@ Norfair's contribution to Python's object tracker library repertoire is its abil
 
 If you are looking for a tracker, here are some other projects worth noting:
 
-- [**OpenCV**](https://opencv.org) includes several tracking solutions like [KCF Tracker](https://docs.opencv.org/3.4/d2/dff/classcv_1_1TrackerKCF.html) and [MedianFlow Tracker](https://docs.opencv.org/3.4/d7/d86/classcv_1_1TrackerMedianFlow.html) which are run by making the user select a part of the frame to track, and then letting the tracker follow that area. They tend not to be run on top of a detector and are not very robust.
-- [**dlib**](http://dlib.net) includes a correlation single object tracker. You have to create your own multiple object tracker on top of it yourself if you want to track multiple objects with it.
-- [**AlphaPose**](https://github.com/MVIG-SJTU/AlphaPose) just released a new version of their human pose tracker. This tracker is tightly integrated into their code base, and to the task of tracking human poses.
-- [**SORT**](https://github.com/abewley/sort) and [**Deep SORT**](https://github.com/nwojke/deep_sort) are similar to this repo in that they use Kalman filters (and a deep embedding for Deep SORT), but they are hardcoded to a fixed distance function and to tracking boxes. Norfair also adds some filtering when matching tracked objects with detections, and changes the Hungarian Algorithm for its own distance minimizer. Both these repos are also released under the GPL license, which might be an issue for some individuals or companies because the source code of derivative works needs to be published.
+- [**ByteTrack**](https://github.com/ifzhang/ByteTrack) and [**BoT-SORT**](https://github.com/NirAharon/BoT-SORT) are high-performance MOT trackers that achieve strong results on MOT benchmarks. They are tightly coupled to specific detection architectures.
+- [**Ultralytics built-in tracking**](https://docs.ultralytics.com/modes/track/) provides integrated tracking (ByteTrack, BoT-SORT) when using YOLO models. Convenient if you only use YOLO, but not detector-agnostic.
+- [**SORT**](https://github.com/abewley/sort) and [**Deep SORT**](https://github.com/nwojke/deep_sort) use Kalman filters like Norfair, but are hardcoded to bounding-box tracking with a fixed distance function. Both are released under the GPL license.
+- [**OC-SORT**](https://github.com/noahcao/OC_SORT) improves on SORT with observation-centric momentum, handling occlusion better. Like SORT, it is box-only.
+- [**supervision**](https://github.com/roboflow/supervision) by Roboflow offers ByteTrack integration alongside annotation and dataset tools. Useful if you want a broader CV toolkit, but less customizable for tracking specifically.
+
+Norfair stands out by being **detector-agnostic**, supporting **any point geometry** (centroids, bounding boxes, keypoints, 3D points), and offering a **BSD-3 license** with no copyleft restrictions.
 
 ## Benchmarks
+
+These benchmarks were produced using the [motmetrics4norfair](https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair) demo script. Our CI runs MOT metrics regression tests on every pull request to prevent tracking quality regressions.
 
 [MOT17](https://motchallenge.net/data/MOT17/) and [MOT20](https://motchallenge.net/data/MOT17/) results obtained using [motmetrics4norfair](https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair) demo script on the `train` split. We used detections obtained with [ByteTrack's](https://github.com/ifzhang/ByteTrack) YOLOX object detection model.
 
