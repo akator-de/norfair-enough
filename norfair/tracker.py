@@ -414,7 +414,9 @@ class Tracker:
                             # Collect for batch removal instead of O(n) per-call list.remove()
                             candidates_to_remove.add(id(matched_candidate))
                     else:
-                        unmatched_candidates.append(matched_candidate)
+                        unmatched_candidates.append(
+                            matched_candidate
+                        )  # pyrefly: ignore[bad-argument-type]
                         unmatched_objects.append(matched_object)
 
                 # Batch-remove merged TrackedObject candidates in a single pass (O(n))
