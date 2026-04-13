@@ -468,7 +468,7 @@ class Tracker:
         """
         if distance_matrix.size > 0:
             flat = distance_matrix.ravel()
-            order = np.argsort(flat, kind="quicksort")
+            order = np.argsort(flat, kind="stable")
             ncols = distance_matrix.shape[1]
 
             det_idxs: list[int] = []
