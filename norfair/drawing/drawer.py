@@ -224,8 +224,8 @@ class Drawer:
 
         # Enforce corner ordering so pt1 is top-left and pt2 is
         # bottom-right regardless of input order (#43).
-        p0 = tuple(points[0])
-        p1 = tuple(points[1])
+        p0 = tuple(map(int, points[0]))
+        p1 = tuple(map(int, points[1]))
         pt1 = (min(p0[0], p1[0]), min(p0[1], p1[1]))
         pt2 = (max(p0[0], p1[0]), max(p0[1], p1[1]))
 
