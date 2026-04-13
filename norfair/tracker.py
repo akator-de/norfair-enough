@@ -588,7 +588,7 @@ class TrackedObject:
         # Clear the current-frame match mask. hit() will set entries back to
         # True for points that get matched this frame; points that remain
         # unmatched stay False so live_points correctly reports them as dead.
-        self._point_matched_in_current_frame = np.zeros(self.num_points, dtype=bool)
+        self._point_matched_in_current_frame.fill(False)
         # Advances the tracker's state
         self.filter.predict()
         self.scores = None
@@ -802,7 +802,7 @@ class TrackedObject:
         # The not-yet-initialized tracked object was just matched this frame,
         # so adopt its current-frame match mask as well (GH#2).
         self._point_matched_in_current_frame = (
-            tracked_object._point_matched_in_current_frame
+            tracked_object._point_matched_in_current_frame.copy()
         )
         self.last_distance = tracked_object.last_distance
         self.current_min_distance = tracked_object.current_min_distance
