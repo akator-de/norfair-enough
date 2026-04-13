@@ -459,7 +459,7 @@
   <span class="md-ellipsis">
     
   
-    Reference
+    API Reference
   
 
     
@@ -540,10 +540,54 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#minimal-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-a-distance-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing a distance function
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#norfair.tracker" class="md-nav__link">
     <span class="md-ellipsis">
       
         tracker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#norfair.tracker.Detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detection
       
     </span>
   </a>
@@ -695,10 +739,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#norfair.tracker.Detection" class="md-nav__link">
+  <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Detection
+        See also
       
     </span>
   </a>
@@ -944,10 +988,54 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#minimal-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-a-distance-function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choosing a distance function
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#norfair.tracker" class="md-nav__link">
     <span class="md-ellipsis">
       
         tracker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#norfair.tracker.Detection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detection
       
     </span>
   </a>
@@ -1099,10 +1187,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#norfair.tracker.Detection" class="md-nav__link">
+  <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Detection
+        See also
       
     </span>
   </a>
@@ -1127,6 +1215,68 @@
 
 
 <h1 id="tracker">Tracker<a class="headerlink" href="#tracker" title="Permanent link">#</a></h1>
+<p>The tracker module is the core of Norfair. It takes per-frame detections from
+any object or keypoint detector and maintains a set of <code>TrackedObject</code>s with
+stable ids across frames, using a configurable distance function and a Kalman
+filter to smooth the estimated state.</p>
+<p>Most pipelines only need to interact with three things from this module:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" href="#norfair.tracker.Detection"><code>Detection</code></a> — wraps the points/bbox produced by your detector for a single frame.</li>
+<li><a class="autorefs autorefs-internal" href="#norfair.tracker.Tracker"><code>Tracker</code></a> — matches detections to existing tracks, spawns new ones, and ages out stale ones.</li>
+<li><a class="autorefs autorefs-internal" href="#norfair.tracker.TrackedObject"><code>TrackedObject</code></a> — what <code>Tracker.update()</code> returns; the stable, id-carrying representation of an object across frames.</li>
+</ul>
+<h2 id="minimal-example">Minimal example<a class="headerlink" href="#minimal-example" title="Permanent link">#</a></h2>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Detection</span><span class="p">,</span> <span class="n">Tracker</span><span class="p">,</span> <span class="n">Video</span><span class="p">,</span> <span class="n">draw_points</span>
+
+<span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span>
+    <span class="n">distance_function</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span>
+    <span class="n">distance_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">initialization_delay</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">hit_counter_max</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">Video</span><span class="p">(</span><span class="n">input_path</span><span class="o">=</span><span class="s2">&quot;video.mp4&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">video</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">video</span><span class="p">:</span>
+        <span class="c1"># my_detector returns a list of (N, 2) arrays — one per object</span>
+        <span class="n">detections</span> <span class="o">=</span> <span class="p">[</span><span class="n">Detection</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">my_detector</span><span class="p">(</span><span class="n">frame</span><span class="p">)]</span>
+        <span class="n">tracked_objects</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">detections</span><span class="o">=</span><span class="n">detections</span><span class="p">)</span>
+        <span class="n">draw_points</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">tracked_objects</span><span class="p">)</span>
+        <span class="n">video</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>A few things worth knowing:</p>
+<ul>
+<li><code>Tracker.update()</code> must be called <strong>once per frame</strong>, in order. Norfair is an
+  online tracker — it never looks at future frames.</li>
+<li>Pass <code>period=N</code> if you only run the detector every <code>N</code> frames but still call
+  <code>update()</code> every frame so the filter can keep predicting.</li>
+<li>For moving cameras, pass the <code>coord_transformations</code> returned by
+  <a class="autorefs autorefs-internal" href="../camera_motion/#norfair.camera_motion.MotionEstimator"><code>MotionEstimator</code></a> into <code>update()</code> —
+  see <a href="../camera_motion/">Camera Motion</a>.</li>
+</ul>
+<h2 id="choosing-a-distance-function">Choosing a distance function<a class="headerlink" href="#choosing-a-distance-function" title="Permanent link">#</a></h2>
+<p>The <code>distance_function</code> argument decides how detections are matched to tracks
+each frame. Norfair ships with several built-ins that you can select by name
+(<code>"euclidean"</code>, <code>"mean_euclidean"</code>, <code>"mean_manhattan"</code>, <code>"frobenius"</code>,
+<code>"iou"</code>, <code>"iou_opt"</code>) plus any metric supported by <code>scipy.spatial.distance.cdist</code>.
+You can also pass your own <code>Callable</code> or a subclass of
+<a class="autorefs autorefs-internal" href="../distances/#norfair.distances.Distance"><code>Distance</code></a> for appearance-aware matching.</p>
+<p>See <a href="../distances/">Distances</a> for the full list and how to build custom ones.</p>
+<h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">#</a></h2>
 
 
 <div class="doc doc-object doc-module">
@@ -1154,6 +1304,350 @@
 
 
 
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="norfair.tracker.Detection" class="doc doc-heading">
+            <code>Detection</code>
+
+
+<a href="#norfair.tracker.Detection" class="headerlink" title="Permanent link">#</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Detections returned by the detector must be converted to a <code>Detection</code> object before being used by Norfair.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>points</code>
+            </td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Points detected. Must be a rank 2 array with shape <code>(n_points, n_dimensions)</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>scores</code>
+            </td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An array of length <code>n_points</code> which assigns a score to each of the points defined in <code>points</code>.</p>
+<p>This is used to inform the tracker of which points to ignore;
+any point with a score below <code>detection_threshold</code> will be ignored.</p>
+<p>This useful for cases in which detections don't always have every point present, as is often the case in pose estimators.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The place to store any extra data which may be useful when calculating the distance function.
+Anything stored here will be available to use inside the distance function.</p>
+<p>This enables the development of more interesting trackers which can do things like assign an appearance embedding to each
+detection to aid in its tracking.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>label</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Hashable">Hashable</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>When working with multiple classes the detection's label can be stored to be used as a matching condition when associating
+tracked objects with new detections. Label's type must be hashable for drawing purposes.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>embedding</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The embedding for the reid_distance.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="norfair.tracker.Detection.points">points</span></code></td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The detection points, validated to shape <code>(n_points, n_dimensions)</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="norfair.tracker.Detection.absolute_points">absolute_points</span></code></td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Starts as a copy of <code>points</code>. When <code>coord_transformations</code> is passed
+to :meth:<code>Tracker.update</code>, this is overwritten with absolute coordinates.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="norfair.tracker.Detection.age">age</span></code></td>
+            <td>
+                  <code><span title="Optional">Optional</span>[<span title="int">int</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Set by the tracker to the matched <code>TrackedObject</code>'s age when the
+detection is stored as a past detection.  <code>None</code> until then.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>norfair/tracker.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">830</span>
+<span class="normal">831</span>
+<span class="normal">832</span>
+<span class="normal">833</span>
+<span class="normal">834</span>
+<span class="normal">835</span>
+<span class="normal">836</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span>
+<span class="normal">850</span>
+<span class="normal">851</span>
+<span class="normal">852</span>
+<span class="normal">853</span>
+<span class="normal">854</span>
+<span class="normal">855</span>
+<span class="normal">856</span>
+<span class="normal">857</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span>
+<span class="normal">865</span>
+<span class="normal">866</span>
+<span class="normal">867</span>
+<span class="normal">868</span>
+<span class="normal">869</span>
+<span class="normal">870</span>
+<span class="normal">871</span>
+<span class="normal">872</span>
+<span class="normal">873</span>
+<span class="normal">874</span>
+<span class="normal">875</span>
+<span class="normal">876</span>
+<span class="normal">877</span>
+<span class="normal">878</span>
+<span class="normal">879</span>
+<span class="normal">880</span>
+<span class="normal">881</span>
+<span class="normal">882</span>
+<span class="normal">883</span>
+<span class="normal">884</span>
+<span class="normal">885</span>
+<span class="normal">886</span>
+<span class="normal">887</span>
+<span class="normal">888</span>
+<span class="normal">889</span>
+<span class="normal">890</span>
+<span class="normal">891</span>
+<span class="normal">892</span>
+<span class="normal">893</span>
+<span class="normal">894</span>
+<span class="normal">895</span>
+<span class="normal">896</span>
+<span class="normal">897</span>
+<span class="normal">898</span>
+<span class="normal">899</span>
+<span class="normal">900</span>
+<span class="normal">901</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Detection</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detections returned by the detector must be converted to a `Detection` object before being used by Norfair.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    points : np.ndarray</span>
+<span class="sd">        Points detected. Must be a rank 2 array with shape `(n_points, n_dimensions)`.</span>
+<span class="sd">    scores : np.ndarray, optional</span>
+<span class="sd">        An array of length `n_points` which assigns a score to each of the points defined in `points`.</span>
+
+<span class="sd">        This is used to inform the tracker of which points to ignore;</span>
+<span class="sd">        any point with a score below `detection_threshold` will be ignored.</span>
+
+<span class="sd">        This useful for cases in which detections don&#39;t always have every point present, as is often the case in pose estimators.</span>
+<span class="sd">    data : Any, optional</span>
+<span class="sd">        The place to store any extra data which may be useful when calculating the distance function.</span>
+<span class="sd">        Anything stored here will be available to use inside the distance function.</span>
+
+<span class="sd">        This enables the development of more interesting trackers which can do things like assign an appearance embedding to each</span>
+<span class="sd">        detection to aid in its tracking.</span>
+<span class="sd">    label : Hashable, optional</span>
+<span class="sd">        When working with multiple classes the detection&#39;s label can be stored to be used as a matching condition when associating</span>
+<span class="sd">        tracked objects with new detections. Label&#39;s type must be hashable for drawing purposes.</span>
+<span class="sd">    embedding : Any, optional</span>
+<span class="sd">        The embedding for the reid_distance.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    points : np.ndarray</span>
+<span class="sd">        The detection points, validated to shape ``(n_points, n_dimensions)``.</span>
+<span class="sd">    absolute_points : np.ndarray</span>
+<span class="sd">        Starts as a copy of ``points``. When ``coord_transformations`` is passed</span>
+<span class="sd">        to :meth:`Tracker.update`, this is overwritten with absolute coordinates.</span>
+<span class="sd">    age : Optional[int]</span>
+<span class="sd">        Set by the tracker to the matched ``TrackedObject``&#39;s age when the</span>
+<span class="sd">        detection is stored as a past detection.  ``None`` until then.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">scores</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">label</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">embedding</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">validate_points</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;scores should be a np.ndarray with length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">)</span><span class="si">}</span><span class="s2">, but got length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span>
+        <span class="k">elif</span> <span class="n">scores</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">),))</span> <span class="o">+</span> <span class="n">scores</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absolute_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">embedding</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">age</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_coordinate_transformation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">coordinate_transformation</span><span class="p">:</span> <span class="n">CoordinatesTransformation</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">coordinate_transformation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">absolute_points</span> <span class="o">=</span> <span class="n">coordinate_transformation</span><span class="o">.</span><span class="n">rel_to_abs</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">absolute_points</span>
+            <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-class">
 
@@ -1273,7 +1767,7 @@ and therefore defines how long an object can live without getting matched to any
                 <p>Each tracked object keeps track of how often the points it's tracking have been getting matched.
 Points that are getting matched (<code>pointwise_hit_counter &gt; 0</code>) are said to be live, and points which aren't (<code>pointwise_hit_counter = 0</code>)
 are said to not be live.</p>
-<p>This is used to determine things like which individual points in a tracked object get drawn by <a class="autorefs autorefs-internal" title="draw_tracked_objects(frame, objects, radius=None, color=None, id_size=None, id_thickness=None, draw_points=True, color_by_label=False, draw_labels=False, label_size=None)" href="../drawing/#norfair.drawing.draw_tracked_objects"><code>draw_tracked_objects</code></a> and which don't.
+<p>This is used to determine things like which individual points in a tracked object get drawn by <a class="autorefs autorefs-internal" title="draw_tracked_objects(frame, objects, radius=None, color=None, id_size=None, id_thickness=None, draw_points=True, color_by_label=False, draw_labels=False, label_size=None)" href="../drawing/#norfair.drawing.draw_points.draw_tracked_objects"><code>draw_tracked_objects</code></a> and which don't.
 This argument defines how large the inertia for each point of a tracker can grow.</p>
               </div>
             </td>
@@ -1302,7 +1796,7 @@ This argument defines how large the inertia for each point of a tracker can grow
                 <code>filter_factory</code>
             </td>
             <td>
-                  <code><a class="autorefs autorefs-internal" title="FilterFactory (norfair.filter.FilterFactory)" href="../#norfair.FilterFactory">FilterFactory</a></code>
+                  <code><a class="autorefs autorefs-internal" title="FilterFactory (norfair.filter.FilterFactory)" href="../filter/#norfair.filter.FilterFactory">FilterFactory</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2926,7 +3420,7 @@ Useful if you are storing embeddings in your detections and want to do metric le
               <div class="doc-md-description">
                 <p>A boolean mask with shape <code>(n_points,)</code>. Points marked as <code>True</code> have recently been matched with detections.
 Points marked as <code>False</code> haven't and are to be considered stale, and should be ignored.</p>
-<p>Functions like <a class="autorefs autorefs-internal" title="draw_tracked_objects(frame, objects, radius=None, color=None, id_size=None, id_thickness=None, draw_points=True, color_by_label=False, draw_labels=False, label_size=None)" href="../drawing/#norfair.drawing.draw_tracked_objects"><code>draw_tracked_objects</code></a> use this property to determine which points not to draw.</p>
+<p>Functions like <a class="autorefs autorefs-internal" title="draw_tracked_objects(frame, objects, radius=None, color=None, id_size=None, id_thickness=None, draw_points=True, color_by_label=False, draw_labels=False, label_size=None)" href="../drawing/#norfair.drawing.draw_points.draw_tracked_objects"><code>draw_tracked_objects</code></a> use this property to determine which points not to draw.</p>
               </div>
             </td>
           </tr>
@@ -4261,341 +4755,6 @@ which needs to reach a certain match rate to be converted into a full blown <cod
 
 </div>
 
-<div class="doc doc-object doc-class">
-
-
-
-<h2 id="norfair.tracker.Detection" class="doc doc-heading">
-            <code>Detection</code>
-
-
-<a href="#norfair.tracker.Detection" class="headerlink" title="Permanent link">#</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-
-
-        <p>Detections returned by the detector must be converted to a <code>Detection</code> object before being used by Norfair.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>points</code>
-            </td>
-            <td>
-                  <code><span title="numpy.ndarray">ndarray</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Points detected. Must be a rank 2 array with shape <code>(n_points, n_dimensions)</code>.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>scores</code>
-            </td>
-            <td>
-                  <code><span title="numpy.ndarray">ndarray</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>An array of length <code>n_points</code> which assigns a score to each of the points defined in <code>points</code>.</p>
-<p>This is used to inform the tracker of which points to ignore;
-any point with a score below <code>detection_threshold</code> will be ignored.</p>
-<p>This useful for cases in which detections don't always have every point present, as is often the case in pose estimators.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>data</code>
-            </td>
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The place to store any extra data which may be useful when calculating the distance function.
-Anything stored here will be available to use inside the distance function.</p>
-<p>This enables the development of more interesting trackers which can do things like assign an appearance embedding to each
-detection to aid in its tracking.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>label</code>
-            </td>
-            <td>
-                  <code><span title="collections.abc.Hashable">Hashable</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>When working with multiple classes the detection's label can be stored to be used as a matching condition when associating
-tracked objects with new detections. Label's type must be hashable for drawing purposes.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>embedding</code>
-            </td>
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The embedding for the reid_distance.</p>
-              </div>
-            </td>
-            <td>
-                  <code>None</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<p><span class="doc-section-title">Attributes:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td><code><span title="norfair.tracker.Detection.points">points</span></code></td>
-            <td>
-                  <code><span title="numpy.ndarray">ndarray</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The detection points, validated to shape <code>(n_points, n_dimensions)</code>.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="norfair.tracker.Detection.absolute_points">absolute_points</span></code></td>
-            <td>
-                  <code><span title="numpy.ndarray">ndarray</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Starts as a copy of <code>points</code>. When <code>coord_transformations</code> is passed
-to :meth:<code>Tracker.update</code>, this is overwritten with absolute coordinates.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code><span title="norfair.tracker.Detection.age">age</span></code></td>
-            <td>
-                  <code><span title="Optional">Optional</span>[<span title="int">int</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Set by the tracker to the matched <code>TrackedObject</code>'s age when the
-detection is stored as a past detection.  <code>None</code> until then.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-
-
-
-
-
-
-              <details class="mkdocstrings-source">
-                <summary>Source code in <code>norfair/tracker.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">830</span>
-<span class="normal">831</span>
-<span class="normal">832</span>
-<span class="normal">833</span>
-<span class="normal">834</span>
-<span class="normal">835</span>
-<span class="normal">836</span>
-<span class="normal">837</span>
-<span class="normal">838</span>
-<span class="normal">839</span>
-<span class="normal">840</span>
-<span class="normal">841</span>
-<span class="normal">842</span>
-<span class="normal">843</span>
-<span class="normal">844</span>
-<span class="normal">845</span>
-<span class="normal">846</span>
-<span class="normal">847</span>
-<span class="normal">848</span>
-<span class="normal">849</span>
-<span class="normal">850</span>
-<span class="normal">851</span>
-<span class="normal">852</span>
-<span class="normal">853</span>
-<span class="normal">854</span>
-<span class="normal">855</span>
-<span class="normal">856</span>
-<span class="normal">857</span>
-<span class="normal">858</span>
-<span class="normal">859</span>
-<span class="normal">860</span>
-<span class="normal">861</span>
-<span class="normal">862</span>
-<span class="normal">863</span>
-<span class="normal">864</span>
-<span class="normal">865</span>
-<span class="normal">866</span>
-<span class="normal">867</span>
-<span class="normal">868</span>
-<span class="normal">869</span>
-<span class="normal">870</span>
-<span class="normal">871</span>
-<span class="normal">872</span>
-<span class="normal">873</span>
-<span class="normal">874</span>
-<span class="normal">875</span>
-<span class="normal">876</span>
-<span class="normal">877</span>
-<span class="normal">878</span>
-<span class="normal">879</span>
-<span class="normal">880</span>
-<span class="normal">881</span>
-<span class="normal">882</span>
-<span class="normal">883</span>
-<span class="normal">884</span>
-<span class="normal">885</span>
-<span class="normal">886</span>
-<span class="normal">887</span>
-<span class="normal">888</span>
-<span class="normal">889</span>
-<span class="normal">890</span>
-<span class="normal">891</span>
-<span class="normal">892</span>
-<span class="normal">893</span>
-<span class="normal">894</span>
-<span class="normal">895</span>
-<span class="normal">896</span>
-<span class="normal">897</span>
-<span class="normal">898</span>
-<span class="normal">899</span>
-<span class="normal">900</span>
-<span class="normal">901</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Detection</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Detections returned by the detector must be converted to a `Detection` object before being used by Norfair.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    points : np.ndarray</span>
-<span class="sd">        Points detected. Must be a rank 2 array with shape `(n_points, n_dimensions)`.</span>
-<span class="sd">    scores : np.ndarray, optional</span>
-<span class="sd">        An array of length `n_points` which assigns a score to each of the points defined in `points`.</span>
-
-<span class="sd">        This is used to inform the tracker of which points to ignore;</span>
-<span class="sd">        any point with a score below `detection_threshold` will be ignored.</span>
-
-<span class="sd">        This useful for cases in which detections don&#39;t always have every point present, as is often the case in pose estimators.</span>
-<span class="sd">    data : Any, optional</span>
-<span class="sd">        The place to store any extra data which may be useful when calculating the distance function.</span>
-<span class="sd">        Anything stored here will be available to use inside the distance function.</span>
-
-<span class="sd">        This enables the development of more interesting trackers which can do things like assign an appearance embedding to each</span>
-<span class="sd">        detection to aid in its tracking.</span>
-<span class="sd">    label : Hashable, optional</span>
-<span class="sd">        When working with multiple classes the detection&#39;s label can be stored to be used as a matching condition when associating</span>
-<span class="sd">        tracked objects with new detections. Label&#39;s type must be hashable for drawing purposes.</span>
-<span class="sd">    embedding : Any, optional</span>
-<span class="sd">        The embedding for the reid_distance.</span>
-
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    points : np.ndarray</span>
-<span class="sd">        The detection points, validated to shape ``(n_points, n_dimensions)``.</span>
-<span class="sd">    absolute_points : np.ndarray</span>
-<span class="sd">        Starts as a copy of ``points``. When ``coord_transformations`` is passed</span>
-<span class="sd">        to :meth:`Tracker.update`, this is overwritten with absolute coordinates.</span>
-<span class="sd">    age : Optional[int]</span>
-<span class="sd">        Set by the tracker to the matched ``TrackedObject``&#39;s age when the</span>
-<span class="sd">        detection is stored as a past detection.  ``None`` until then.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-        <span class="n">scores</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">data</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">label</span><span class="p">:</span> <span class="n">Hashable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">embedding</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">validate_points</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;scores should be a np.ndarray with length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="p">)</span><span class="si">}</span><span class="s2">, but got length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-                <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span>
-        <span class="k">elif</span> <span class="n">scores</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">points</span><span class="p">),))</span> <span class="o">+</span> <span class="n">scores</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">absolute_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">embedding</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">age</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">update_coordinate_transformation</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">coordinate_transformation</span><span class="p">:</span> <span class="n">CoordinatesTransformation</span>
-    <span class="p">):</span>
-        <span class="k">if</span> <span class="n">coordinate_transformation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">absolute_points</span> <span class="o">=</span> <span class="n">coordinate_transformation</span><span class="o">.</span><span class="n">rel_to_abs</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">absolute_points</span>
-            <span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-              </details>
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-
-
 
 
 
@@ -4603,16 +4762,13 @@ detection is stored as a past detection.  <code>None</code> until then.</p>
 
     </div>
 
-</div>
-
-
-
-
-  </div>
-
-    </div>
-
-</div>
+</div><h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="../distances/">Distances</a> — how detections are matched to tracks.</li>
+<li><a href="../filter/">Filter</a> — Kalman filter factories used to smooth state estimates.</li>
+<li><a href="../drawing/">Drawing</a> — rendering the returned <code>TrackedObject</code>s on frames.</li>
+<li><a href="../camera_motion/">Camera Motion</a> — handling moving cameras.</li>
+</ul>
 
 
 

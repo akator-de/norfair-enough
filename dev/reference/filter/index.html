@@ -459,7 +459,7 @@
   <span class="md-ellipsis">
     
   
-    Reference
+    API Reference
   
 
     
@@ -708,10 +708,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#norfair.filter" class="md-nav__link">
     <span class="md-ellipsis">
       
         filter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#norfair.filter.FilterFactory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FilterFactory
       
     </span>
   </a>
@@ -747,10 +780,32 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#norfair.filter.NoFilterFactory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NoFilterFactory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#norfair.filter.OptimizedKalmanFilterFactory" class="md-nav__link">
     <span class="md-ellipsis">
       
         OptimizedKalmanFilterFactory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
       
     </span>
   </a>
@@ -828,10 +883,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#norfair.filter" class="md-nav__link">
     <span class="md-ellipsis">
       
         filter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#norfair.filter.FilterFactory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FilterFactory
       
     </span>
   </a>
@@ -867,10 +955,32 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#norfair.filter.NoFilterFactory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NoFilterFactory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#norfair.filter.OptimizedKalmanFilterFactory" class="md-nav__link">
     <span class="md-ellipsis">
       
         OptimizedKalmanFilterFactory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
       
     </span>
   </a>
@@ -895,6 +1005,51 @@
 
 
 <h1 id="filter">Filter<a class="headerlink" href="#filter" title="Permanent link">#</a></h1>
+<p>Each <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject"><code>TrackedObject</code></a> uses a predictive filter
+to smooth its estimated position and velocity over time. The <code>filter_factory</code>
+argument on <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.Tracker"><code>Tracker</code></a> decides which filter is built
+for every new track.</p>
+<p>Norfair ships with two Kalman filter factories (plus
+<a class="autorefs autorefs-internal" href="#norfair.filter.NoFilterFactory"><code>NoFilterFactory</code></a> to disable filtering):</p>
+<ul>
+<li><a class="autorefs autorefs-internal" href="#norfair.filter.OptimizedKalmanFilterFactory"><code>OptimizedKalmanFilterFactory</code></a> —
+  the default. A NumPy-only constant-velocity Kalman filter tuned for speed.
+  Use this unless you need custom dynamics.</li>
+<li><a class="autorefs autorefs-internal" href="#norfair.filter.FilterPyKalmanFilterFactory"><code>FilterPyKalmanFilterFactory</code></a> —
+  backed by the <a href="https://github.com/rlabbe/filterpy"><code>filterpy</code></a> library.
+  Slower but makes it easy to swap in a custom <code>filterpy</code> Kalman filter if you
+  need a different motion model.</li>
+</ul>
+<p>Both expose the same knobs (<code>R</code> — measurement noise, <code>Q</code> — process noise) so
+you can trade smoothness against responsiveness without changing tracker code:</p>
+<ul>
+<li>Higher <code>R</code> or lower <code>Q</code> → the filter trusts the estimate more → smoother,
+  but slower to react to real motion.</li>
+<li>Lower <code>R</code> or higher <code>Q</code> → the filter trusts the measurement more → twitchier
+  but more responsive.</li>
+</ul>
+<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">#</a></h2>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tracker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">norfair.filter</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizedKalmanFilterFactory</span>
+
+<span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span>
+    <span class="n">distance_function</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span>
+    <span class="n">distance_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="c1"># Increase R to reduce jitter on noisy detectors.</span>
+    <span class="n">filter_factory</span><span class="o">=</span><span class="n">OptimizedKalmanFilterFactory</span><span class="p">(</span><span class="n">R</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">Q</span><span class="o">=</span><span class="mf">0.1</span><span class="p">),</span>
+<span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>To disable filtering entirely (e.g. for debugging raw detections end-to-end),
+pass a <a class="autorefs autorefs-internal" href="#norfair.filter.NoFilterFactory"><code>NoFilterFactory</code></a> instead.</p>
+<h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">#</a></h2>
 
 
 <div class="doc doc-object doc-module">
@@ -927,6 +1082,76 @@
 
 
 
+<h2 id="norfair.filter.FilterFactory" class="doc doc-heading">
+            <code>FilterFactory</code>
+
+
+<a href="#norfair.filter.FilterFactory" class="headerlink" title="Permanent link">#</a></h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="abc.ABC">ABC</span></code></p>
+
+
+
+        <p>Abstract class representing a generic Filter factory</p>
+<p>Subclasses must implement the method <code>create_filter</code></p>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>norfair/filter.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">FilterFactory</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract class representing a generic Filter factory</span>
+
+<span class="sd">    Subclasses must implement the method `create_filter`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_detection</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Filter</span><span class="p">:</span>
+        <span class="k">pass</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="norfair.filter.FilterPyKalmanFilterFactory" class="doc doc-heading">
             <code>FilterPyKalmanFilterFactory</code>
 
@@ -936,7 +1161,7 @@
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="FilterFactory (norfair.filter.FilterFactory)" href="../#norfair.FilterFactory">FilterFactory</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="FilterFactory (norfair.filter.FilterFactory)" href="#norfair.filter.FilterFactory">FilterFactory</a></code></p>
 
 
 
@@ -1423,6 +1648,109 @@ which shall be used as initial position estimation for it.</p>
 
 
 
+<h2 id="norfair.filter.NoFilterFactory" class="doc doc-heading">
+            <code>NoFilterFactory</code>
+
+
+<a href="#norfair.filter.NoFilterFactory" class="headerlink" title="Permanent link">#</a></h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="FilterFactory (norfair.filter.FilterFactory)" href="#norfair.filter.FilterFactory">FilterFactory</a></code></p>
+
+
+
+        <p>This class allows the user to try Norfair without any predictive filter or velocity estimation.</p>
+<p>This track only by comparing the position of the previous detections to the ones in the current frame.</p>
+<p>The throughput of this class in FPS is similar to the one achieved by the
+<a href="#norfair.filter.NoFilterFactory--optimizedkalmanfilterfactory"><code>OptimizedKalmanFilterFactory</code></a> class, so this class exists only for
+comparative purposes and it is not advised to use it for tracking on a real application.</p>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>norfair/filter.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">NoFilterFactory</span><span class="p">(</span><span class="n">FilterFactory</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows the user to try Norfair without any predictive filter or velocity estimation.</span>
+
+<span class="sd">    This track only by comparing the position of the previous detections to the ones in the current frame.</span>
+
+<span class="sd">    The throughput of this class in FPS is similar to the one achieved by the</span>
+<span class="sd">    [`OptimizedKalmanFilterFactory`](#optimizedkalmanfilterfactory) class, so this class exists only for</span>
+<span class="sd">    comparative purposes and it is not advised to use it for tracking on a real application.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_detection</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">num_points</span> <span class="o">=</span> <span class="n">initial_detection</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dim_points</span> <span class="o">=</span> <span class="n">initial_detection</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dim_z</span> <span class="o">=</span> <span class="n">dim_points</span> <span class="o">*</span> <span class="n">num_points</span>  <span class="c1"># flattened positions</span>
+        <span class="n">dim_x</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">dim_z</span>  <span class="c1"># We need to accommodate for velocities</span>
+
+        <span class="n">no_filter</span> <span class="o">=</span> <span class="n">NoFilter</span><span class="p">(</span>
+            <span class="n">dim_x</span><span class="p">,</span>
+            <span class="n">dim_z</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">no_filter</span><span class="o">.</span><span class="n">x</span><span class="p">[:</span><span class="n">dim_z</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">initial_detection</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">return</span> <span class="n">no_filter</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
 <h2 id="norfair.filter.OptimizedKalmanFilterFactory" class="doc doc-heading">
             <code>OptimizedKalmanFilterFactory</code>
 
@@ -1432,7 +1760,7 @@ which shall be used as initial position estimation for it.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="FilterFactory (norfair.filter.FilterFactory)" href="../#norfair.FilterFactory">FilterFactory</a></code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="FilterFactory (norfair.filter.FilterFactory)" href="#norfair.filter.FilterFactory">FilterFactory</a></code></p>
 
 
 
@@ -1715,7 +2043,12 @@ values produce smoother but laggier tracks.</p>
 
     </div>
 
-</div>
+</div><h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="../tracker/">Tracker</a> — accepts the <code>filter_factory</code> used here.</li>
+<li><a href="../../getting_started/#tracking-issues">Getting Started</a> — practical tips on
+  tuning <code>R</code> and <code>Q</code> when the tracker jitters or lags.</li>
+</ul>
 
 
 

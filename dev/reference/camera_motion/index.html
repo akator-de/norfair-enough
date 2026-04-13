@@ -459,7 +459,7 @@
   <span class="md-ellipsis">
     
   
-    Reference
+    API Reference
   
 
     
@@ -652,6 +652,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#norfair.camera_motion" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -753,6 +775,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
   
 </li>
       
@@ -883,6 +916,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#norfair.camera_motion" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -987,6 +1042,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1005,6 +1071,71 @@
 
 
 <h1 id="camera-motion">Camera Motion<a class="headerlink" href="#camera-motion" title="Permanent link">#</a></h1>
+<p>When the camera itself moves, the apparent motion of tracked objects becomes
+a mix of "the object moved" and "the camera moved". Norfair's camera motion
+module estimates the camera's frame-to-frame transformation from optical flow
+and lets the <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.Tracker"><code>Tracker</code></a> reason about positions in a
+stable world coordinate system.</p>
+<p>The main entry point is <a class="autorefs autorefs-internal" href="#norfair.camera_motion.MotionEstimator"><code>MotionEstimator</code></a>.
+It returns a <a class="autorefs autorefs-internal" href="#norfair.camera_motion.CoordinatesTransformation"><code>CoordinatesTransformation</code></a>
+for each frame which you pass to <code>Tracker.update(coord_transformations=...)</code>.
+Two concrete transformation families are provided:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" href="#norfair.camera_motion.TranslationTransformation"><code>TranslationTransformation</code></a> /
+  <a class="autorefs autorefs-internal" href="#norfair.camera_motion.TranslationTransformationGetter"><code>TranslationTransformationGetter</code></a> —
+  cheap, good enough for pure pan/tilt.</li>
+<li><a class="autorefs autorefs-internal" href="#norfair.camera_motion.HomographyTransformation"><code>HomographyTransformation</code></a> /
+  <a class="autorefs autorefs-internal" href="#norfair.camera_motion.HomographyTransformationGetter"><code>HomographyTransformationGetter</code></a> —
+  full 8-DoF homography, handles rotation, zoom, and perspective. This is the
+  default.</li>
+</ul>
+<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">#</a></h2>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Detection</span><span class="p">,</span> <span class="n">Tracker</span><span class="p">,</span> <span class="n">Video</span><span class="p">,</span> <span class="n">draw_points</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">norfair.camera_motion</span><span class="w"> </span><span class="kn">import</span> <span class="n">MotionEstimator</span>
+
+<span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="n">distance_function</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">motion_estimator</span> <span class="o">=</span> <span class="n">MotionEstimator</span><span class="p">()</span>
+
+<span class="k">with</span> <span class="n">Video</span><span class="p">(</span><span class="n">input_path</span><span class="o">=</span><span class="s2">&quot;video.mp4&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">video</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">video</span><span class="p">:</span>
+        <span class="n">coord_transformation</span> <span class="o">=</span> <span class="n">motion_estimator</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+        <span class="n">detections</span> <span class="o">=</span> <span class="p">[</span><span class="n">Detection</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">my_detector</span><span class="p">(</span><span class="n">frame</span><span class="p">)]</span>
+        <span class="n">tracked_objects</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">detections</span><span class="o">=</span><span class="n">detections</span><span class="p">,</span>
+            <span class="n">coord_transformations</span><span class="o">=</span><span class="n">coord_transformation</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">draw_points</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">tracked_objects</span><span class="p">)</span>
+        <span class="n">video</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<p>You can pass a <code>mask</code> to <code>motion_estimator.update()</code> to ignore image regions
+that contain the tracked objects themselves (which would otherwise pollute the
+optical-flow estimate). A common pattern is to build the mask from the previous
+frame's detections or tracked objects.</p>
+<p>For debugging, set <code>MotionEstimator(draw_flow=True)</code> to overlay the sampled
+optical-flow vectors on the frame, and use
+<a class="autorefs autorefs-internal" title="draw_absolute_grid(frame, coord_transformations, grid_size=20, radius=2, thickness=1, color=Color.black, polar=False)" href="../drawing/#norfair.drawing.absolute_grid.draw_absolute_grid"><code>draw_absolute_grid</code></a> together with
+<a class="autorefs autorefs-internal" href="../drawing/#norfair.drawing.fixed_camera.FixedCamera"><code>FixedCamera</code></a> to visualize the recovered
+world coordinate system.</p>
+<h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">#</a></h2>
 
 
 <div class="doc doc-object doc-module">
@@ -2790,7 +2921,13 @@ or vice versa.</p>
 
     </div>
 
-</div>
+</div><h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="../tracker/">Tracker</a> — consumes the <code>coord_transformations</code> returned here.</li>
+<li><a href="../drawing/">Drawing</a> — <a class="autorefs autorefs-internal" href="../drawing/#norfair.drawing.fixed_camera.FixedCamera"><code>FixedCamera</code></a> and
+  <a class="autorefs autorefs-internal" title="draw_absolute_grid(frame, coord_transformations, grid_size=20, radius=2, thickness=1, color=Color.black, polar=False)" href="../drawing/#norfair.drawing.absolute_grid.draw_absolute_grid"><code>draw_absolute_grid</code></a> pair with
+  <code>MotionEstimator</code> for visualization.</li>
+</ul>
 
 
 

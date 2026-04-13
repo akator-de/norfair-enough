@@ -457,7 +457,7 @@
   <span class="md-ellipsis">
     
   
-    Reference
+    API Reference
   
 
     
@@ -734,10 +734,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#norfair.utils" class="md-nav__link">
+  <a href="#example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        utils
+        Example
       
     </span>
   </a>
@@ -745,10 +745,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#norfair.utils.print_objects_as_table" class="md-nav__link">
+  <a href="#api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        print_objects_as_table
+        API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#norfair.utils" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        utils
       
     </span>
   </a>
@@ -767,10 +778,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#norfair.utils.warn_once" class="md-nav__link">
+  <a href="#norfair.utils.print_objects_as_table" class="md-nav__link">
     <span class="md-ellipsis">
       
-        warn_once
+        print_objects_as_table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
       
     </span>
   </a>
@@ -820,10 +842,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#norfair.utils" class="md-nav__link">
+  <a href="#example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        utils
+        Example
       
     </span>
   </a>
@@ -831,10 +853,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#norfair.utils.print_objects_as_table" class="md-nav__link">
+  <a href="#api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        print_objects_as_table
+        API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#norfair.utils" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        utils
       
     </span>
   </a>
@@ -853,10 +886,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#norfair.utils.warn_once" class="md-nav__link">
+  <a href="#norfair.utils.print_objects_as_table" class="md-nav__link">
     <span class="md-ellipsis">
       
-        warn_once
+        print_objects_as_table
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
       
     </span>
   </a>
@@ -881,6 +925,49 @@
 
 
 <h1 id="utils">Utils<a class="headerlink" href="#utils" title="Permanent link">#</a></h1>
+<p>A small grab-bag of helpers that don't fit anywhere else. Only two are part
+of the public API:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="get_cutout(points, image)" href="#norfair.utils.get_cutout"><code>get_cutout</code></a> — crops the axis-aligned bounding
+  rectangle around a set of points out of an image. Handy for feeding a patch
+  into a ReID / appearance model to build your own distance function.</li>
+<li><a class="autorefs autorefs-internal" title="print_objects_as_table(tracked_objects)" href="#norfair.utils.print_objects_as_table"><code>print_objects_as_table</code></a> — pretty-prints
+  the current <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject"><code>TrackedObject</code></a>s as a Rich table
+  (id, age, hit counter, last distance, init id). Useful for quickly debugging
+  why the tracker is — or isn't — matching things.</li>
+</ul>
+<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">#</a></h2>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Detection</span><span class="p">,</span> <span class="n">Tracker</span><span class="p">,</span> <span class="n">Video</span><span class="p">,</span> <span class="n">get_cutout</span><span class="p">,</span> <span class="n">print_objects_as_table</span>
+
+<span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="n">distance_function</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">Video</span><span class="p">(</span><span class="n">input_path</span><span class="o">=</span><span class="s2">&quot;video.mp4&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">video</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">video</span><span class="p">:</span>
+        <span class="n">detections</span> <span class="o">=</span> <span class="p">[</span><span class="n">Detection</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">my_detector</span><span class="p">(</span><span class="n">frame</span><span class="p">)]</span>
+        <span class="n">tracked_objects</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">detections</span><span class="o">=</span><span class="n">detections</span><span class="p">)</span>
+
+        <span class="c1"># Debug: dump the current track table.</span>
+        <span class="n">print_objects_as_table</span><span class="p">(</span><span class="n">tracked_objects</span><span class="p">)</span>
+
+        <span class="c1"># Grab an appearance patch for the first tracked object.</span>
+        <span class="k">if</span> <span class="n">tracked_objects</span><span class="p">:</span>
+            <span class="n">patch</span> <span class="o">=</span> <span class="n">get_cutout</span><span class="p">(</span><span class="n">tracked_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">estimate</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">#</a></h2>
 
 
 <div class="doc doc-object doc-module">
@@ -909,6 +996,41 @@
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="norfair.utils.get_cutout" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">get_cutout</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span></code>
+
+<a href="#norfair.utils.get_cutout" class="headerlink" title="Permanent link">#</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Returns a rectangular cut-out from a set of points on an image</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>norfair/utils.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_cutout</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a rectangular cut-out from a set of points on an image&quot;&quot;&quot;</span>
+    <span class="n">max_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span>
+    <span class="n">min_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span>
+    <span class="n">max_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]))</span>
+    <span class="n">min_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">image</span><span class="p">[</span><span class="n">min_y</span><span class="p">:</span><span class="n">max_y</span><span class="p">,</span> <span class="n">min_x</span><span class="p">:</span><span class="n">max_x</span><span class="p">]</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 <div class="doc doc-object doc-function">
 
@@ -969,85 +1091,18 @@
 
 </div>
 
-<div class="doc doc-object doc-function">
-
-
-<h2 id="norfair.utils.get_cutout" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_cutout</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span></code>
-
-<a href="#norfair.utils.get_cutout" class="headerlink" title="Permanent link">#</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Returns a rectangular cut-out from a set of points on an image</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>norfair/utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_cutout</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a rectangular cut-out from a set of points on an image&quot;&quot;&quot;</span>
-    <span class="n">max_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span>
-    <span class="n">min_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span>
-    <span class="n">max_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]))</span>
-    <span class="n">min_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]))</span>
-    <span class="k">return</span> <span class="n">image</span><span class="p">[</span><span class="n">min_y</span><span class="p">:</span><span class="n">max_y</span><span class="p">,</span> <span class="n">min_x</span><span class="p">:</span><span class="n">max_x</span><span class="p">]</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h2 id="norfair.utils.warn_once" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">warn_once</span><span class="p">(</span><span class="n">message</span><span class="p">)</span></code>
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-cached"><code>cached</code></small>
-  </span>
-
-<a href="#norfair.utils.warn_once" class="headerlink" title="Permanent link">#</a></h2>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Write a warning message only once.</p>
-
-
-            <details class="mkdocstrings-source">
-              <summary>Source code in <code>norfair/utils.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">89</span>
-<span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span>
-<span class="normal">93</span>
-<span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@cache</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">warn_once</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Write a warning message only once.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
 
 
   </div>
 
     </div>
 
-</div>
+</div><h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="../tracker/">Tracker</a> — source of the <code>TrackedObject</code>s inspected here.</li>
+<li><a href="../distances/">Distances</a> — <code>get_cutout</code> pairs well with a custom appearance
+  distance.</li>
+</ul>
 
 
 

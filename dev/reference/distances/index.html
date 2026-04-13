@@ -459,7 +459,7 @@
   <span class="md-ellipsis">
     
   
-    Reference
+    API Reference
   
 
     
@@ -624,6 +624,50 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#built-in-distances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in distances
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameterized-distances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameterized distances
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-distances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom distances
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#norfair.distances" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -800,6 +844,17 @@
     <span class="md-ellipsis">
       
         create_normalized_mean_euclidean_distance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
       
     </span>
   </a>
@@ -961,6 +1016,50 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#built-in-distances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Built-in distances
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameterized-distances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameterized distances
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-distances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom distances
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#norfair.distances" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1143,6 +1242,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See also
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1161,6 +1271,103 @@
 
 
 <h1 id="distances">Distances<a class="headerlink" href="#distances" title="Permanent link">#</a></h1>
+<p>A <strong>distance function</strong> decides, for a given frame, how close each incoming
+<code>Detection</code> is to every existing <code>TrackedObject</code>. The
+<a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.Tracker"><code>Tracker</code></a> then uses these pairwise distances to
+solve the matching problem (small distance → likely the same object).</p>
+<p>Norfair ships with a handful of built-in distances, plus utilities for
+building your own — either scalar (one detection / one track at a time) or
+vectorized (all pairs at once, using NumPy).</p>
+<h2 id="built-in-distances">Built-in distances<a class="headerlink" href="#built-in-distances" title="Permanent link">#</a></h2>
+<p>You can pass any of these to <code>Tracker(distance_function=...)</code> by name:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Best for</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>"euclidean"</code></td>
+<td>Single-point detections (centroids, keypoints).</td>
+<td>Vectorized via <a class="autorefs autorefs-internal" href="#norfair.distances.ScipyDistance"><code>ScipyDistance</code></a> (<code>cdist</code>). Mathematically equivalent to <code>frobenius</code> for single-point detections, but faster because it avoids the per-pair Python loop.</td>
+</tr>
+<tr>
+<td><code>"mean_euclidean"</code></td>
+<td>Multi-point detections (keypoints, polygons).</td>
+<td>Averages per-point Euclidean distance.</td>
+</tr>
+<tr>
+<td><code>"mean_manhattan"</code></td>
+<td>Multi-point detections, cheaper than Euclidean.</td>
+<td>Averages per-point L1 distance.</td>
+</tr>
+<tr>
+<td><code>"frobenius"</code></td>
+<td>Flattened L2 between all points.</td>
+<td>Loop-based <a class="autorefs autorefs-internal" href="#norfair.distances.ScalarDistance"><code>ScalarDistance</code></a>. Equivalent to <code>"euclidean"</code> for single-point detections.</td>
+</tr>
+<tr>
+<td><code>"iou"</code></td>
+<td>Bounding boxes.</td>
+<td><code>1 - IoU</code>, so smaller is better. Requires <code>(2, 2)</code> top-left / bottom-right point arrays.</td>
+</tr>
+<tr>
+<td><code>"iou_opt"</code></td>
+<td>Bounding boxes, large detection counts.</td>
+<td>Vectorized, faster variant of <code>"iou"</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Any name accepted by
+<a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html"><code>scipy.spatial.distance.cdist</code></a>
+also works and is wrapped automatically as a
+<a class="autorefs autorefs-internal" href="#norfair.distances.ScipyDistance"><code>ScipyDistance</code></a>.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tracker</span>
+
+<span class="c1"># Centroid tracking with plain Euclidean distance.</span>
+<span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="n">distance_function</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="c1"># Bounding-box tracking with IoU. Threshold is in `1 - IoU` space,</span>
+<span class="c1"># so 0.7 means &quot;match if IoU &gt;= 0.3&quot;.</span>
+<span class="n">bbox_tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="n">distance_function</span><span class="o">=</span><span class="s2">&quot;iou&quot;</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="parameterized-distances">Parameterized distances<a class="headerlink" href="#parameterized-distances" title="Permanent link">#</a></h2>
+<p>Two factory helpers produce distances tailored to your data:</p>
+<ul>
+<li><a class="autorefs autorefs-internal" title="create_normalized_mean_euclidean_distance(height, width)" href="#norfair.distances.create_normalized_mean_euclidean_distance"><code>create_normalized_mean_euclidean_distance</code></a> —
+  Mean Euclidean distance normalized by the frame size, so the same
+  <code>distance_threshold</code> works across resolutions.</li>
+<li><a class="autorefs autorefs-internal" title="create_keypoints_voting_distance(keypoint_distance_threshold, detection_threshold)" href="#norfair.distances.create_keypoints_voting_distance"><code>create_keypoints_voting_distance</code></a> —
+  Counts how many keypoints are close enough to vote "same object"; useful for
+  pose / keypoint trackers where detectors return many noisy points per object.</li>
+</ul>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tracker</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">norfair.distances</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_normalized_mean_euclidean_distance</span>
+
+<span class="n">distance</span> <span class="o">=</span> <span class="n">create_normalized_mean_euclidean_distance</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mi">1080</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1920</span><span class="p">)</span>
+<span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="n">distance_function</span><span class="o">=</span><span class="n">distance</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="custom-distances">Custom distances<a class="headerlink" href="#custom-distances" title="Permanent link">#</a></h2>
+<p>For appearance-aware tracking (embeddings, ReID, color histograms, …) you can
+pass any <code>Callable[[Detection, TrackedObject], float]</code> as
+<code>distance_function</code>, or — for bulk performance — subclass
+<a class="autorefs autorefs-internal" href="#norfair.distances.VectorizedDistance"><code>VectorizedDistance</code></a> and compute all
+pairs at once.</p>
+<h2 id="api">API<a class="headerlink" href="#api" title="Permanent link">#</a></h2>
 
 
 <div class="doc doc-object doc-module">
@@ -3709,7 +3916,12 @@ point in the tracked object.</p>
 
     </div>
 
-</div>
+</div><h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">#</a></h2>
+<ul>
+<li><a href="../tracker/">Tracker</a> — how the distance is consumed each frame.</li>
+<li><a href="../filter/">Filter</a> — the Kalman filter that produces the <code>estimate</code> used by
+  most distance functions.</li>
+</ul>
 
 
 

@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#migration-guide-tryolabsnorfair-norfair-enough" class="md-skip">
+        <a href="#migration-guide-tryolabsnorfair--norfair-enough" class="md-skip">
           Skip to content
         </a>
       
@@ -495,7 +495,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#trackerupdate-may-mutate-detection-objects-behavior-now-documented" class="md-nav__link">
+  <a href="#trackerupdate-may-mutate-detection-objects----behavior-now-documented" class="md-nav__link">
     <span class="md-ellipsis">
       
         Tracker.update() may mutate Detection objects -- behavior now documented
@@ -639,7 +639,7 @@
   <span class="md-ellipsis">
     
   
-    Reference
+    API Reference
   
 
     
@@ -978,7 +978,7 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#trackerupdate-may-mutate-detection-objects-behavior-now-documented" class="md-nav__link">
+  <a href="#trackerupdate-may-mutate-detection-objects----behavior-now-documented" class="md-nav__link">
     <span class="md-ellipsis">
       
         Tracker.update() may mutate Detection objects -- behavior now documented
@@ -1065,7 +1065,7 @@
 
 
 
-<h1 id="migration-guide-tryolabsnorfair-norfair-enough">Migration Guide: tryolabs/norfair → norfair-enough<a class="headerlink" href="#migration-guide-tryolabsnorfair-norfair-enough" title="Permanent link">#</a></h1>
+<h1 id="migration-guide-tryolabsnorfair--norfair-enough">Migration Guide: tryolabs/norfair → norfair-enough<a class="headerlink" href="#migration-guide-tryolabsnorfair--norfair-enough" title="Permanent link">#</a></h1>
 <p><code>norfair-enough</code> is a maintained fork of <a href="https://github.com/tryolabs/norfair"><code>tryolabs/norfair</code></a>,
 based on upstream v2.3.0. This guide describes what you need to change when moving an existing
 project from the upstream package to <code>norfair-enough</code>.</p>
@@ -1147,9 +1147,9 @@ emit a deprecation warning on first use. Migrate at your convenience:</p>
 <li><code>line_color=...</code>      → use <code>color=...</code></li>
 <li><code>line_width=...</code>      → use <code>thickness=...</code></li>
 </ul>
-<p>See the <a class="autorefs autorefs-internal" title="drawing" href="../reference/drawing/#norfair.drawing">Drawing reference</a> for the full current API.</p>
+<p>See the [Drawing reference][norfair.drawing] for the full current API.</p>
 <h2 id="behavior-changes">Behavior changes<a class="headerlink" href="#behavior-changes" title="Permanent link">#</a></h2>
-<h3 id="trackerupdate-may-mutate-detection-objects-behavior-now-documented"><code>Tracker.update()</code> may mutate <code>Detection</code> objects -- behavior now documented<a class="headerlink" href="#trackerupdate-may-mutate-detection-objects-behavior-now-documented" title="Permanent link">#</a></h3>
+<h3 id="trackerupdate-may-mutate-detection-objects----behavior-now-documented"><code>Tracker.update()</code> may mutate <code>Detection</code> objects -- behavior now documented<a class="headerlink" href="#trackerupdate-may-mutate-detection-objects----behavior-now-documented" title="Permanent link">#</a></h3>
 <p>In both upstream <code>norfair</code> and <code>norfair-enough</code>, <code>Tracker.update()</code> may mutate attributes
 on the <code>Detection</code> instances you pass in (for example <code>detection.absolute_points</code> when
 <code>coord_transformations</code> is provided, and <code>detection.age</code> when detections are mapped to
