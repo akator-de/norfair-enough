@@ -124,6 +124,7 @@ This version has been modified for integration into the Norfair tracking framewo
 Adaptation by [cl445], 2025.
 """
 
+import logging
 import sys
 from collections import deque
 from copy import deepcopy
@@ -132,6 +133,8 @@ from math import exp, log, sqrt
 import numpy as np
 from numpy import dot, eye, isscalar, linalg, shape, zeros
 from scipy.stats import multivariate_normal
+
+_logger = logging.getLogger(__name__)
 
 
 def logpdf(x, mean=None, cov=1, allow_singular=True):
@@ -642,7 +645,16 @@ class KalmanFilter:
         # S = HPH' + R
         # project system uncertainty into measurement space
         self.S = dot(H, PHT) + R
-        self.SI = self.inv(self.S)
+        try:
+            if np.linalg.cond(self.S) > 1e12:
+                raise np.linalg.LinAlgError("ill-conditioned")
+            self.SI = self.inv(self.S)
+        except np.linalg.LinAlgError:
+            _logger.warning(
+                "Singular or ill-conditioned innovation covariance S in "
+                "KalmanFilter.update; falling back to pseudo-inverse."
+            )
+            self.SI = np.linalg.pinv(self.S)
         # K = PH'inv(S)
         # map system uncertainty into kalman gain
         self.K = dot(PHT, self.SI)
@@ -840,7 +852,17 @@ class KalmanFilter:
 
         # project system uncertainty into measurement space
         self.S = dot(H, PHT) + dot(H, self.M) + dot(self.M.T, H.T) + R
-        self.SI = self.inv(self.S)
+        try:
+            if np.linalg.cond(self.S) > 1e12:
+                raise np.linalg.LinAlgError("ill-conditioned")
+            self.SI = self.inv(self.S)
+        except np.linalg.LinAlgError:
+            _logger.warning(
+                "Singular or ill-conditioned innovation covariance S in "
+                "KalmanFilter.update_correlated; "
+                "falling back to pseudo-inverse."
+            )
+            self.SI = np.linalg.pinv(self.S)
 
         # K = PH'inv(S)
         # map system uncertainty into kalman gain
@@ -1077,7 +1099,9 @@ class KalmanFilter:
         covariances_p = zeros((n, self.dim_x, self.dim_x))
 
         if update_first:
-            for i, (z, F, Q, H, R, B, u) in enumerate(zip(zs, Fs, Qs, Hs, Rs, Bs, us)):
+            for i, (z, F, Q, H, R, B, u) in enumerate(
+                zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
+            ):
                 self.update(z, R=R, H=H)
                 means[i, :] = self.x
                 covariances[i, :, :] = self.P
@@ -1089,7 +1113,9 @@ class KalmanFilter:
                 if saver is not None:
                     saver.save()
         else:
-            for i, (z, F, Q, H, R, B, u) in enumerate(zip(zs, Fs, Qs, Hs, Rs, Bs, us)):
+            for i, (z, F, Q, H, R, B, u) in enumerate(
+                zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
+            ):
                 self.predict(u=u, B=B, F=F, Q=Q)
                 means_p[i, :] = self.x
                 covariances_p[i, :, :] = self.P
@@ -1269,7 +1295,16 @@ class KalmanFilter:
         S = H @ PHT + R
 
         # Compute Kalman gain
-        K = PHT @ self.inv(S)
+        try:
+            if np.linalg.cond(S) > 1e12:
+                raise np.linalg.LinAlgError("ill-conditioned")
+            K = PHT @ self.inv(S)
+        except np.linalg.LinAlgError:
+            _logger.warning(
+                "Singular or ill-conditioned innovation covariance S in "
+                "KalmanFilter.get_update; falling back to pseudo-inverse."
+            )
+            K = PHT @ np.linalg.pinv(S)
 
         # Update state estimate with the scaled residual
         x = x + K @ y
@@ -1343,7 +1378,9 @@ class KalmanFilter:
         mahalanobis : float
         """
         if self._mahalanobis is None:
-            self._mahalanobis = sqrt(float(dot(dot(self.y.T, self.SI), self.y)))
+            self._mahalanobis = sqrt(
+                max(0.0, float(dot(dot(self.y.T, self.SI), self.y)))
+            )
         return self._mahalanobis
 
     @property
@@ -1861,7 +1898,9 @@ def batch_filter(
         Bs = [0.0] * n
 
     if update_first:
-        for i, (z, F, Q, H, R, B, u) in enumerate(zip(zs, Fs, Qs, Hs, Rs, Bs, us)):
+        for i, (z, F, Q, H, R, B, u) in enumerate(
+            zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
+        ):
             x, P = update(x, P, z, R=R, H=H)
             means[i, :] = x
             covariances[i, :, :] = P
@@ -1872,7 +1911,9 @@ def batch_filter(
             if saver is not None:
                 saver.save()
     else:
-        for i, (z, F, Q, H, R, B, u) in enumerate(zip(zs, Fs, Qs, Hs, Rs, Bs, us)):
+        for i, (z, F, Q, H, R, B, u) in enumerate(
+            zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
+        ):
             x, P = predict(x, P, u=u, B=B, F=F, Q=Q)
             means_p[i, :] = x
             covariances_p[i, :, :] = P
