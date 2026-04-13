@@ -3,6 +3,7 @@ name = "norfair-enough"
 version = "2.4.0"
 description = "Lightweight Python library for adding real-time multi-object tracking to any detector."
 license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 authors = [
     { name = "Tryolabs", email = "hello@tryolabs.com" },
 ]
@@ -65,7 +66,7 @@ test = [
     "pyrefly>=0.50.0",
     "pytest>=9.0.0",
     "pytest-cov>=7.0.0",
-    "ruff>=0.14.0",
+    "ruff==0.14.14",
 ]
 
 [build-system]

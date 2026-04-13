@@ -751,7 +751,7 @@ test = [
     { name = "pyrefly", specifier = ">=0.50.0" },
     { name = "pytest", specifier = ">=9.0.0" },
     { name = "pytest-cov", specifier = ">=7.0.0" },
-    { name = "ruff", specifier = ">=0.14.0" },
+    { name = "ruff", specifier = "==0.14.14" },
 ]
 
 [[package]]
