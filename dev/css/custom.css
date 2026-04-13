@@ -2,6 +2,7 @@
   --md-primary-fg-color: #0B0723;
 }
 
+/* Hide the text-only site name in the header since logo-dark.svg already contains it */
 .md-header__topic>.md-ellipsis {
   opacity: 0;
 }
