@@ -458,8 +458,11 @@ class Tracker:
 
         """
         if distance_matrix.size > 0:
-            # Clamp costs so entries above threshold don't influence the assignment
-            cost = np.clip(distance_matrix, None, distance_threshold)
+            # Use a large penalty for entries above threshold so they don't
+            # get chosen by linear_sum_assignment over valid matches
+            valid_mask = distance_matrix < distance_threshold
+            penalty = distance_threshold * min(distance_matrix.shape) + 1.0
+            cost = np.where(valid_mask, distance_matrix, penalty)
             row_indices, col_indices = linear_sum_assignment(cost)
 
             # Keep only pairs whose original distance is below the threshold
