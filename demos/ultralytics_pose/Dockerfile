@@ -8,5 +8,8 @@ COPY requirements.txt /demo/requirements.txt
 RUN pip install --no-cache-dir -r /demo/requirements.txt
 
 COPY src/ /demo/src/
+RUN groupadd --system app && useradd --system --gid app --create-home app && \
+    chown -R app:app /demo
 
 WORKDIR /demo/src/
+USER app
