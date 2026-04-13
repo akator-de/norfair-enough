@@ -719,6 +719,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#norfair.distances.ScalarDistance.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#norfair.distances.ScalarDistance.get_distances" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -747,6 +758,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#norfair.distances.VectorizedDistance.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#norfair.distances.VectorizedDistance.get_distances" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -770,6 +792,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="ScipyDistance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#norfair.distances.ScipyDistance.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1111,6 +1150,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#norfair.distances.ScalarDistance.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#norfair.distances.ScalarDistance.get_distances" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1139,6 +1189,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#norfair.distances.VectorizedDistance.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#norfair.distances.VectorizedDistance.get_distances" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1162,6 +1223,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="ScipyDistance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#norfair.distances.ScipyDistance.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        __init__
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1377,7 +1455,7 @@ pairs at once.</p>
 <a id="norfair.distances"></a>
     <div class="doc doc-contents first">
 
-        <p>Predefined distances</p>
+        <p>Predefined distance functions and the :class:<code>Distance</code> base class.</p>
 
 
 
@@ -1415,8 +1493,10 @@ pairs at once.</p>
 
 
 
-        <p>Abstract class representing a distance.</p>
-<p>Subclasses must implement the method <code>get_distances</code></p>
+        <p>Abstract base class representing a tracker distance.</p>
+<p>Subclasses must implement :meth:<code>get_distances</code>, which returns a
+distance matrix between tracked objects and candidates (detections or
+other tracked objects, when ReID is in use).</p>
 
 
 
@@ -1455,11 +1535,15 @@ pairs at once.</p>
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span>
-<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Distance</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Abstract class representing a distance.</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Distance</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class representing a tracker distance.</span>
 
-<span class="sd">    Subclasses must implement the method `get_distances`</span>
+<span class="sd">    Subclasses must implement :meth:`get_distances`, which returns a</span>
+<span class="sd">    distance matrix between tracked objects and candidates (detections or</span>
+<span class="sd">    other tracked objects, when ReID is in use).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractmethod</span>
@@ -1468,21 +1552,23 @@ pairs at once.</p>
         <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span>
         <span class="n">candidates</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Candidate&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Method that calculates the distances between new candidates and objects.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the distance matrix between ``objects`` and ``candidates``.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        objects : Sequence[TrackedObject]</span>
-<span class="sd">            Sequence of [TrackedObject][norfair.tracker.TrackedObject] to be compared with potential [Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]</span>
-<span class="sd">            candidates.</span>
-<span class="sd">        candidates : Union[List[Detection], List[TrackedObject]], optional</span>
-<span class="sd">            List of candidates ([Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]) to be compared to [TrackedObject][norfair.tracker.TrackedObject].</span>
+<span class="sd">            Sequence of [TrackedObject][norfair.tracker.TrackedObject]</span>
+<span class="sd">            instances currently being tracked.</span>
+<span class="sd">        candidates : Sequence[Detection or TrackedObject], optional</span>
+<span class="sd">            Candidates to be compared against the tracked ``objects``.</span>
+<span class="sd">            Detections are used during the normal matching step; tracked</span>
+<span class="sd">            objects are used during ReID.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        np.ndarray</span>
-<span class="sd">            A matrix containing the distances between objects and candidates.</span>
+<span class="sd">            A ``(n_candidates, n_objects)`` matrix of distances.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -1515,7 +1601,7 @@ pairs at once.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Method that calculates the distances between new candidates and objects.</p>
+        <p>Return the distance matrix between <code>objects</code> and <code>candidates</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1538,8 +1624,8 @@ pairs at once.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Sequence of <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a> to be compared with potential <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.Detection">Detection</a> or <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>
-candidates.</p>
+                <p>Sequence of <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>
+instances currently being tracked.</p>
               </div>
             </td>
             <td>
@@ -1551,11 +1637,13 @@ candidates.</p>
                 <code>candidates</code>
             </td>
             <td>
-                  <code><span title="Union">Union</span>[<span title="List">List</span>[<a class="autorefs autorefs-internal" title="Detection (norfair.tracker.Detection)" href="../tracker/#norfair.tracker.Detection">Detection</a>], <span title="List">List</span>[<a class="autorefs autorefs-internal" title="TrackedObject (norfair.tracker.TrackedObject)" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>]]</code>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<a class="autorefs autorefs-internal" title="Detection (norfair.tracker.Detection)" href="../tracker/#norfair.tracker.Detection">Detection</a> or <a class="autorefs autorefs-internal" title="TrackedObject (norfair.tracker.TrackedObject)" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>List of candidates (<a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.Detection">Detection</a> or <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>) to be compared to <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>.</p>
+                <p>Candidates to be compared against the tracked <code>objects</code>.
+Detections are used during the normal matching step; tracked
+objects are used during ReID.</p>
               </div>
             </td>
             <td>
@@ -1581,7 +1669,7 @@ candidates.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A matrix containing the distances between objects and candidates.</p>
+                <p>A <code>(n_candidates, n_objects)</code> matrix of distances.</p>
               </div>
             </td>
           </tr>
@@ -1591,8 +1679,7 @@ candidates.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
-<span class="normal">30</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
 <span class="normal">31</span>
 <span class="normal">32</span>
 <span class="normal">33</span>
@@ -1612,27 +1699,32 @@ candidates.</p>
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span>
-<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@abstractmethod</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_distances</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span>
     <span class="n">candidates</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Candidate&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Method that calculates the distances between new candidates and objects.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the distance matrix between ``objects`` and ``candidates``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    objects : Sequence[TrackedObject]</span>
-<span class="sd">        Sequence of [TrackedObject][norfair.tracker.TrackedObject] to be compared with potential [Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]</span>
-<span class="sd">        candidates.</span>
-<span class="sd">    candidates : Union[List[Detection], List[TrackedObject]], optional</span>
-<span class="sd">        List of candidates ([Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]) to be compared to [TrackedObject][norfair.tracker.TrackedObject].</span>
+<span class="sd">        Sequence of [TrackedObject][norfair.tracker.TrackedObject]</span>
+<span class="sd">        instances currently being tracked.</span>
+<span class="sd">    candidates : Sequence[Detection or TrackedObject], optional</span>
+<span class="sd">        Candidates to be compared against the tracked ``objects``.</span>
+<span class="sd">        Detections are used during the normal matching step; tracked</span>
+<span class="sd">        objects are used during ReID.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    np.ndarray</span>
-<span class="sd">        A matrix containing the distances between objects and candidates.</span>
+<span class="sd">        A ``(n_candidates, n_objects)`` matrix of distances.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1665,7 +1757,7 @@ candidates.</p>
 
 
 
-        <p>ScalarDistance class represents a distance that is calculated pointwise.</p>
+        <p>Distance computed pointwise (one pair at a time).</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1684,13 +1776,13 @@ candidates.</p>
                 <code>distance_function</code>
             </td>
             <td>
-                  <code><span title="Union">Union</span>[<span title="collections.abc.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="Detection (norfair.tracker.Detection)" href="../tracker/#norfair.tracker.Detection">Detection</a>, <a class="autorefs autorefs-internal" title="TrackedObject (norfair.tracker.TrackedObject)" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>], <span title="float">float</span>], <span title="collections.abc.Callable">Callable</span>[[<a class="autorefs autorefs-internal" title="TrackedObject (norfair.tracker.TrackedObject)" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>, <a class="autorefs autorefs-internal" title="TrackedObject (norfair.tracker.TrackedObject)" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>], <span title="float">float</span>]]</code>
+                  <code><span title="collections.abc.Callable">Callable</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Distance function used to determine the pointwise distance between new candidates and objects.
-This function should take 2 input arguments, the first being a <code>Union[Detection, TrackedObject]</code>,
-and the second <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>. It has to return a <code>float</code> with the distance it calculates.</p>
+                <p>Function used to compute the distance between a pair. It must
+accept two positional arguments — a <code>Detection</code> or
+<code>TrackedObject</code> and a <code>TrackedObject</code> — and return a <code>float</code>.</p>
               </div>
             </td>
             <td>
@@ -1709,10 +1801,7 @@ and the second <a class="autorefs autorefs-internal" href="../tracker/#norfair.t
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>norfair/distances.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 53</span>
-<span class="normal"> 54</span>
-<span class="normal"> 55</span>
-<span class="normal"> 56</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 56</span>
 <span class="normal"> 57</span>
 <span class="normal"> 58</span>
 <span class="normal"> 59</span>
@@ -1793,16 +1882,25 @@ and the second <a class="autorefs autorefs-internal" href="../tracker/#norfair.t
 <span class="normal">134</span>
 <span class="normal">135</span>
 <span class="normal">136</span>
-<span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ScalarDistance</span><span class="p">(</span><span class="n">Distance</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ScalarDistance class represents a distance that is calculated pointwise.</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ScalarDistance</span><span class="p">(</span><span class="n">Distance</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Distance computed pointwise (one pair at a time).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    distance_function : Union[Callable[[&quot;Detection&quot;, &quot;TrackedObject&quot;], float], Callable[[&quot;TrackedObject&quot;, &quot;TrackedObject&quot;], float]]</span>
-<span class="sd">        Distance function used to determine the pointwise distance between new candidates and objects.</span>
-<span class="sd">        This function should take 2 input arguments, the first being a `Union[Detection, TrackedObject]`,</span>
-<span class="sd">        and the second [TrackedObject][norfair.tracker.TrackedObject]. It has to return a `float` with the distance it calculates.</span>
+<span class="sd">    distance_function : Callable</span>
+<span class="sd">        Function used to compute the distance between a pair. It must</span>
+<span class="sd">        accept two positional arguments — a ``Detection`` or</span>
+<span class="sd">        ``TrackedObject`` and a ``TrackedObject`` — and return a ``float``.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@overload</span>
@@ -1822,8 +1920,11 @@ and the second <a class="autorefs autorefs-internal" href="../tracker/#norfair.t
         <span class="n">distance_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span>
         <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;TrackedObject&quot;</span><span class="p">,</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
     <span class="p">):</span>
-        <span class="c1"># Store the function; at runtime both signatures work since the actual types</span>
-        <span class="c1"># are compatible (duck typing)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the per-pair ``distance_function``.</span>
+
+<span class="sd">        The two overloads (detection→object and object→object) are both</span>
+<span class="sd">        valid at runtime — Python&#39;s duck typing handles the dispatch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">distance_function</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">distance_function</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_distances</span><span class="p">(</span>
@@ -1831,21 +1932,24 @@ and the second <a class="autorefs autorefs-internal" href="../tracker/#norfair.t
         <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span>
         <span class="n">candidates</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Candidate&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Method that calculates the distances between new candidates and objects.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a distance matrix by calling ``distance_function`` for every pair.</span>
+
+<span class="sd">        Pairs with mismatched labels are skipped and their entries left at</span>
+<span class="sd">        ``np.inf``.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        objects : Sequence[TrackedObject]</span>
-<span class="sd">            Sequence of [TrackedObject][norfair.tracker.TrackedObject] to be compared with potential [Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]</span>
-<span class="sd">            candidates.</span>
-<span class="sd">        candidates : Union[List[Detection], List[TrackedObject]], optional</span>
-<span class="sd">            List of candidates ([Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]) to be compared to [TrackedObject][norfair.tracker.TrackedObject].</span>
+<span class="sd">            Tracked objects to compare against ``candidates``.</span>
+<span class="sd">        candidates : Sequence[Detection or TrackedObject], optional</span>
+<span class="sd">            Candidates. ``None`` or empty sequences return a matrix filled</span>
+<span class="sd">            with ``np.inf``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        np.ndarray</span>
-<span class="sd">            A matrix containing the distances between objects and candidates.</span>
+<span class="sd">            A ``(n_candidates, n_objects)`` matrix of distances.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">objects</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
             <span class="c1"># Handle None or empty cases</span>
@@ -1897,6 +2001,55 @@ and the second <a class="autorefs autorefs-internal" href="../tracker/#norfair.t
 <div class="doc doc-object doc-function">
 
 
+<h3 id="norfair.distances.ScalarDistance.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">distance_function</span><span class="p">)</span></code>
+
+<a href="#norfair.distances.ScalarDistance.__init__" class="headerlink" title="Permanent link">#</a></h3>
+          <div class="doc-overloads">
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">__init__</span><span class="p">(</span><span class="n">distance_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Detection</span><span class="p">,</span> <span class="n">TrackedObject</span><span class="p">],</span> <span class="nb">float</span><span class="p">])</span>
+</code></pre></div><div class="doc-signature highlight"><pre><span></span><code><span class="nf">__init__</span><span class="p">(</span><span class="n">distance_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">TrackedObject</span><span class="p">,</span> <span class="n">TrackedObject</span><span class="p">],</span> <span class="nb">float</span><span class="p">])</span>
+</code></pre></div>          </div>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Store the per-pair <code>distance_function</code>.</p>
+<p>The two overloads (detection→object and object→object) are both
+valid at runtime — Python's duck typing handles the dispatch.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>norfair/distances.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">distance_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span>
+    <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;TrackedObject&quot;</span><span class="p">,</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Store the per-pair ``distance_function``.</span>
+
+<span class="sd">    The two overloads (detection→object and object→object) are both</span>
+<span class="sd">    valid at runtime — Python&#39;s duck typing handles the dispatch.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">distance_function</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">distance_function</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="norfair.distances.ScalarDistance.get_distances" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">get_distances</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">candidates</span><span class="p">)</span></code>
 
@@ -1905,7 +2058,9 @@ and the second <a class="autorefs autorefs-internal" href="../tracker/#norfair.t
 
     <div class="doc doc-contents ">
 
-        <p>Method that calculates the distances between new candidates and objects.</p>
+        <p>Return a distance matrix by calling <code>distance_function</code> for every pair.</p>
+<p>Pairs with mismatched labels are skipped and their entries left at
+<code>np.inf</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1928,8 +2083,7 @@ and the second <a class="autorefs autorefs-internal" href="../tracker/#norfair.t
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Sequence of <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a> to be compared with potential <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.Detection">Detection</a> or <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>
-candidates.</p>
+                <p>Tracked objects to compare against <code>candidates</code>.</p>
               </div>
             </td>
             <td>
@@ -1941,11 +2095,12 @@ candidates.</p>
                 <code>candidates</code>
             </td>
             <td>
-                  <code><span title="Union">Union</span>[<span title="List">List</span>[<a class="autorefs autorefs-internal" title="Detection (norfair.tracker.Detection)" href="../tracker/#norfair.tracker.Detection">Detection</a>], <span title="List">List</span>[<a class="autorefs autorefs-internal" title="TrackedObject (norfair.tracker.TrackedObject)" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>]]</code>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<a class="autorefs autorefs-internal" title="Detection (norfair.tracker.Detection)" href="../tracker/#norfair.tracker.Detection">Detection</a> or <a class="autorefs autorefs-internal" title="TrackedObject (norfair.tracker.TrackedObject)" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>List of candidates (<a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.Detection">Detection</a> or <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>) to be compared to <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>.</p>
+                <p>Candidates. <code>None</code> or empty sequences return a matrix filled
+with <code>np.inf</code>.</p>
               </div>
             </td>
             <td>
@@ -1971,7 +2126,7 @@ candidates.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A matrix containing the distances between objects and candidates.</p>
+                <p>A <code>(n_candidates, n_objects)</code> matrix of distances.</p>
               </div>
             </td>
           </tr>
@@ -1981,13 +2136,7 @@ candidates.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 86</span>
-<span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 92</span>
 <span class="normal"> 93</span>
 <span class="normal"> 94</span>
 <span class="normal"> 95</span>
@@ -2032,26 +2181,38 @@ candidates.</p>
 <span class="normal">134</span>
 <span class="normal">135</span>
 <span class="normal">136</span>
-<span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_distances</span><span class="p">(</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_distances</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span>
     <span class="n">candidates</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Candidate&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Method that calculates the distances between new candidates and objects.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a distance matrix by calling ``distance_function`` for every pair.</span>
+
+<span class="sd">    Pairs with mismatched labels are skipped and their entries left at</span>
+<span class="sd">    ``np.inf``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    objects : Sequence[TrackedObject]</span>
-<span class="sd">        Sequence of [TrackedObject][norfair.tracker.TrackedObject] to be compared with potential [Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]</span>
-<span class="sd">        candidates.</span>
-<span class="sd">    candidates : Union[List[Detection], List[TrackedObject]], optional</span>
-<span class="sd">        List of candidates ([Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]) to be compared to [TrackedObject][norfair.tracker.TrackedObject].</span>
+<span class="sd">        Tracked objects to compare against ``candidates``.</span>
+<span class="sd">    candidates : Sequence[Detection or TrackedObject], optional</span>
+<span class="sd">        Candidates. ``None`` or empty sequences return a matrix filled</span>
+<span class="sd">        with ``np.inf``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    np.ndarray</span>
-<span class="sd">        A matrix containing the distances between objects and candidates.</span>
+<span class="sd">        A ``(n_candidates, n_objects)`` matrix of distances.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">objects</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
         <span class="c1"># Handle None or empty cases</span>
@@ -2115,9 +2276,11 @@ candidates.</p>
 
 
 
-        <p>VectorizedDistance class represents a distance that is calculated in a vectorized way. This means
-that instead of going through every pair and explicitly calculating its distance, VectorizedDistance
-uses the entire vectors to compare to each other in a single operation.</p>
+        <p>Distance computed in a single vectorized operation.</p>
+<p>Rather than iterating over every pair of candidate and tracked object,
+<code>VectorizedDistance</code> stacks their coordinates and hands the whole
+batch to <code>distance_function</code> in one call — much faster for large
+numbers of objects.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2140,9 +2303,9 @@ uses the entire vectors to compare to each other in a single operation.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Distance function used to determine the distances between new candidates and objects.
-This function should take 2 input arguments, the first being a <code>np.ndarray</code> and the second
-<code>np.ndarray</code>. It has to return a <code>np.ndarray</code> with the distance matrix it calculates.</p>
+                <p>Distance function that accepts two 2D arrays <code>(candidates,
+objects)</code> and returns a <code>(n_candidates, n_objects)</code> distance
+matrix.</p>
               </div>
             </td>
             <td>
@@ -2161,16 +2324,7 @@ This function should take 2 input arguments, the first being a <code>np.ndarray<
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>norfair/distances.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">149</span>
 <span class="normal">150</span>
 <span class="normal">151</span>
 <span class="normal">152</span>
@@ -2270,24 +2424,45 @@ This function should take 2 input arguments, the first being a <code>np.ndarray<
 <span class="normal">246</span>
 <span class="normal">247</span>
 <span class="normal">248</span>
-<span class="normal">249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VectorizedDistance</span><span class="p">(</span><span class="n">Distance</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    VectorizedDistance class represents a distance that is calculated in a vectorized way. This means</span>
-<span class="sd">    that instead of going through every pair and explicitly calculating its distance, VectorizedDistance</span>
-<span class="sd">    uses the entire vectors to compare to each other in a single operation.</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VectorizedDistance</span><span class="p">(</span><span class="n">Distance</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Distance computed in a single vectorized operation.</span>
+
+<span class="sd">    Rather than iterating over every pair of candidate and tracked object,</span>
+<span class="sd">    ``VectorizedDistance`` stacks their coordinates and hands the whole</span>
+<span class="sd">    batch to ``distance_function`` in one call — much faster for large</span>
+<span class="sd">    numbers of objects.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    distance_function : Callable[[np.ndarray, np.ndarray], np.ndarray]</span>
-<span class="sd">        Distance function used to determine the distances between new candidates and objects.</span>
-<span class="sd">        This function should take 2 input arguments, the first being a `np.ndarray` and the second</span>
-<span class="sd">        `np.ndarray`. It has to return a `np.ndarray` with the distance matrix it calculates.</span>
+<span class="sd">        Distance function that accepts two 2D arrays ``(candidates,</span>
+<span class="sd">        objects)`` and returns a ``(n_candidates, n_objects)`` distance</span>
+<span class="sd">        matrix.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">distance_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Store the vectorized ``distance_function``.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">distance_function</span> <span class="o">=</span> <span class="n">distance_function</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_distances</span><span class="p">(</span>
@@ -2295,21 +2470,26 @@ This function should take 2 input arguments, the first being a <code>np.ndarray<
         <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span>
         <span class="n">candidates</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Candidate&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Method that calculates the distances between new candidates and objects.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the distance matrix computed per label group.</span>
+
+<span class="sd">        Objects and candidates are grouped by label; for each label the</span>
+<span class="sd">        corresponding sub-block of the distance matrix is filled by</span>
+<span class="sd">        ``distance_function`` called on the stacked coordinates. Entries</span>
+<span class="sd">        across different labels remain ``np.inf``.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        objects : Sequence[TrackedObject]</span>
-<span class="sd">            Sequence of [TrackedObject][norfair.tracker.TrackedObject] to be compared with potential [Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]</span>
-<span class="sd">            candidates.</span>
-<span class="sd">        candidates : Union[List[Detection], List[TrackedObject]], optional</span>
-<span class="sd">            List of candidates ([Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]) to be compared to [TrackedObject][norfair.tracker.TrackedObject].</span>
+<span class="sd">            Tracked objects to compare against ``candidates``.</span>
+<span class="sd">        candidates : Sequence[Detection or TrackedObject], optional</span>
+<span class="sd">            Candidates. ``None`` or empty sequences return a matrix filled</span>
+<span class="sd">            with ``np.inf``.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        np.ndarray</span>
-<span class="sd">            A matrix containing the distances between objects and candidates.</span>
+<span class="sd">            A ``(n_candidates, n_objects)`` matrix of distances.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">objects</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
             <span class="c1"># Handle None or empty cases</span>
@@ -2363,21 +2543,20 @@ This function should take 2 input arguments, the first being a <code>np.ndarray<
     <span class="k">def</span><span class="w"> </span><span class="nf">_compute_distance</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">stacked_candidates</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">stacked_objects</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Method that computes the pairwise distances between new candidates and objects.</span>
-<span class="sd">        It is intended to use the entire vectors to compare to each other in a single operation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the pairwise distance between stacked candidates and objects.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        stacked_candidates : np.ndarray</span>
-<span class="sd">            np.ndarray containing a stack of candidates to be compared with the stacked_objects.</span>
+<span class="sd">            Stacked candidate coordinates.</span>
 <span class="sd">        stacked_objects : np.ndarray</span>
-<span class="sd">            np.ndarray containing a stack of objects to be compared with the stacked_objects.</span>
+<span class="sd">            Stacked object coordinates.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        np.ndarray</span>
-<span class="sd">            A matrix containing the distances between objects and candidates.</span>
+<span class="sd">            A ``(n_candidates, n_objects)`` matrix of distances.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_function</span><span class="p">(</span><span class="n">stacked_candidates</span><span class="p">,</span> <span class="n">stacked_objects</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -2399,6 +2578,39 @@ This function should take 2 input arguments, the first being a <code>np.ndarray<
 <div class="doc doc-object doc-function">
 
 
+<h3 id="norfair.distances.VectorizedDistance.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">distance_function</span><span class="p">)</span></code>
+
+<a href="#norfair.distances.VectorizedDistance.__init__" class="headerlink" title="Permanent link">#</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Store the vectorized <code>distance_function</code>.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>norfair/distances.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">distance_function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Store the vectorized ``distance_function``.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">distance_function</span> <span class="o">=</span> <span class="n">distance_function</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="norfair.distances.VectorizedDistance.get_distances" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">get_distances</span><span class="p">(</span><span class="n">objects</span><span class="p">,</span> <span class="n">candidates</span><span class="p">)</span></code>
 
@@ -2407,7 +2619,11 @@ This function should take 2 input arguments, the first being a <code>np.ndarray<
 
     <div class="doc doc-contents ">
 
-        <p>Method that calculates the distances between new candidates and objects.</p>
+        <p>Return the distance matrix computed per label group.</p>
+<p>Objects and candidates are grouped by label; for each label the
+corresponding sub-block of the distance matrix is filled by
+<code>distance_function</code> called on the stacked coordinates. Entries
+across different labels remain <code>np.inf</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2430,8 +2646,7 @@ This function should take 2 input arguments, the first being a <code>np.ndarray<
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Sequence of <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a> to be compared with potential <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.Detection">Detection</a> or <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>
-candidates.</p>
+                <p>Tracked objects to compare against <code>candidates</code>.</p>
               </div>
             </td>
             <td>
@@ -2443,11 +2658,12 @@ candidates.</p>
                 <code>candidates</code>
             </td>
             <td>
-                  <code><span title="Union">Union</span>[<span title="List">List</span>[<a class="autorefs autorefs-internal" title="Detection (norfair.tracker.Detection)" href="../tracker/#norfair.tracker.Detection">Detection</a>], <span title="List">List</span>[<a class="autorefs autorefs-internal" title="TrackedObject (norfair.tracker.TrackedObject)" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>]]</code>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<a class="autorefs autorefs-internal" title="Detection (norfair.tracker.Detection)" href="../tracker/#norfair.tracker.Detection">Detection</a> or <a class="autorefs autorefs-internal" title="TrackedObject (norfair.tracker.TrackedObject)" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>List of candidates (<a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.Detection">Detection</a> or <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>) to be compared to <a class="autorefs autorefs-internal" href="../tracker/#norfair.tracker.TrackedObject">TrackedObject</a>.</p>
+                <p>Candidates. <code>None</code> or empty sequences return a matrix filled
+with <code>np.inf</code>.</p>
               </div>
             </td>
             <td>
@@ -2473,7 +2689,7 @@ candidates.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A matrix containing the distances between objects and candidates.</p>
+                <p>A <code>(n_candidates, n_objects)</code> matrix of distances.</p>
               </div>
             </td>
           </tr>
@@ -2483,20 +2699,7 @@ candidates.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">173</span>
 <span class="normal">174</span>
 <span class="normal">175</span>
 <span class="normal">176</span>
@@ -2551,26 +2754,49 @@ candidates.</p>
 <span class="normal">225</span>
 <span class="normal">226</span>
 <span class="normal">227</span>
-<span class="normal">228</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_distances</span><span class="p">(</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_distances</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span>
     <span class="n">candidates</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="s2">&quot;Candidate&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Method that calculates the distances between new candidates and objects.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the distance matrix computed per label group.</span>
+
+<span class="sd">    Objects and candidates are grouped by label; for each label the</span>
+<span class="sd">    corresponding sub-block of the distance matrix is filled by</span>
+<span class="sd">    ``distance_function`` called on the stacked coordinates. Entries</span>
+<span class="sd">    across different labels remain ``np.inf``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    objects : Sequence[TrackedObject]</span>
-<span class="sd">        Sequence of [TrackedObject][norfair.tracker.TrackedObject] to be compared with potential [Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]</span>
-<span class="sd">        candidates.</span>
-<span class="sd">    candidates : Union[List[Detection], List[TrackedObject]], optional</span>
-<span class="sd">        List of candidates ([Detection][norfair.tracker.Detection] or [TrackedObject][norfair.tracker.TrackedObject]) to be compared to [TrackedObject][norfair.tracker.TrackedObject].</span>
+<span class="sd">        Tracked objects to compare against ``candidates``.</span>
+<span class="sd">    candidates : Sequence[Detection or TrackedObject], optional</span>
+<span class="sd">        Candidates. ``None`` or empty sequences return a matrix filled</span>
+<span class="sd">        with ``np.inf``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    np.ndarray</span>
-<span class="sd">        A matrix containing the distances between objects and candidates.</span>
+<span class="sd">        A ``(n_candidates, n_objects)`` matrix of distances.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">objects</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">candidates</span><span class="p">:</span>
         <span class="c1"># Handle None or empty cases</span>
@@ -2651,8 +2877,9 @@ candidates.</p>
 
 
 
-        <p>ScipyDistance class extends VectorizedDistance for the use of Scipy's vectorized distances.</p>
-<p>This class uses <code>scipy.spatial.distance.cdist</code> to calculate distances between two <code>np.ndarray</code>.</p>
+        <p>Vectorized distance backed by <code>scipy.spatial.distance.cdist</code>.</p>
+<p>Uses <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html"><code>scipy.spatial.distance.cdist</code></a>
+to calculate distances between two <code>np.ndarray</code> batches.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2691,7 +2918,8 @@ new candidates and objects.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Additional keyword arguments passed through to <code>scipy.spatial.distance.cdist</code>.</p>
+                <p>Additional keyword arguments forwarded to
+<code>scipy.spatial.distance.cdist</code>.</p>
               </div>
             </td>
             <td>
@@ -2715,32 +2943,35 @@ new candidates and objects.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>norfair/distances.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
-<span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
-<span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
-<span class="normal">262</span>
-<span class="normal">263</span>
-<span class="normal">264</span>
-<span class="normal">265</span>
-<span class="normal">266</span>
-<span class="normal">267</span>
-<span class="normal">268</span>
-<span class="normal">269</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">269</span>
 <span class="normal">270</span>
 <span class="normal">271</span>
 <span class="normal">272</span>
-<span class="normal">273</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ScipyDistance</span><span class="p">(</span><span class="n">VectorizedDistance</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ScipyDistance class extends VectorizedDistance for the use of Scipy&#39;s vectorized distances.</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ScipyDistance</span><span class="p">(</span><span class="n">VectorizedDistance</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Vectorized distance backed by ``scipy.spatial.distance.cdist``.</span>
 
-<span class="sd">    This class uses `scipy.spatial.distance.cdist` to calculate distances between two `np.ndarray`.</span>
+<span class="sd">    Uses [`scipy.spatial.distance.cdist`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html)</span>
+<span class="sd">    to calculate distances between two ``np.ndarray`` batches.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2748,14 +2979,17 @@ new candidates and objects.</p>
 <span class="sd">        Defines the specific Scipy metric to use to calculate the pairwise distances between</span>
 <span class="sd">        new candidates and objects.</span>
 <span class="sd">    **kwargs</span>
-<span class="sd">        Additional keyword arguments passed through to `scipy.spatial.distance.cdist`.</span>
+<span class="sd">        Additional keyword arguments forwarded to</span>
+<span class="sd">        `scipy.spatial.distance.cdist`.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    [`scipy.spatial.distance.cdist`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html)</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the scipy metric and any extra ``cdist`` keyword arguments.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="n">metric</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distance_function</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">cdist</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
@@ -2773,6 +3007,35 @@ new candidates and objects.</p>
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="norfair.distances.ScipyDistance.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+<a href="#norfair.distances.ScipyDistance.__init__" class="headerlink" title="Permanent link">#</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Configure the scipy metric and any extra <code>cdist</code> keyword arguments.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>norfair/distances.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure the scipy metric and any extra ``cdist`` keyword arguments.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="n">metric</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distance_function</span><span class="o">=</span><span class="n">partial</span><span class="p">(</span><span class="n">cdist</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 
 
@@ -2794,13 +3057,13 @@ new candidates and objects.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Frobernius norm on the difference of the points in detection and the estimates in tracked_object.</p>
+        <p>Frobenius norm of the difference between detection points and tracked-object estimates.</p>
 <p>The Frobenius distance and norm are given by:</p>
 <div class="arithmatex">\[
 d_f(a, b) = ||a - b||_F
 \]</div>
 <div class="arithmatex">\[
-||A||_F = [\sum_{i,j} abs(a_{i,j})^2]^{1/2}
+||A||_F = [\\sum_{i,j} abs(a_{i,j})^2]^{1/2}
 \]</div>
 
 
@@ -2881,27 +3144,7 @@ d_f(a, b) = ||a - b||_F
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">276</span>
-<span class="normal">277</span>
-<span class="normal">278</span>
-<span class="normal">279</span>
-<span class="normal">280</span>
-<span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span>
-<span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">296</span>
 <span class="normal">297</span>
 <span class="normal">298</span>
 <span class="normal">299</span>
@@ -2911,9 +3154,28 @@ d_f(a, b) = ||a - b||_F
 <span class="normal">303</span>
 <span class="normal">304</span>
 <span class="normal">305</span>
-<span class="normal">306</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">frobenius</span><span class="p">(</span><span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Frobernius norm on the difference of the points in detection and the estimates in tracked_object.</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">frobenius</span><span class="p">(</span><span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Frobenius norm of the difference between detection points and tracked-object estimates.</span>
 
 <span class="sd">    The Frobenius distance and norm are given by:</span>
 
@@ -2940,6 +3202,7 @@ d_f(a, b) = ||a - b||_F
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    [`np.linalg.norm`](https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html)</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">detection</span><span class="o">.</span><span class="n">points</span> <span class="o">-</span> <span class="n">tracked_object</span><span class="o">.</span><span class="n">estimate</span><span class="p">))</span>
 </code></pre></div></td></tr></table></div>
@@ -2959,7 +3222,7 @@ d_f(a, b) = ||a - b||_F
 
     <div class="doc doc-contents ">
 
-        <p>Average euclidean distance between the points in detection and estimates in tracked_object.</p>
+        <p>Average Euclidean distance between detection points and tracked-object estimates.</p>
 <div class="arithmatex">\[
 d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_2}{N}
 \]</div>
@@ -3001,7 +3264,7 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_2}{N}
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A tracked object</p>
+                <p>A tracked object.</p>
               </div>
             </td>
             <td>
@@ -3042,36 +3305,35 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_2}{N}
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
-<span class="normal">319</span>
-<span class="normal">320</span>
-<span class="normal">321</span>
-<span class="normal">322</span>
-<span class="normal">323</span>
-<span class="normal">324</span>
-<span class="normal">325</span>
-<span class="normal">326</span>
-<span class="normal">327</span>
-<span class="normal">328</span>
-<span class="normal">329</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">329</span>
 <span class="normal">330</span>
 <span class="normal">331</span>
 <span class="normal">332</span>
-<span class="normal">333</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean_euclidean</span><span class="p">(</span><span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Average euclidean distance between the points in detection and estimates in tracked_object.</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span>
+<span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean_euclidean</span><span class="p">(</span><span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Average Euclidean distance between detection points and tracked-object estimates.</span>
 
 <span class="sd">    $$</span>
-<span class="sd">    d(a, b) = \\frac{\\sum_{i=0}^N ||a_i - b_i||_2}{N}</span>
+<span class="sd">    d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_2}{N}</span>
 <span class="sd">    $$</span>
 
 <span class="sd">    Parameters</span>
@@ -3079,7 +3341,7 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_2}{N}
 <span class="sd">    detection : Detection</span>
 <span class="sd">        A detection.</span>
 <span class="sd">    tracked_object : TrackedObject</span>
-<span class="sd">        A tracked object</span>
+<span class="sd">        A tracked object.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -3089,6 +3351,7 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_2}{N}
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    [`np.linalg.norm`](https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html)</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">detection</span><span class="o">.</span><span class="n">points</span> <span class="o">-</span> <span class="n">tracked_object</span><span class="o">.</span><span class="n">estimate</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
@@ -3108,12 +3371,11 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_2}{N}
 
     <div class="doc doc-contents ">
 
-        <p>Average manhattan distance between the points in detection and the estimates in tracked_object</p>
-<p>Given by:</p>
+        <p>Average Manhattan distance between detection points and tracked-object estimates.</p>
 <div class="arithmatex">\[
 d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_1}{N}
 \]</div>
-<p>Where <span class="arithmatex">\(||a||_1\)</span> is the manhattan norm.</p>
+<p>Where <span class="arithmatex">\(||a||_1\)</span> is the Manhattan norm.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3152,7 +3414,7 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_1}{N}
             </td>
             <td>
               <div class="doc-md-description">
-                <p>a tracked object.</p>
+                <p>A tracked object.</p>
               </div>
             </td>
             <td>
@@ -3193,27 +3455,7 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_1}{N}
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">336</span>
-<span class="normal">337</span>
-<span class="normal">338</span>
-<span class="normal">339</span>
-<span class="normal">340</span>
-<span class="normal">341</span>
-<span class="normal">342</span>
-<span class="normal">343</span>
-<span class="normal">344</span>
-<span class="normal">345</span>
-<span class="normal">346</span>
-<span class="normal">347</span>
-<span class="normal">348</span>
-<span class="normal">349</span>
-<span class="normal">350</span>
-<span class="normal">351</span>
-<span class="normal">352</span>
-<span class="normal">353</span>
-<span class="normal">354</span>
-<span class="normal">355</span>
-<span class="normal">356</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">356</span>
 <span class="normal">357</span>
 <span class="normal">358</span>
 <span class="normal">359</span>
@@ -3223,24 +3465,39 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_1}{N}
 <span class="normal">363</span>
 <span class="normal">364</span>
 <span class="normal">365</span>
-<span class="normal">366</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean_manhattan</span><span class="p">(</span><span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Average manhattan distance between the points in detection and the estimates in tracked_object</span>
-
-<span class="sd">    Given by:</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">mean_manhattan</span><span class="p">(</span><span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Average Manhattan distance between detection points and tracked-object estimates.</span>
 
 <span class="sd">    $$</span>
-<span class="sd">    d(a, b) = \\frac{\\sum_{i=0}^N ||a_i - b_i||_1}{N}</span>
+<span class="sd">    d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_1}{N}</span>
 <span class="sd">    $$</span>
 
-<span class="sd">    Where $||a||_1$ is the manhattan norm.</span>
+<span class="sd">    Where $||a||_1$ is the Manhattan norm.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    detection : Detection</span>
 <span class="sd">        A detection.</span>
 <span class="sd">    tracked_object : TrackedObject</span>
-<span class="sd">        a tracked object.</span>
+<span class="sd">        A tracked object.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -3250,6 +3507,7 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_1}{N}
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    [`np.linalg.norm`](https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html)</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
         <span class="n">detection</span><span class="o">.</span><span class="n">points</span> <span class="o">-</span> <span class="n">tracked_object</span><span class="o">.</span><span class="n">estimate</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
@@ -3271,10 +3529,12 @@ d(a, b) = \frac{\sum_{i=0}^N ||a_i - b_i||_1}{N}
 
     <div class="doc doc-contents ">
 
-        <p>Calculate IoU between two sets of bounding boxes. Both sets of boxes are expected
-to be in <code>[x_min, y_min, x_max, y_max]</code> format.</p>
-<p>Normal IoU is 1 when the boxes are the same and 0 when they don't overlap,
-to transform that into a distance that makes sense we return <code>1 - iou</code>.</p>
+        <p>Compute <code>1 - IoU</code> between two sets of bounding boxes.</p>
+<p>Both sets of boxes are expected to be in
+<code>[x_min, y_min, x_max, y_max]</code> format.</p>
+<p>Normal IoU is <code>1</code> when the boxes are identical and <code>0</code> when they
+don't overlap; to turn this into a distance the function returns
+<code>1 - IoU</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3297,7 +3557,7 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
             </td>
             <td>
               <div class="doc-md-description">
-                <p>(N, 4) numpy.ndarray containing candidates bounding boxes.</p>
+                <p><code>(N, 4)</code> array of candidate bounding boxes.</p>
               </div>
             </td>
             <td>
@@ -3313,7 +3573,7 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
             </td>
             <td>
               <div class="doc-md-description">
-                <p>(K, 4) numpy.ndarray containing objects bounding boxes.</p>
+                <p><code>(K, 4)</code> array of object bounding boxes.</p>
               </div>
             </td>
             <td>
@@ -3339,7 +3599,8 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
             </td>
             <td>
               <div class="doc-md-description">
-                <p>(N, K) numpy.ndarray of <code>1 - iou</code> between candidates and objects.</p>
+                <p><code>(N, K)</code> array of <code>1 - IoU</code> values between candidates and
+objects.</p>
               </div>
             </td>
           </tr>
@@ -3349,21 +3610,7 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">395</span>
-<span class="normal">396</span>
-<span class="normal">397</span>
-<span class="normal">398</span>
-<span class="normal">399</span>
-<span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">409</span>
 <span class="normal">410</span>
 <span class="normal">411</span>
 <span class="normal">412</span>
@@ -3383,25 +3630,47 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
 <span class="normal">426</span>
 <span class="normal">427</span>
 <span class="normal">428</span>
-<span class="normal">429</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">iou</span><span class="p">(</span><span class="n">candidates</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">objects</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate IoU between two sets of bounding boxes. Both sets of boxes are expected</span>
-<span class="sd">    to be in `[x_min, y_min, x_max, y_max]` format.</span>
+<span class="normal">429</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span>
+<span class="normal">446</span>
+<span class="normal">447</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">iou</span><span class="p">(</span><span class="n">candidates</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">objects</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute ``1 - IoU`` between two sets of bounding boxes.</span>
 
-<span class="sd">    Normal IoU is 1 when the boxes are the same and 0 when they don&#39;t overlap,</span>
-<span class="sd">    to transform that into a distance that makes sense we return `1 - iou`.</span>
+<span class="sd">    Both sets of boxes are expected to be in</span>
+<span class="sd">    ``[x_min, y_min, x_max, y_max]`` format.</span>
+
+<span class="sd">    Normal IoU is ``1`` when the boxes are identical and ``0`` when they</span>
+<span class="sd">    don&#39;t overlap; to turn this into a distance the function returns</span>
+<span class="sd">    ``1 - IoU``.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    candidates : numpy.ndarray</span>
-<span class="sd">        (N, 4) numpy.ndarray containing candidates bounding boxes.</span>
-<span class="sd">    objects : numpy.ndarray</span>
-<span class="sd">        (K, 4) numpy.ndarray containing objects bounding boxes.</span>
+<span class="sd">    candidates : np.ndarray</span>
+<span class="sd">        ``(N, 4)`` array of candidate bounding boxes.</span>
+<span class="sd">    objects : np.ndarray</span>
+<span class="sd">        ``(K, 4)`` array of object bounding boxes.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    numpy.ndarray</span>
-<span class="sd">        (N, K) numpy.ndarray of `1 - iou` between candidates and objects.</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        ``(N, K)`` array of ``1 - IoU`` values between candidates and</span>
+<span class="sd">        objects.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_validate_bboxes</span><span class="p">(</span><span class="n">candidates</span><span class="p">)</span>
     <span class="n">_validate_bboxes</span><span class="p">(</span><span class="n">objects</span><span class="p">)</span>
@@ -3435,7 +3704,10 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
 
     <div class="doc doc-contents ">
 
-        <p>Select a distance by name.</p>
+        <p>Return a predefined :class:<code>Distance</code> by name.</p>
+<p>Accepts the names of Norfair's built-in scalar and vectorized
+distances, as well as any metric supported by
+<a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html"><code>scipy.spatial.distance.cdist</code></a>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3458,7 +3730,7 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A string defining the metric to get.</p>
+                <p>Name of the distance to look up.</p>
               </div>
             </td>
             <td>
@@ -3484,7 +3756,30 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The distance object.</p>
+                <p>A distance object ready to be passed to <code>Tracker</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>name</code> is not a known distance.</p>
               </div>
             </td>
           </tr>
@@ -3494,25 +3789,7 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">473</span>
-<span class="normal">474</span>
-<span class="normal">475</span>
-<span class="normal">476</span>
-<span class="normal">477</span>
-<span class="normal">478</span>
-<span class="normal">479</span>
-<span class="normal">480</span>
-<span class="normal">481</span>
-<span class="normal">482</span>
-<span class="normal">483</span>
-<span class="normal">484</span>
-<span class="normal">485</span>
-<span class="normal">486</span>
-<span class="normal">487</span>
-<span class="normal">488</span>
-<span class="normal">489</span>
-<span class="normal">490</span>
-<span class="normal">491</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">491</span>
 <span class="normal">492</span>
 <span class="normal">493</span>
 <span class="normal">494</span>
@@ -3529,21 +3806,55 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
 <span class="normal">505</span>
 <span class="normal">506</span>
 <span class="normal">507</span>
-<span class="normal">508</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_distance_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Distance</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Select a distance by name.</span>
+<span class="normal">508</span>
+<span class="normal">509</span>
+<span class="normal">510</span>
+<span class="normal">511</span>
+<span class="normal">512</span>
+<span class="normal">513</span>
+<span class="normal">514</span>
+<span class="normal">515</span>
+<span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span>
+<span class="normal">523</span>
+<span class="normal">524</span>
+<span class="normal">525</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span>
+<span class="normal">534</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_distance_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Distance</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a predefined :class:`Distance` by name.</span>
+
+<span class="sd">    Accepts the names of Norfair&#39;s built-in scalar and vectorized</span>
+<span class="sd">    distances, as well as any metric supported by</span>
+<span class="sd">    [`scipy.spatial.distance.cdist`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.cdist.html).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    name : str</span>
-<span class="sd">        A string defining the metric to get.</span>
+<span class="sd">        Name of the distance to look up.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Distance</span>
-<span class="sd">        The distance object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        A distance object ready to be passed to ``Tracker``.</span>
 
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If ``name`` is not a known distance.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">distance_function</span><span class="p">:</span> <span class="n">Distance</span>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">_SCALAR_DISTANCE_FUNCTIONS</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -3582,13 +3893,15 @@ to transform that into a distance that makes sense we return <code>1 - iou</code
 
     <div class="doc doc-contents ">
 
-        <p>Construct a keypoint voting distance function configured with the thresholds.</p>
-<p>Count how many points in a detection match the with a tracked_object.
-A match is considered when distance between the points is &lt; <code>keypoint_distance_threshold</code>
-and the score of the last_detection of the tracked_object is &gt; <code>detection_threshold</code>.
-Notice the if multiple points are tracked, the ith point in detection can only match the ith
-point in the tracked object.</p>
-<p>Distance is 1 if no point matches and approximates 0 as more points are matched.</p>
+        <p>Build a keypoint-voting scalar distance bound to the given thresholds.</p>
+<p>The returned distance counts how many points in a detection match the
+points in a tracked object. A point counts as a match when the
+distance between it and its peer is below
+<code>keypoint_distance_threshold</code> and both detection and tracked-object
+scores exceed <code>detection_threshold</code>. The <code>i</code>-th point in a
+detection can only match the <code>i</code>-th point in a tracked object.</p>
+<p>The distance is <code>1</code> when nothing matches and tends towards <code>0</code> as
+more points match.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3611,7 +3924,7 @@ point in the tracked object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Points closer than this threshold are considered a match.</p>
+                <p>Points closer than this threshold count as a match.</p>
               </div>
             </td>
             <td>
@@ -3627,7 +3940,7 @@ point in the tracked object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Detections and objects with score lower than this threshold are ignored.</p>
+                <p>Points with score at or below this threshold are ignored.</p>
               </div>
             </td>
             <td>
@@ -3653,7 +3966,7 @@ point in the tracked object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The distance funtion that must be passed to the Tracker.</p>
+                <p>A scalar distance function that can be passed to <code>Tracker</code>.</p>
               </div>
             </td>
           </tr>
@@ -3663,33 +3976,7 @@ point in the tracked object.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">511</span>
-<span class="normal">512</span>
-<span class="normal">513</span>
-<span class="normal">514</span>
-<span class="normal">515</span>
-<span class="normal">516</span>
-<span class="normal">517</span>
-<span class="normal">518</span>
-<span class="normal">519</span>
-<span class="normal">520</span>
-<span class="normal">521</span>
-<span class="normal">522</span>
-<span class="normal">523</span>
-<span class="normal">524</span>
-<span class="normal">525</span>
-<span class="normal">526</span>
-<span class="normal">527</span>
-<span class="normal">528</span>
-<span class="normal">529</span>
-<span class="normal">530</span>
-<span class="normal">531</span>
-<span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
-<span class="normal">535</span>
-<span class="normal">536</span>
-<span class="normal">537</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">537</span>
 <span class="normal">538</span>
 <span class="normal">539</span>
 <span class="normal">540</span>
@@ -3703,31 +3990,61 @@ point in the tracked object.</p>
 <span class="normal">548</span>
 <span class="normal">549</span>
 <span class="normal">550</span>
-<span class="normal">551</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_keypoints_voting_distance</span><span class="p">(</span>
+<span class="normal">551</span>
+<span class="normal">552</span>
+<span class="normal">553</span>
+<span class="normal">554</span>
+<span class="normal">555</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span>
+<span class="normal">563</span>
+<span class="normal">564</span>
+<span class="normal">565</span>
+<span class="normal">566</span>
+<span class="normal">567</span>
+<span class="normal">568</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span>
+<span class="normal">573</span>
+<span class="normal">574</span>
+<span class="normal">575</span>
+<span class="normal">576</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_keypoints_voting_distance</span><span class="p">(</span>
     <span class="n">keypoint_distance_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">detection_threshold</span><span class="p">:</span> <span class="nb">float</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Construct a keypoint voting distance function configured with the thresholds.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a keypoint-voting scalar distance bound to the given thresholds.</span>
 
-<span class="sd">    Count how many points in a detection match the with a tracked_object.</span>
-<span class="sd">    A match is considered when distance between the points is &lt; `keypoint_distance_threshold`</span>
-<span class="sd">    and the score of the last_detection of the tracked_object is &gt; `detection_threshold`.</span>
-<span class="sd">    Notice the if multiple points are tracked, the ith point in detection can only match the ith</span>
-<span class="sd">    point in the tracked object.</span>
+<span class="sd">    The returned distance counts how many points in a detection match the</span>
+<span class="sd">    points in a tracked object. A point counts as a match when the</span>
+<span class="sd">    distance between it and its peer is below</span>
+<span class="sd">    ``keypoint_distance_threshold`` and both detection and tracked-object</span>
+<span class="sd">    scores exceed ``detection_threshold``. The ``i``-th point in a</span>
+<span class="sd">    detection can only match the ``i``-th point in a tracked object.</span>
 
-<span class="sd">    Distance is 1 if no point matches and approximates 0 as more points are matched.</span>
+<span class="sd">    The distance is ``1`` when nothing matches and tends towards ``0`` as</span>
+<span class="sd">    more points match.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    keypoint_distance_threshold: float</span>
-<span class="sd">        Points closer than this threshold are considered a match.</span>
-<span class="sd">    detection_threshold: float</span>
-<span class="sd">        Detections and objects with score lower than this threshold are ignored.</span>
+<span class="sd">    keypoint_distance_threshold : float</span>
+<span class="sd">        Points closer than this threshold count as a match.</span>
+<span class="sd">    detection_threshold : float</span>
+<span class="sd">        Points with score at or below this threshold are ignored.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Callable</span>
-<span class="sd">        The distance funtion that must be passed to the Tracker.</span>
+<span class="sd">        A scalar distance function that can be passed to ``Tracker``.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">keypoints_voting_distance</span><span class="p">(</span>
@@ -3761,8 +4078,9 @@ point in the tracked object.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Construct a normalized mean euclidean distance function configured with the max height and width.</p>
-<p>The result distance is bound to [0, 1] where 1 indicates oposite corners of the image.</p>
+        <p>Build a normalized mean Euclidean distance bound to the image size.</p>
+<p>The returned distance is normalized so it lies in <code>[0, 1]</code>, where
+<code>1</code> corresponds to opposite corners of the image.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3827,7 +4145,7 @@ point in the tracked object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The distance funtion that must be passed to the Tracker.</p>
+                <p>A scalar distance function that can be passed to <code>Tracker</code>.</p>
               </div>
             </td>
           </tr>
@@ -3837,64 +4155,66 @@ point in the tracked object.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/distances.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">554</span>
-<span class="normal">555</span>
-<span class="normal">556</span>
-<span class="normal">557</span>
-<span class="normal">558</span>
-<span class="normal">559</span>
-<span class="normal">560</span>
-<span class="normal">561</span>
-<span class="normal">562</span>
-<span class="normal">563</span>
-<span class="normal">564</span>
-<span class="normal">565</span>
-<span class="normal">566</span>
-<span class="normal">567</span>
-<span class="normal">568</span>
-<span class="normal">569</span>
-<span class="normal">570</span>
-<span class="normal">571</span>
-<span class="normal">572</span>
-<span class="normal">573</span>
-<span class="normal">574</span>
-<span class="normal">575</span>
-<span class="normal">576</span>
-<span class="normal">577</span>
-<span class="normal">578</span>
-<span class="normal">579</span>
-<span class="normal">580</span>
-<span class="normal">581</span>
-<span class="normal">582</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">582</span>
 <span class="normal">583</span>
 <span class="normal">584</span>
 <span class="normal">585</span>
 <span class="normal">586</span>
-<span class="normal">587</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_normalized_mean_euclidean_distance</span><span class="p">(</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span>
+<span class="normal">599</span>
+<span class="normal">600</span>
+<span class="normal">601</span>
+<span class="normal">602</span>
+<span class="normal">603</span>
+<span class="normal">604</span>
+<span class="normal">605</span>
+<span class="normal">606</span>
+<span class="normal">607</span>
+<span class="normal">608</span>
+<span class="normal">609</span>
+<span class="normal">610</span>
+<span class="normal">611</span>
+<span class="normal">612</span>
+<span class="normal">613</span>
+<span class="normal">614</span>
+<span class="normal">615</span>
+<span class="normal">616</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_normalized_mean_euclidean_distance</span><span class="p">(</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="s2">&quot;TrackedObject&quot;</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Construct a normalized mean euclidean distance function configured with the max height and width.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a normalized mean Euclidean distance bound to the image size.</span>
 
-<span class="sd">    The result distance is bound to [0, 1] where 1 indicates oposite corners of the image.</span>
+<span class="sd">    The returned distance is normalized so it lies in ``[0, 1]``, where</span>
+<span class="sd">    ``1`` corresponds to opposite corners of the image.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    height: int</span>
+<span class="sd">    height : int</span>
 <span class="sd">        Height of the image.</span>
-<span class="sd">    width: int</span>
+<span class="sd">    width : int</span>
 <span class="sd">        Width of the image.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Callable</span>
-<span class="sd">        The distance funtion that must be passed to the Tracker.</span>
+<span class="sd">        A scalar distance function that can be passed to ``Tracker``.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">normalized__mean_euclidean_distance</span><span class="p">(</span>
         <span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">:</span> <span class="s2">&quot;TrackedObject&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalized mean euclidean distance&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalized mean Euclidean distance between detection and tracked object.&quot;&quot;&quot;</span>
         <span class="c1"># calculate distances and normalized it by width and height</span>
         <span class="n">difference</span> <span class="o">=</span> <span class="p">(</span><span class="n">detection</span><span class="o">.</span><span class="n">points</span> <span class="o">-</span> <span class="n">tracked_object</span><span class="o">.</span><span class="n">estimate</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
         <span class="n">difference</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/=</span> <span class="n">width</span>
