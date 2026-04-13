@@ -1,3 +1,2 @@
 *.gif filter=lfs diff=lfs merge=lfs -text
-docs/img/banner.png filter=lfs diff=lfs merge=lfs -text
 *.webp filter=lfs diff=lfs merge=lfs -text
