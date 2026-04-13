@@ -16,6 +16,32 @@ except ImportError:
     cv2 = DummyOpenCVImport()
 
 
+def _is_finite_point(point: tuple | np.ndarray) -> bool:
+    """Return ``True`` when every coordinate in *point* is finite.
+
+    NaN and Inf values can appear when the Kalman filter diverges or
+    when a camera-motion estimate is degenerate.  Passing such values
+    to OpenCV drawing primitives via ``.astype(int)`` causes undefined
+    signed-integer wraparound, silent misdrawing, or hard crashes on
+    some platforms.
+    """
+    return bool(np.all(np.isfinite(point)))
+
+
+def _safe_int_point(point: np.ndarray) -> tuple[int, int] | None:
+    """Convert a coordinate array to an ``(int, int)`` tuple, or ``None`` if non-finite.
+
+    Returns
+    -------
+    tuple[int, int] | None
+        The point as a plain ``(int, int)`` tuple, or ``None`` when any
+        coordinate is not finite.
+    """
+    if not _is_finite_point(point):
+        return None
+    return tuple(point.astype(int))
+
+
 class Drawer:
     """Basic drawing primitives used by the higher-level helpers.
 
@@ -55,6 +81,10 @@ class Drawer:
             The ``frame`` passed in (drawn on in place).
 
         """
+        # Guard: skip draw when position contains NaN/Inf (#41)
+        if not _is_finite_point(position):
+            return frame
+
         if radius is None:
             radius = int(max(max(frame.shape) * 0.005, 1))
         if thickness is None:
@@ -116,6 +146,10 @@ class Drawer:
             The ``frame`` passed in (drawn on in place).
 
         """
+        # Guard: skip draw when position contains NaN/Inf (#41)
+        if not _is_finite_point(position):
+            return frame
+
         font_size = (
             size if size is not None else min(max(max(frame.shape) / 4000, 0.5), 1.5)
         )
@@ -179,14 +213,26 @@ class Drawer:
             The ``frame`` passed in (drawn on in place).
 
         """
+        # Guard: skip draw when any corner contains NaN/Inf (#41)
+        if not _is_finite_point(points[0]) or not _is_finite_point(points[1]):
+            return frame
+
         if color is None:
             color = Color.black
         if thickness is None:
             thickness = 1
+
+        # Enforce corner ordering so pt1 is top-left and pt2 is
+        # bottom-right regardless of input order (#43).
+        p0 = tuple(map(int, points[0]))
+        p1 = tuple(map(int, points[1]))
+        pt1 = (min(p0[0], p1[0]), min(p0[1], p1[1]))
+        pt2 = (max(p0[0], p1[0]), max(p0[1], p1[1]))
+
         frame = cv2.rectangle(
             frame,
-            tuple(points[0]),
-            tuple(points[1]),
+            pt1,
+            pt2,
             color=color,
             thickness=thickness,
         )
@@ -222,6 +268,10 @@ class Drawer:
             The ``frame`` passed in (drawn on in place).
 
         """
+        # Guard: skip draw when center contains NaN/Inf (#41)
+        if not _is_finite_point(center):
+            return frame
+
         middle_x, middle_y = center
         left = center[0] - radius
         top = center[1] - radius
@@ -273,6 +323,10 @@ class Drawer:
             The ``frame`` passed in (drawn on in place).
 
         """
+        # Guard: skip draw when either endpoint contains NaN/Inf (#41)
+        if not _is_finite_point(start) or not _is_finite_point(end):
+            return frame
+
         return cv2.line(
             frame,
             pt1=start,

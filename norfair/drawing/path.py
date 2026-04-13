@@ -6,7 +6,7 @@ from collections.abc import Callable, Sequence
 import numpy as np
 
 from norfair.drawing.color import Palette
-from norfair.drawing.drawer import Drawer
+from norfair.drawing.drawer import Drawer, _safe_int_point
 from norfair.tracker import TrackedObject
 from norfair.utils import warn_once
 
@@ -125,10 +125,12 @@ class Paths:
             points_to_draw = self.get_points_to_draw(obj.estimate)
 
             for point in points_to_draw:
+                safe_pos = _safe_int_point(point)
+                if safe_pos is None:
+                    continue
                 mask = Drawer.circle(
                     mask,
-                    # pyrefly: ignore[bad-argument-type]
-                    position=tuple(point.astype(int)),
+                    position=safe_pos,
                     radius=self.radius,
                     color=color,
                     thickness=self.thickness,
@@ -263,10 +265,12 @@ class AbsolutePaths:
             )
 
             for point in points_rel:
+                safe_pos = _safe_int_point(point)
+                if safe_pos is None:
+                    continue
                 Drawer.circle(
                     frame,
-                    # pyrefly: ignore[bad-argument-type]
-                    position=tuple(point.astype(int)),
+                    position=safe_pos,
                     radius=self.radius,
                     color=color,
                     thickness=self.thickness,
@@ -286,11 +290,14 @@ class AbsolutePaths:
                     else past_points
                 )
                 for j, point in enumerate(past_points_rel):
+                    start = _safe_int_point(last_rel[j])
+                    end = _safe_int_point(point)
+                    if start is None or end is None:
+                        continue
                     Drawer.line(
                         overlay,
-                        # pyrefly: ignore[bad-argument-type]
-                        tuple(last_rel[j].astype(int)),
-                        tuple(point.astype(int)),  # pyrefly: ignore[bad-argument-type]
+                        start,
+                        end,
                         color=color,
                         thickness=self.thickness,
                     )

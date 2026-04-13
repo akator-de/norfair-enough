@@ -8,7 +8,7 @@ from norfair.tracker import Detection, TrackedObject
 from norfair.utils import warn_once
 
 from .color import ColorLike, Palette, parse_color
-from .drawer import Drawable, Drawer
+from .drawer import Drawable, Drawer, _safe_int_point  # noqa: F401
 from .utils import _build_text
 
 
@@ -145,6 +145,10 @@ def draw_boxes(
             obj_color = Palette.choose_color(np.random.rand())
         else:
             obj_color = parse_color(color)
+
+        # Skip objects with non-finite coordinates (#41)
+        if not np.all(np.isfinite(d.points)):
+            continue
 
         points = d.points.astype(int)
         if draw_box:
