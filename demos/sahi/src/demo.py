@@ -5,7 +5,7 @@ from sahi.predict import get_prediction, get_sliced_prediction
 from sahi.prediction import PredictionResult
 from utils import create_arg_parser, obtain_detection_model
 
-from norfair import Detection, Tracker, Video, draw_boxes, draw_tracked_boxes
+from norfair import Detection, Tracker, Video, draw_boxes
 from norfair.filter import OptimizedKalmanFilterFactory
 
 
@@ -75,7 +75,7 @@ def main(
             tracked_objects = tracker.update()
 
         draw_boxes(frame, detections)
-        draw_tracked_boxes(frame, tracked_objects)
+        draw_boxes(frame, tracked_objects)
         video.write(frame)
 
 
