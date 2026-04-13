@@ -5,7 +5,6 @@ translation and homography implementations, and the :class:`MotionEstimator`
 that ties them to OpenCV's sparse optical flow.
 """
 
-import contextlib
 import copy
 import logging
 from abc import ABC, abstractmethod
@@ -285,13 +284,22 @@ class HomographyTransformationGetter(TransformationGetter):
             confidence=self.confidence,
         )
 
+        if homography_matrix is None or points_used is None:
+            logger.warning(
+                "Homography estimation failed for this frame "
+                "(degenerate/collinear/insufficient inlier points)"
+            )
+            if isinstance(self.data, np.ndarray):
+                return True, HomographyTransformation(self.data)
+            else:
+                return True, None
+
         proportion_points_used = np.sum(points_used) / len(points_used)
 
         update_prvs = proportion_points_used < self.proportion_points_used_threshold
 
         if self.data is not None:
-            with contextlib.suppress(TypeError, ValueError):
-                homography_matrix = homography_matrix @ self.data
+            homography_matrix = homography_matrix @ self.data
 
         if update_prvs:
             self.data = homography_matrix
