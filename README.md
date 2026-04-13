@@ -85,7 +85,7 @@ Most tracking demos are showcased with vehicles and pedestrians, but the detecto
 2. [Track both bounding boxes and human keypoints](https://github.com/akator-de/norfair-enough/tree/main/demos/keypoints_bounding_boxes) (multi-class), unifying the detections from a YOLO model and OpenPose.
 3. [Re-identification (ReID)](https://github.com/akator-de/norfair-enough/tree/main/demos/reid) of tracked objects using appearance embeddings. This is a good starting point for scenarios with a lot of occlusion, in which the Kalman filter alone would struggle.
 4. [Accurately track objects even if the camera is moving](https://github.com/akator-de/norfair-enough/tree/main/demos/camera_motion), by estimating camera motion potentially accounting for pan, tilt, rotation, movement in any direction, and zoom.
-5. [Track points in 3D](https://github.com/akator-de/norfair-enough/tree/main/demos/3d_track), using [MediaPipe Objectron](https://google.github.io/mediapipe/solutions/objectron.html).
+5. [Track points in 3D](https://github.com/akator-de/norfair-enough/tree/main/demos/3d_track), using [MediaPipe Objectron](https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/objectron.md).
 6. [Tracking of small objects](https://github.com/akator-de/norfair-enough/tree/main/demos/sahi), using [SAHI: Slicing Aided Hyper Inference](https://github.com/obss/sahi).
 
 ### Benchmarking and profiling
