@@ -1889,7 +1889,7 @@ def batch_filter(
         Bs = [0.0] * n
 
     if update_first:
-        for i, (z, F, Q, H, R, B, u) in enumerate(zip(zs, Fs, Qs, Hs, Rs, Bs, us)):
+        for i, (z, F, Q, H, R, B, u) in enumerate(zip(zs, Fs, Qs, Hs, Rs, Bs, us)):  # pyrefly: ignore[bad-argument-type]
             x, P = update(x, P, z, R=R, H=H)
             means[i, :] = x
             covariances[i, :, :] = P
@@ -1900,7 +1900,7 @@ def batch_filter(
             if saver is not None:
                 saver.save()
     else:
-        for i, (z, F, Q, H, R, B, u) in enumerate(zip(zs, Fs, Qs, Hs, Rs, Bs, us)):
+        for i, (z, F, Q, H, R, B, u) in enumerate(zip(zs, Fs, Qs, Hs, Rs, Bs, us)):  # pyrefly: ignore[bad-argument-type]
             x, P = predict(x, P, u=u, B=B, F=F, Q=Q)
             means_p[i, :] = x
             covariances_p[i, :, :] = P
