@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../getting_started/">
       
       
-        <link rel="next" href="../migration/">
+        <link rel="next" href="../reference/">
       
       
         
@@ -23,7 +23,7 @@
     
     
       
-        <title>Getting Started - norfair-enough</title>
+        <title>Migration Guide - norfair-enough</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#getting-started" class="md-skip">
+        <a href="#migration-guide-tryolabsnorfair-norfair-enough" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Getting Started
+              Migration Guide
             
           </span>
         </div>
@@ -207,11 +207,9 @@
   
   
   
-    
   
-  
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="./" class="md-tabs__link">
+    <li class="md-tabs__item">
+      <a href="../getting_started/" class="md-tabs__link">
         
   
   
@@ -228,9 +226,11 @@
   
   
   
+    
   
-    <li class="md-tabs__item">
-      <a href="../migration/" class="md-tabs__link">
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
         
   
   
@@ -338,6 +338,33 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -357,7 +384,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Migration Guide
   
 
     
@@ -375,7 +402,7 @@
   <span class="md-ellipsis">
     
   
-    Getting Started
+    Migration Guide
   
 
     
@@ -401,10 +428,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#model-or-detector" class="md-nav__link">
+  <a href="#tldr" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Model or Detector
+        TL;DR
       
     </span>
   </a>
@@ -412,10 +439,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        Installation
       
     </span>
   </a>
@@ -423,10 +450,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#video" class="md-nav__link">
+  <a href="#python-version" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Video
+        Python version
       
     </span>
   </a>
@@ -434,34 +461,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tracking" class="md-nav__link">
+  <a href="#dependency-changes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tracking
+        Dependency changes
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Tracking">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deprecated-drawing-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecated drawing APIs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behavior-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Behavior changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Behavior changes">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
+  <a href="#trackerupdate-may-mutate-detection-objects-behavior-now-documented" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next Steps
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Next Steps">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#detection-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Detection Issues
+        Tracker.update() may mutate Detection objects -- behavior now documented
       
     </span>
   </a>
@@ -469,10 +506,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tracking-issues" class="md-nav__link">
+  <a href="#stricter-input-validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tracking Issues
+        Stricter input validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-notable-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other notable fixes
       
     </span>
   </a>
@@ -483,9 +531,37 @@
     </nav>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#newly-exported-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Newly exported symbols
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repository differences
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#staying-on-upstream-tryolabsnorfair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Staying on upstream tryolabs/norfair
+      
+    </span>
+  </a>
   
 </li>
       
@@ -493,33 +569,6 @@
   
 </nav>
       
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../migration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Migration Guide
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -862,10 +911,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#model-or-detector" class="md-nav__link">
+  <a href="#tldr" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Model or Detector
+        TL;DR
       
     </span>
   </a>
@@ -873,10 +922,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#installation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        Installation
       
     </span>
   </a>
@@ -884,10 +933,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#video" class="md-nav__link">
+  <a href="#python-version" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Video
+        Python version
       
     </span>
   </a>
@@ -895,34 +944,44 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tracking" class="md-nav__link">
+  <a href="#dependency-changes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tracking
+        Dependency changes
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Tracking">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deprecated-drawing-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecated drawing APIs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behavior-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Behavior changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Behavior changes">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
+  <a href="#trackerupdate-may-mutate-detection-objects-behavior-now-documented" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next Steps
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Next Steps">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#detection-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Detection Issues
+        Tracker.update() may mutate Detection objects -- behavior now documented
       
     </span>
   </a>
@@ -930,10 +989,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#tracking-issues" class="md-nav__link">
+  <a href="#stricter-input-validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tracking Issues
+        Stricter input validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-notable-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other notable fixes
       
     </span>
   </a>
@@ -944,9 +1014,37 @@
     </nav>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#newly-exported-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Newly exported symbols
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repository differences
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#staying-on-upstream-tryolabsnorfair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Staying on upstream tryolabs/norfair
+      
+    </span>
+  </a>
   
 </li>
       
@@ -967,84 +1065,152 @@
 
 
 
-<h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">#</a></h1>
-<p>Norfair's goal is to easily track multiple objects in videos based on the frame-by-frame detections of a user-defined model.</p>
-<h2 id="model-or-detector">Model or Detector<a class="headerlink" href="#model-or-detector" title="Permanent link">#</a></h2>
-<p>We recommend first deciding and setting up the model and then adding Norfair on top of it.
-Models trained for any form of <a href="https://paperswithcode.com/task/object-detection">object detection</a> or <a href="https://paperswithcode.com/task/keypoint-detection">keypoint detection</a> (including <a href="https://paperswithcode.com/task/pose-estimation">pose estimation</a>) are all supported. You can check some of the integrations we have as examples:</p>
+<h1 id="migration-guide-tryolabsnorfair-norfair-enough">Migration Guide: tryolabs/norfair → norfair-enough<a class="headerlink" href="#migration-guide-tryolabsnorfair-norfair-enough" title="Permanent link">#</a></h1>
+<p><code>norfair-enough</code> is a maintained fork of <a href="https://github.com/tryolabs/norfair"><code>tryolabs/norfair</code></a>,
+based on upstream v2.3.0. This guide describes what you need to change when moving an existing
+project from the upstream package to <code>norfair-enough</code>.</p>
+<h2 id="tldr">TL;DR<a class="headerlink" href="#tldr" title="Permanent link">#</a></h2>
 <ul>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov7">Yolov7</a>, <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov5">Yolov5</a> and <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov4">Yolov4</a></li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/detectron2">Detectron2</a></li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/alphapose">Alphapose</a></li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/openpose">Openpose</a></li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/mmdetection">MMDetection</a></li>
+<li>Uninstall <code>norfair</code>, install <code>norfair-enough</code>.</li>
+<li>The import path stays the same: <code>from norfair import ...</code>.</li>
+<li>Make sure you are on Python 3.10 or newer.</li>
+<li>Most code continues to work unchanged; a few APIs have been deprecated or behavior has been
+  tightened.</li>
 </ul>
-<p>Any other model trained on one of the supported tasks is also supported and should be easy to integrate with Norfair, regardless of whether it uses Pytorch, TensorFlow, or other.</p>
-<p>If you are unsure of which model to use, <a href="https://github.com/WongKinYiu/yolov7">Yolov7</a> is a good starting point since it's easy to set up and offers models of different sizes pre-trained on object detection and pose estimation.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Norfair is a Detection-Based-Tracker (DBT) and as such, its performance is highly dependent on the performance of the model of choice.</p>
-</div>
-<p>The detections from the model will need to be wrapped in an instance of <a class="autorefs autorefs-internal" href="../reference/tracker/#norfair.tracker.Detection">Detection</a> before passing them to Norfair.</p>
-<h2 id="install">Install<a class="headerlink" href="#install" title="Permanent link">#</a></h2>
-<p>Installing Norfair is extremely easy, simply run <code>pip install norfair-enough</code> to install the latest version from <a href="https://pypi.org/project/norfair-enough/">PyPI</a>.</p>
-<p>You can also install the latest version from the main branch using <code>pip install git+https://github.com/akator-de/norfair-enough.git@main#egg=norfair-enough</code></p>
-<h2 id="video">Video<a class="headerlink" href="#video" title="Permanent link">#</a></h2>
-<p>Norfair offers optional functionality to process videos (mp4 and mov formats are supported) or capture a live feed from a camera.
-To use this functionality you need to install Norfair with the <code>video</code> extra using this command: <code>pip install norfair-enough[video]</code>.</p>
-<p>Check the <a class="autorefs autorefs-internal" title="Video" href="../reference/video/#norfair.video.Video">Video class</a> for more info on how to use it.</p>
-<h2 id="tracking">Tracking<a class="headerlink" href="#tracking" title="Permanent link">#</a></h2>
-<p>Let's dive right into a simple example in the following snippet:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
-<span class="normal"> 2</span>
-<span class="normal"> 3</span>
-<span class="normal"> 4</span>
-<span class="normal"> 5</span>
-<span class="normal"> 6</span>
-<span class="normal"> 7</span>
-<span class="normal"> 8</span>
-<span class="normal"> 9</span>
-<span class="normal">10</span>
-<span class="normal">11</span>
-<span class="normal">12</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Detection</span><span class="p">,</span> <span class="n">Tracker</span><span class="p">,</span> <span class="n">Video</span><span class="p">,</span> <span class="n">draw_points</span>
-
-<span class="n">detector</span> <span class="o">=</span> <span class="n">MyDetector</span><span class="p">()</span>  <span class="c1"># Set up a detector</span>
-<span class="n">video</span> <span class="o">=</span> <span class="n">Video</span><span class="p">(</span><span class="n">input_path</span><span class="o">=</span><span class="s2">&quot;video.mp4&quot;</span><span class="p">)</span>
-<span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="n">distance_function</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">video</span><span class="p">:</span>
-   <span class="n">detections</span> <span class="o">=</span> <span class="n">detector</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
-   <span class="n">norfair_detections</span> <span class="o">=</span> <span class="p">[</span><span class="n">Detection</span><span class="p">(</span><span class="n">points</span><span class="p">)</span> <span class="k">for</span> <span class="n">points</span> <span class="ow">in</span> <span class="n">detections</span><span class="p">]</span>
-   <span class="n">tracked_objects</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">detections</span><span class="o">=</span><span class="n">norfair_detections</span><span class="p">)</span>
-   <span class="n">draw_points</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">drawables</span><span class="o">=</span><span class="n">tracked_objects</span><span class="p">)</span>
-   <span class="n">video</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
+<p>Replace the upstream package with the fork:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>pip<span class="w"> </span>uninstall<span class="w"> </span>norfair
+pip<span class="w"> </span>install<span class="w"> </span>norfair-enough
 </code></pre></div></td></tr></table></div>
-<p>The tracker is created and then the detections are fed to it one frame at a time in order. This method is called <em>online tracking</em> and allows Norfair to be used in live feeds and real-time scenarios where future frames are not available.</p>
-<p>Norfair includes functionality for creating an output video with drawings which is useful for evaluating and debugging. We usually start with this simple setup and move from there.</p>
-<h3 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">#</a></h3>
-<p>The next steps depend a lot on your goal and the result of evaluating the output videos, nevertheless here are some pointers that might help you solve common problems</p>
-<h4 id="detection-issues">Detection Issues<a class="headerlink" href="#detection-issues" title="Permanent link">#</a></h4>
-<p>Most common problem is that the tracking has errors or is not precise enough. In this case, the first thing to check is whether this is a detection error or a tracking error. As mentioned above if the detector fails the tracking will suffer.</p>
-<p>To debug this use <a class="autorefs autorefs-internal" href="../reference/drawing/#norfair.drawing.draw_points"><code>draw_points</code></a> or <a class="autorefs autorefs-internal" href="../reference/drawing/#norfair.drawing.draw_boxes"><code>draw_boxes</code></a> to inspect the detections and analyze if they are precise enough. If you are filtering the detections based on scores, this is a good time to tweak the threshold. If you decide that the detections are not good enough you can try a different architecture, a bigger version of the model, or consider fine-tuning the model on your domain.</p>
-<h4 id="tracking-issues">Tracking Issues<a class="headerlink" href="#tracking-issues" title="Permanent link">#</a></h4>
-<p>After inspecting the detections you might find issues with the tracking, several things can go wrong with tracking but here is a list of common errors and things to try:</p>
+<div class="admonition warning">
+<p class="admonition-title">Do not install both packages at the same time</p>
+<p>Both <code>norfair</code> and <code>norfair-enough</code> ship the same top-level Python module (<code>norfair</code>).
+Installing both into the same environment will lead to undefined import behavior.
+Always uninstall one before installing the other.</p>
+</div>
+<p>Imports do <strong>not</strong> change — <code>norfair-enough</code> keeps the original module name:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Detection</span><span class="p">,</span> <span class="n">Tracker</span><span class="p">,</span> <span class="n">draw_points</span>
+</code></pre></div></td></tr></table></div>
+<p>If you install from source, use the fork's repository URL:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/akator-de/norfair-enough.git@main#egg=norfair-enough&quot;</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="python-version">Python version<a class="headerlink" href="#python-version" title="Permanent link">#</a></h2>
+<p><code>norfair-enough</code> requires <strong>Python 3.10 or newer</strong>.</p>
+<p>Upstream <code>norfair</code> historically supported earlier Python versions (3.8/3.9).
+If your project is still on Python 3.8 or 3.9 you will need to upgrade your interpreter
+before migrating. The fork follows the upstream decision (v2.4.0) to drop older Python
+versions — see <a href="https://github.com/akator-de/norfair-enough/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</p>
+<p>The CI matrix for <code>norfair-enough</code> covers Python 3.10 through 3.13.</p>
+<h2 id="dependency-changes">Dependency changes<a class="headerlink" href="#dependency-changes" title="Permanent link">#</a></h2>
 <ul>
-<li>Objects take <strong>too long to start</strong>, this can have multiple causes:<ul>
-<li><code>initialization_delay</code> is too big on the Tracker. Makes the TrackedObject stay on initializing for too long, <code>3</code> is usually a good value to start with.</li>
-<li><code>distance_threshold</code> is too small on the Tracker. Prevents the Detections to be matched with the correct TrackedObject. The best value depends on the distance used.</li>
-<li>Incorrect <code>distance_function</code> on the Tracker. Some distances might not be valid in some cases, for instance, if using IoU but the objects in your video move so quickly that there is never an overlap between the detections of consecutive frames. Try different distances, <code>euclidean</code> or <code>create_normalized_mean_euclidean_distance</code> are good starting points.</li>
+<li><strong><code>filterpy</code> is no longer a dependency.</strong> The fork ships an internal Kalman filter
+  implementation derived from the original FilterPy <code>KalmanFilter</code> class (MIT, Roger R. Labbe Jr.).
+  <code>FilterPyKalmanFilterFactory</code> still exists for backwards compatibility but now uses the
+  internal implementation — you can remove <code>filterpy</code> from your own requirements.</li>
+<li><strong>NumPy 2.x is supported</strong> alongside NumPy 1.23+. No code change required on your side.</li>
 </ul>
-</li>
-<li>Objects take <strong>too long to disappear</strong>. Lower <code>hit_counter_max</code> on the Tracker.</li>
-<li>Points or bounding boxes <strong>jitter too much</strong>. Increase <code>R</code> (measurement error) or lower <code>Q</code> (estimate or process error) on the <code>OptimizedKalmanFilterFactory</code> or <code>FilterPyKalmanFilterFactory</code>. This makes the Kalman Filter put less weight on the measurements and trust more on the estimate, stabilizing the result.</li>
-<li><strong>Camera motion</strong> confuses the Tracker. If the camera moves, the apparent movement of objects can become too erratic for the Tracker. Use <code>MotionEstimator</code>.</li>
-<li><strong>Incorrect matches</strong> between Detections and TrackedObjects, a couple of scenarios can cause this:<ul>
-<li><code>distance_threshold</code> is too big so the Tracker matches Detections to TrackedObjects that are simply too far. Lower the threshold until you fix the error, the correct value will depend on the distance function that you're using.</li>
-<li>Mismatches when objects overlap. In this case, tracking becomes more challenging, usually, the quality of the detection degrades causing one of the objects to be missed or creating a single big detection that includes both objects. On top of the detection issues, the tracker needs to decide which detection should be matched to which TrackedObject which can be error-prone if only considering spatial information. The solution is not easy but incorporating the notion of the appearance similarity based on some kind of embedding to your distance_function can help.</li>
+<h2 id="deprecated-drawing-apis">Deprecated drawing APIs<a class="headerlink" href="#deprecated-drawing-apis" title="Permanent link">#</a></h2>
+<p>The following drawing helpers are <strong>deprecated</strong> in <code>norfair-enough</code> but still work. They now
+emit a deprecation warning on first use. Migrate at your convenience:</p>
+<table>
+<thead>
+<tr>
+<th>Deprecated</th>
+<th>Replacement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>draw_tracked_objects(...)</code></td>
+<td><code>draw_points(...)</code></td>
+</tr>
+<tr>
+<td><code>draw_tracked_boxes(...)</code></td>
+<td><code>draw_boxes(...)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Both replacements accept tracked objects directly, so most call sites only need a rename.</p>
+<p>Additional deprecated parameters on <code>draw_points</code>:</p>
+<ul>
+<li><code>color_by_label=True</code> → use <code>color="by_label"</code></li>
+<li><code>detections=...</code>      → use <code>drawables=...</code></li>
+<li><code>label_size=...</code>      → use <code>text_size=...</code></li>
 </ul>
-</li>
-<li>Can't <strong>recover</strong> an object <strong>after occlusions</strong>. Use ReID distance, see <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/reid">this demo</a> for an example but for real-world use you will need a good ReID model that can provide good embeddings.</li>
+<p>Additional deprecated parameters on <code>draw_boxes</code>:</p>
+<ul>
+<li><code>color_by_label=True</code> → use <code>color="by_label"</code></li>
+<li><code>detections=...</code>      → use <code>drawables=...</code></li>
+<li><code>label_size=...</code>      → use <code>text_size=...</code></li>
+<li><code>random_color=True</code>   → use <code>color="random"</code></li>
+<li><code>line_color=...</code>      → use <code>color=...</code></li>
+<li><code>line_width=...</code>      → use <code>thickness=...</code></li>
 </ul>
+<p>See the <a class="autorefs autorefs-internal" title="drawing" href="../reference/drawing/#norfair.drawing">Drawing reference</a> for the full current API.</p>
+<h2 id="behavior-changes">Behavior changes<a class="headerlink" href="#behavior-changes" title="Permanent link">#</a></h2>
+<h3 id="trackerupdate-may-mutate-detection-objects-behavior-now-documented"><code>Tracker.update()</code> may mutate <code>Detection</code> objects -- behavior now documented<a class="headerlink" href="#trackerupdate-may-mutate-detection-objects-behavior-now-documented" title="Permanent link">#</a></h3>
+<p>In both upstream <code>norfair</code> and <code>norfair-enough</code>, <code>Tracker.update()</code> may mutate attributes
+on the <code>Detection</code> instances you pass in (for example <code>detection.absolute_points</code> when
+<code>coord_transformations</code> is provided, and <code>detection.age</code> when detections are mapped to
+tracked objects).</p>
+<p>The difference in <code>norfair-enough</code> is that this mutation behavior is now documented
+explicitly in the docstrings for <code>Tracker.update()</code> and <code>Detection</code>. If your code reuses
+<code>Detection</code> objects after calling <code>Tracker.update()</code> -- for drawing, logging, or further
+processing -- be aware of these mutations and review your code accordingly. In most
+real-world pipelines this is invisible.</p>
+<h3 id="stricter-input-validation">Stricter input validation<a class="headerlink" href="#stricter-input-validation" title="Permanent link">#</a></h3>
+<ul>
+<li><code>Tracker</code> and related APIs now raise <code>ValueError</code> for invalid input that previously
+  triggered <code>assert</code> statements. If you run Python with <code>-O</code>, the previous assertions
+  were silently skipped; now the checks always run.</li>
+<li>The <code>iou</code> distance function validates both candidates and objects (previously only one
+  side was checked).</li>
+</ul>
+<h3 id="other-notable-fixes">Other notable fixes<a class="headerlink" href="#other-notable-fixes" title="Permanent link">#</a></h3>
+<p>These are bug fixes relative to upstream v2.3.0. If your code accidentally depended on
+the buggy behavior you may see different results:</p>
+<ul>
+<li><code>draw_tracked_objects</code> now returns the frame (previously returned <code>None</code>).</li>
+<li><code>distance_matrix.any()</code> no longer incorrectly skips zero distances during matching.</li>
+<li><code>hex_to_bgr</code> now accepts uppercase hex color strings.</li>
+<li><code>PredictionsTextFile</code> fixes file-handle leaks.</li>
+<li><code>AbsolutePaths</code> fixes memory leaks for destroyed objects.</li>
+<li><code>Accumulators.update</code> fixes quadratic array growth.</li>
+<li><code>Video</code> output filenames now handle paths and file extensions portably; it also supports
+  the context manager protocol (<code>with Video(...) as v:</code>) and exposes a <code>close()</code> method
+  for reliable resource cleanup.</li>
+<li><code>TrackedObject.global_id</code> counter is now thread-safe.</li>
+</ul>
+<p>For the full list of fixes and changes, see
+<a href="https://github.com/akator-de/norfair-enough/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</p>
+<h2 id="newly-exported-symbols">Newly exported symbols<a class="headerlink" href="#newly-exported-symbols" title="Permanent link">#</a></h2>
+<p>The following symbols are now exported directly from the top-level <code>norfair</code> package and
+no longer need to be imported from submodules:</p>
+<ul>
+<li><code>TrackedObject</code></li>
+<li><code>Distance</code></li>
+<li><code>FilterFactory</code></li>
+<li><code>ColorLike</code></li>
+<li>camera motion classes</li>
+<li>metrics classes</li>
+</ul>
+<p>Old imports continue to work.</p>
+<h2 id="repository-differences">Repository differences<a class="headerlink" href="#repository-differences" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Demos</strong>: the fork ships modernized demos under <code>demos/</code>. Some have been updated to
+  newer model versions and dependencies.</li>
+<li><strong>Tooling</strong>: <code>norfair-enough</code> uses <a href="https://docs.astral.sh/ruff/"><code>ruff</code></a> for linting and
+  <code>pytest</code> for tests, with a CI matrix covering Python 3.10–3.13.</li>
+<li><strong>Packaging</strong>: published on PyPI as
+  <a href="https://pypi.org/project/norfair-enough/"><code>norfair-enough</code></a>.</li>
+</ul>
+<h2 id="staying-on-upstream-tryolabsnorfair">Staying on upstream <code>tryolabs/norfair</code><a class="headerlink" href="#staying-on-upstream-tryolabsnorfair" title="Permanent link">#</a></h2>
+<p>Upstream <code>tryolabs/norfair</code> is no longer actively maintained. If you prefer to stay on it,
+you can continue to install it from
+<a href="https://github.com/tryolabs/norfair">its repository</a> or PyPI — but be aware that bug fixes
+and new Python/NumPy compatibility work will not flow back. <code>norfair-enough</code> exists precisely
+to keep this codebase alive for users who need it.</p>
 
 
 
