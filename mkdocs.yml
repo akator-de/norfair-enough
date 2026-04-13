@@ -66,6 +66,12 @@ extra:
 markdown_extensions:
     - toc:
         permalink: "#"  # adds link anchors to all titles (default char is ¶)
+        # Use the GitHub-flavored slugger so README anchors like
+        # `#examples--demos` (from "Examples & demos") keep working when the
+        # README is rendered as docs/index.md.
+        slugify: !!python/object/apply:pymdownx.slugs.slugify
+            kwds:
+                case: lower
     - pymdownx.tabbed:
         alternate_style: true
     - admonition
