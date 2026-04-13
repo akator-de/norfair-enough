@@ -6,7 +6,6 @@ from collections.abc import Callable, Hashable, Sequence
 from typing import Any
 
 import numpy as np
-from scipy.optimize import linear_sum_assignment
 
 from norfair.camera_motion import CoordinatesTransformation
 
@@ -439,10 +438,18 @@ class Tracker:
     def match_dets_and_objs(self, distance_matrix: np.ndarray, distance_threshold):
         """Match detections with tracked objects from a distance matrix.
 
-        Uses the Hungarian algorithm (``scipy.optimize.linear_sum_assignment``)
-        to find the optimal minimum-cost assignment in O(n³) time, then
-        filters out any matches whose distance meets or exceeds
-        ``distance_threshold``.
+        Instead of minimizing the global distance, this greedy strategy
+        starts with the global minimum entry and matches the det-obj
+        corresponding to that distance, then takes the second minimum, and
+        so on until ``distance_threshold`` is reached.
+
+        This avoids pathological cases where minimizing the global distance
+        forces matches that shouldn't happen just to bring the overall sum
+        down.
+
+        The distances are pre-sorted with ``np.argsort`` so the scan is
+        O(n*m*log(n*m) + n*m) instead of the previous O(min(n,m)*n*m)
+        repeated-argmin approach.
 
         Parameters
         ----------
@@ -454,21 +461,28 @@ class Tracker:
         Returns
         -------
         tuple[list[int], list[int]]
-            Matched detection and object indices.
+            Matched detection and object indices, in matching order.
 
         """
         if distance_matrix.size > 0:
-            # Use a large penalty for entries above threshold so they don't
-            # get chosen by linear_sum_assignment over valid matches
-            valid_mask = distance_matrix < distance_threshold
-            penalty = distance_threshold * min(distance_matrix.shape) + 1.0
-            cost = np.where(valid_mask, distance_matrix, penalty)
-            row_indices, col_indices = linear_sum_assignment(cost)
+            flat = distance_matrix.ravel()
+            order = np.argsort(flat, kind="quicksort")
+            ncols = distance_matrix.shape[1]
 
-            # Keep only pairs whose original distance is below the threshold
-            mask = distance_matrix[row_indices, col_indices] < distance_threshold
-            det_idxs = row_indices[mask].tolist()
-            obj_idxs = col_indices[mask].tolist()
+            det_idxs: list[int] = []
+            obj_idxs: list[int] = []
+            used_rows: set[int] = set()
+            used_cols: set[int] = set()
+
+            for idx in order:
+                if flat[idx] >= distance_threshold:
+                    break
+                r, c = divmod(int(idx), ncols)
+                if r not in used_rows and c not in used_cols:
+                    det_idxs.append(r)
+                    obj_idxs.append(c)
+                    used_rows.add(r)
+                    used_cols.add(c)
 
             return det_idxs, obj_idxs
         else:
