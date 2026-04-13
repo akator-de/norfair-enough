@@ -4,12 +4,11 @@ on:
   push:
     branches:
       - main
-  pull_request_target:
-    types: [opened, reopened, synchronize]
+  workflow_dispatch:
 
 permissions:
   contents: read
-  pull-requests: write
+  pull-requests: read
 
 jobs:
   update_release_draft:
