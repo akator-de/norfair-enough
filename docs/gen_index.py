@@ -12,11 +12,9 @@ with open("README.md") as f:
 content = re.sub(r"\]\(/?docs/", r"](", content)
 # remove "docs" from src fields in html
 content = re.sub(r"src=\"/?docs/", 'src="', content)
-# GitHub and mkdocs slugify headings differently. "Examples & demos" becomes
-# "examples--demos" on GitHub (two dashes around the stripped `&`) but
-# "examples-demos" under mkdocs' default slugify. Rewrite the anchor so the
-# rendered index.md has working in-page links.
-content = re.sub(r"#examples--demos\b", "#examples-demos", content)
+# The toc extension is configured (in mkdocs.yml) with pymdownx.slugs.slugify
+# which preserves the GitHub-style anchor `#examples--demos` for the heading
+# "Examples & demos", so no rewrite is needed here.
 
 # write the index
 with mkdocs_gen_files.open("index.md", "w") as fd:  #
