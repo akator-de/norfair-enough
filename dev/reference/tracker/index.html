@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../../img/icon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -3096,8 +3096,8 @@ separate <code>Tracker</code> instances in different threads is safe — the sha
                             <span class="n">candidates_to_remove</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">matched_candidate</span><span class="p">))</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">unmatched_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                            <span class="n">matched_candidate</span>  <span class="c1"># pyrefly: ignore[bad-argument-type]</span>
-                        <span class="p">)</span>
+                            <span class="n">matched_candidate</span>
+                        <span class="p">)</span>  <span class="c1"># pyrefly: ignore[bad-argument-type]</span>
                         <span class="n">unmatched_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">matched_object</span><span class="p">)</span>
 
                 <span class="c1"># Batch-remove merged TrackedObject candidates in a single pass (O(n))</span>

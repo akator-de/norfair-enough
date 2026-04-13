@@ -19,7 +19,7 @@
       
       
       <link rel="icon" href="../img/icon.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
@@ -968,9 +968,9 @@
 
 
 <h1 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">#</a></h1>
-<p>Norfair's goal is to easily track multiple objects in videos based on the frame-by-frame detections of a user-defined model.</p>
+<p>Norfair Enough's goal is to easily track multiple objects in videos based on the frame-by-frame detections of a user-defined model.</p>
 <h2 id="model-or-detector">Model or Detector<a class="headerlink" href="#model-or-detector" title="Permanent link">#</a></h2>
-<p>We recommend first deciding and setting up the model and then adding Norfair on top of it.
+<p>We recommend first deciding and setting up the model and then adding the tracker on top of it.
 Models trained for any form of <a href="https://paperswithcode.com/task/object-detection">object detection</a> or <a href="https://paperswithcode.com/task/keypoint-detection">keypoint detection</a> (including <a href="https://paperswithcode.com/task/pose-estimation">pose estimation</a>) are all supported. You can check some of the integrations we have as examples:</p>
 <ul>
 <li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov7">Yolov7</a>, <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov5">Yolov5</a> and <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov4">Yolov4</a></li>
@@ -982,19 +982,19 @@ Models trained for any form of <a href="https://paperswithcode.com/task/object-d
 <blockquote>
 <p><strong>Note:</strong> These demos were originally written for <a href="https://github.com/tryolabs/norfair">tryolabs/norfair</a> which is no longer actively maintained. Some demos may reference upstream resources that could become unavailable in the future. They remain compatible with norfair-enough — just replace <code>pip install norfair</code> with <code>pip install norfair-enough</code>.</p>
 </blockquote>
-<p>Any other model trained on one of the supported tasks is also supported and should be easy to integrate with Norfair, regardless of whether it uses Pytorch, TensorFlow, or other.</p>
+<p>Any other model trained on one of the supported tasks is also supported and should be easy to integrate with the library, regardless of whether it uses Pytorch, TensorFlow, or other.</p>
 <p>If you are unsure of which model to use, <a href="https://github.com/WongKinYiu/yolov7">Yolov7</a> is a good starting point since it's easy to set up and offers models of different sizes pre-trained on object detection and pose estimation.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Norfair is a Detection-Based-Tracker (DBT) and as such, its performance is highly dependent on the performance of the model of choice.</p>
+<p>The library is a Detection-Based-Tracker (DBT) and as such, its performance is highly dependent on the performance of the model of choice.</p>
 </div>
-<p>The detections from the model will need to be wrapped in an instance of <a class="autorefs autorefs-internal" href="../reference/tracker/#norfair.tracker.Detection">Detection</a> before passing them to Norfair.</p>
+<p>The detections from the model will need to be wrapped in an instance of <a class="autorefs autorefs-internal" href="../reference/tracker/#norfair.tracker.Detection">Detection</a> before passing them to the tracker.</p>
 <h2 id="install">Install<a class="headerlink" href="#install" title="Permanent link">#</a></h2>
-<p>Installing Norfair is extremely easy, simply run <code>pip install norfair-enough</code> to install the latest version from <a href="https://pypi.org/project/norfair-enough/">PyPI</a>.</p>
+<p>Installing the library is extremely easy, simply run <code>pip install norfair-enough</code> to install the latest version from <a href="https://pypi.org/project/norfair-enough/">PyPI</a>.</p>
 <p>You can also install the latest version from the main branch using <code>pip install git+https://github.com/akator-de/norfair-enough.git@main#egg=norfair-enough</code></p>
 <h2 id="video">Video<a class="headerlink" href="#video" title="Permanent link">#</a></h2>
-<p>Norfair offers optional functionality to process videos (mp4 and mov formats are supported) or capture a live feed from a camera.
-To use this functionality you need to install Norfair with the <code>video</code> extra using this command: <code>pip install norfair-enough[video]</code>.</p>
+<p>The library offers optional functionality to process videos (mp4 and mov formats are supported) or capture a live feed from a camera.
+To use this functionality you need to install the library with the <code>video</code> extra using this command: <code>pip install norfair-enough[video]</code>.</p>
 <p>Check the <a class="autorefs autorefs-internal" title="Video" href="../reference/video/#norfair.video.Video">Video class</a> for more info on how to use it.</p>
 <h2 id="tracking">Tracking<a class="headerlink" href="#tracking" title="Permanent link">#</a></h2>
 <p>Let's dive right into a simple example in the following snippet:</p>
@@ -1022,8 +1022,8 @@ To use this functionality you need to install Norfair with the <code>video</code
    <span class="n">draw_points</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">drawables</span><span class="o">=</span><span class="n">tracked_objects</span><span class="p">)</span>
    <span class="n">video</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
-<p>The tracker is created and then the detections are fed to it one frame at a time in order. This method is called <em>online tracking</em> and allows Norfair to be used in live feeds and real-time scenarios where future frames are not available.</p>
-<p>Norfair includes functionality for creating an output video with drawings which is useful for evaluating and debugging. We usually start with this simple setup and move from there.</p>
+<p>The tracker is created and then the detections are fed to it one frame at a time in order. This method is called <em>online tracking</em> and allows the tracker to be used in live feeds and real-time scenarios where future frames are not available.</p>
+<p>The library includes functionality for creating an output video with drawings which is useful for evaluating and debugging. We usually start with this simple setup and move from there.</p>
 <h3 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">#</a></h3>
 <p>The next steps depend a lot on your goal and the result of evaluating the output videos, nevertheless here are some pointers that might help you solve common problems</p>
 <h4 id="detection-issues">Detection Issues<a class="headerlink" href="#detection-issues" title="Permanent link">#</a></h4>
