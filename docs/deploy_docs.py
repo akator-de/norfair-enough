@@ -30,7 +30,10 @@ def get_latest_version() -> version.Version | None:
             try:
                 return version.parse(line.split()[0])
             except version.InvalidVersion:
-                logger.warning("Latest deployed version %r is not a valid version, treating as None", line.split()[0])
+                logger.warning(
+                    "Latest deployed version %r is not a valid version, treating as None",
+                    line.split()[0],
+                )
                 return None
     logger.warning("Could not read the latest version deployed")
 
