@@ -1200,7 +1200,7 @@ pip<span class="w"> </span>install<span class="w"> </span>norfair-enough<span cl
 <span class="c1"># Set up Ultralytics YOLO detector</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">YOLO</span><span class="p">(</span><span class="s2">&quot;yolo11n.pt&quot;</span><span class="p">)</span>
 
-<span class="c1"># Norfair</span>
+<span class="c1"># Norfair Enough</span>
 <span class="n">video</span> <span class="o">=</span> <span class="n">Video</span><span class="p">(</span><span class="n">input_path</span><span class="o">=</span><span class="s2">&quot;video.mp4&quot;</span><span class="p">)</span>
 <span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="n">distance_function</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 
@@ -1230,7 +1230,7 @@ pip<span class="w"> </span>install<span class="w"> </span>norfair-enough<span cl
 <p>Norfair Enough stands out by being <strong>detector-agnostic</strong>, supporting <strong>any point geometry</strong> (centroids, bounding boxes, keypoints, 3D points), and offering a <strong>BSD-3 license</strong> with no copyleft restrictions.</p>
 <h2 id="benchmarks">Benchmarks<a class="headerlink" href="#benchmarks" title="Permanent link">#</a></h2>
 <p>These benchmarks were produced using the <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair">motmetrics4norfair</a> demo script. Our CI runs MOT metrics regression tests on every pull request to prevent tracking quality regressions.</p>
-<p><a href="https://motchallenge.net/data/MOT17/">MOT17</a> and <a href="https://motchallenge.net/data/MOT17/">MOT20</a> results obtained using <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair">motmetrics4norfair</a> demo script on the <code>train</code> split. We used detections obtained with <a href="https://github.com/ifzhang/ByteTrack">ByteTrack's</a> YOLOX object detection model.</p>
+<p><a href="https://motchallenge.net/data/MOT17/">MOT17</a> and <a href="https://motchallenge.net/data/MOT20/">MOT20</a> results obtained using <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair">motmetrics4norfair</a> demo script on the <code>train</code> split. We used detections obtained with <a href="https://github.com/ifzhang/ByteTrack">ByteTrack's</a> YOLOX object detection model.</p>
 <table>
 <thead>
 <tr>
