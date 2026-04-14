@@ -6,6 +6,8 @@ This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2
 
 ## [Unreleased]
 
+## [2.4.1] - 2026-04-14
+
 ### Added
 - Comprehensive test coverage for `camera_motion`, drawing subpackage, `Video`, and utils (#76)
 - Add CodeRabbit-generated unit tests for `Video`, tracker, and package exports (#26)
