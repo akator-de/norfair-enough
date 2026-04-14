@@ -22,7 +22,7 @@ _If applicable, add screenshots or videos to help explain your problem._
 **Environment (please complete the following information):**
  - OS: [e.g. Ubuntu 20.04]
  - Python version: [e.g. 3.9.10]
- - Norfair version: [e.g. 1.0.0]
+ - norfair-enough version: [e.g. 2.4.0]
 
 **Additional context**
 _Add any other context about the problem here._
