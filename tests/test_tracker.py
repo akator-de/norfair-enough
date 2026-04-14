@@ -69,9 +69,7 @@ def test_simple(filter_factory, delay, counter_max):
         tracked_objects = tracker.update(detections)
         assert len(tracked_objects) == 1
         obj = tracked_objects[0]
-        np.testing.assert_almost_equal(
-            tracked_objects[0].estimate, np.array([[1, 1]])
-        )
+        np.testing.assert_almost_equal(tracked_objects[0].estimate, np.array([[1, 1]]))
         assert obj.age == age
         assert obj.hit_counter == age + 1
 
@@ -80,13 +78,11 @@ def test_simple(filter_factory, delay, counter_max):
         tracked_objects = tracker.update(detections)
         assert len(tracked_objects) == 1
         obj = tracked_objects[0]
-        np.testing.assert_almost_equal(
-            tracked_objects[0].estimate, np.array([[1, 1]])
-        )
+        np.testing.assert_almost_equal(tracked_objects[0].estimate, np.array([[1, 1]]))
         assert obj.age == age
         assert obj.hit_counter == counter_max
 
-    # check that counter goes down to 0 wen no detections
+    # check that counter goes down to 0 when no detections
     # Set age explicitly after previous loop (was counter_max + 2)
     age = counter_max + 2
     for counter in range(counter_max - 1, -1, -1):
@@ -94,9 +90,7 @@ def test_simple(filter_factory, delay, counter_max):
         tracked_objects = tracker.update()
         assert len(tracked_objects) == 1
         obj = tracked_objects[0]
-        np.testing.assert_almost_equal(
-            tracked_objects[0].estimate, np.array([[1, 1]])
-        )
+        np.testing.assert_almost_equal(tracked_objects[0].estimate, np.array([[1, 1]]))
         assert obj.age == age
         assert obj.hit_counter == counter
 

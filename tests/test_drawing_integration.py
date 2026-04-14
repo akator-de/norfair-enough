@@ -14,16 +14,16 @@ import pytest
 
 cv2 = pytest.importorskip("cv2")
 
-from norfair import Detection
-from norfair.drawing import (
+from norfair import Detection  # noqa: E402
+from norfair.drawing import (  # noqa: E402
     AbsolutePaths,
     Paths,
     draw_absolute_grid,
     draw_boxes,
     draw_points,
 )
-from norfair.drawing.drawer import Drawable
-from norfair.drawing.fixed_camera import FixedCamera
+from norfair.drawing.drawer import Drawable  # noqa: E402
+from norfair.drawing.fixed_camera import FixedCamera  # noqa: E402
 
 # Visible color constant used in tests where the default palette color
 # would be black (e.g. Detection objects have id=None, so Palette returns
@@ -34,6 +34,7 @@ _GREEN = (0, 255, 0)
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _black_frame(size=200):
     """Return a size x size 3-channel black frame."""
@@ -92,6 +93,7 @@ class MockCoordTransform:
 # draw_boxes tests
 # ---------------------------------------------------------------------------
 
+
 class TestDrawBoxes:
     def test_basic_detection(self):
         """Detection drawn with an explicit visible color and thickness."""
@@ -117,8 +119,12 @@ class TestDrawBoxes:
         frame = _black_frame()
         det = Detection(points=np.array([[10, 10], [80, 80]]), label="cat")
         result = draw_boxes(
-            frame, [det], color=_GREEN, thickness=2,
-            draw_labels=True, draw_ids=True,
+            frame,
+            [det],
+            color=_GREEN,
+            thickness=2,
+            draw_labels=True,
+            draw_ids=True,
         )
         assert _frame_has_nonzero(result)
 
@@ -129,7 +135,11 @@ class TestDrawBoxes:
             scores=np.array([0.9, 0.8]),
         )
         result = draw_boxes(
-            frame, [det], color=_GREEN, thickness=2, draw_scores=True,
+            frame,
+            [det],
+            color=_GREEN,
+            thickness=2,
+            draw_scores=True,
         )
         assert _frame_has_nonzero(result)
 
@@ -137,8 +147,11 @@ class TestDrawBoxes:
         frame = _black_frame()
         det = Detection(points=np.array([[10, 10], [80, 80]]), label="dog")
         result = draw_boxes(
-            frame, [det], color=_GREEN,
-            draw_box=False, draw_labels=True,
+            frame,
+            [det],
+            color=_GREEN,
+            draw_box=False,
+            draw_labels=True,
         )
         # Even with draw_box=False, text may be drawn if label present.
         # Just ensure no crash.
@@ -168,6 +181,7 @@ class TestDrawBoxes:
 # ---------------------------------------------------------------------------
 # draw_points tests
 # ---------------------------------------------------------------------------
+
 
 class TestDrawPoints:
     def test_basic_detection(self):
@@ -201,8 +215,11 @@ class TestDrawPoints:
         det = Detection(points=np.array([[30, 30], [70, 70]]), label="test")
         # Should not crash even when circles are suppressed
         result = draw_points(
-            frame, [det], color=_GREEN,
-            draw_points=False, draw_labels=True,
+            frame,
+            [det],
+            color=_GREEN,
+            draw_points=False,
+            draw_labels=True,
         )
         assert result is not None
 
@@ -216,8 +233,11 @@ class TestDrawPoints:
         frame = _black_frame()
         det = Detection(points=np.array([[50, 50], [100, 100]]), label="cat")
         result = draw_points(
-            frame, [det], color=_GREEN,
-            text_color=(0, 0, 255), draw_labels=True,
+            frame,
+            [det],
+            color=_GREEN,
+            text_color=(0, 0, 255),
+            draw_labels=True,
         )
         assert _frame_has_nonzero(result)
 
@@ -225,6 +245,7 @@ class TestDrawPoints:
 # ---------------------------------------------------------------------------
 # NaN / Inf coordinate safety
 # ---------------------------------------------------------------------------
+
 
 class TestNanInfSafety:
     """Non-finite coordinates must not crash; the frame should stay unchanged."""
@@ -285,6 +306,7 @@ class TestNanInfSafety:
 # Empty / None drawables
 # ---------------------------------------------------------------------------
 
+
 class TestEmptyNoneDrawables:
     def test_draw_boxes_empty_list(self):
         frame = _black_frame()
@@ -328,6 +350,7 @@ class TestEmptyNoneDrawables:
 # Paths
 # ---------------------------------------------------------------------------
 
+
 class TestPaths:
     def test_draw_produces_output(self):
         frame = _black_frame()
@@ -342,9 +365,7 @@ class TestPaths:
         path_drawer = Paths(attenuation=0.0)  # no fading
         for _ in range(5):
             frame = _black_frame()
-            obj = MockTrackedObject(
-                estimate=np.array([[50, 50], [80, 80]]), obj_id=1
-            )
+            obj = MockTrackedObject(estimate=np.array([[50, 50], [80, 80]]), obj_id=1)
             result = path_drawer.draw(frame, [obj])
         assert _frame_has_nonzero(result)
 
@@ -385,6 +406,7 @@ class TestPaths:
 # AbsolutePaths
 # ---------------------------------------------------------------------------
 
+
 class TestAbsolutePaths:
     def test_draw_without_transform(self):
         frame = _black_frame()
@@ -407,9 +429,7 @@ class TestAbsolutePaths:
         for i in range(5):
             frame = _black_frame()
             obj = MockTrackedObject(
-                estimate=np.array(
-                    [[30 + i * 5, 30 + i * 5], [60 + i * 5, 60 + i * 5]]
-                ),
+                estimate=np.array([[30 + i * 5, 30 + i * 5], [60 + i * 5, 60 + i * 5]]),
                 obj_id=1,
             )
             result = abs_paths.draw(frame, [obj], coord_transform=transform)
@@ -465,12 +485,16 @@ class TestAbsolutePaths:
 # draw_absolute_grid
 # ---------------------------------------------------------------------------
 
+
 class TestDrawAbsoluteGrid:
     def test_no_transform(self):
         """Grid with a visible color and no coord transform."""
         frame = _black_frame()
         draw_absolute_grid(
-            frame, coord_transformations=None, grid_size=10, color=_GREEN,
+            frame,
+            coord_transformations=None,
+            grid_size=10,
+            color=_GREEN,
         )
         assert _frame_has_nonzero(frame)
 
@@ -478,7 +502,10 @@ class TestDrawAbsoluteGrid:
         frame = _black_frame()
         transform = MockCoordTransform()
         draw_absolute_grid(
-            frame, coord_transformations=transform, grid_size=10, color=_GREEN,
+            frame,
+            coord_transformations=transform,
+            grid_size=10,
+            color=_GREEN,
         )
         assert _frame_has_nonzero(frame)
 
@@ -495,8 +522,11 @@ class TestDrawAbsoluteGrid:
     def test_polar_mode(self):
         frame = _black_frame()
         draw_absolute_grid(
-            frame, coord_transformations=None, grid_size=10,
-            polar=True, color=_GREEN,
+            frame,
+            coord_transformations=None,
+            grid_size=10,
+            polar=True,
+            color=_GREEN,
         )
         assert _frame_has_nonzero(frame)
 
@@ -515,7 +545,10 @@ class TestDrawAbsoluteGrid:
     def test_large_grid_size(self):
         frame = _black_frame()
         draw_absolute_grid(
-            frame, coord_transformations=None, grid_size=50, color=_GREEN,
+            frame,
+            coord_transformations=None,
+            grid_size=50,
+            color=_GREEN,
         )
         assert _frame_has_nonzero(frame)
 
@@ -523,6 +556,7 @@ class TestDrawAbsoluteGrid:
 # ---------------------------------------------------------------------------
 # FixedCamera
 # ---------------------------------------------------------------------------
+
 
 class TestFixedCamera:
     def test_basic_adjust_frame(self):
@@ -602,6 +636,7 @@ class TestFixedCamera:
 # Drawable wrapper
 # ---------------------------------------------------------------------------
 
+
 class TestDrawable:
     def test_from_detection(self):
         det = Detection(points=np.array([[10, 20], [30, 40]]), label="car")
@@ -648,6 +683,7 @@ class TestDrawable:
 # draw_boxes / draw_points with Drawable wrapper
 # ---------------------------------------------------------------------------
 
+
 class TestDrawableWithDrawFunctions:
     def test_draw_boxes_accepts_drawable(self):
         frame = _black_frame()
@@ -673,6 +709,7 @@ class TestDrawableWithDrawFunctions:
 # ---------------------------------------------------------------------------
 # Color strategy variants for draw_boxes
 # ---------------------------------------------------------------------------
+
 
 class TestColorStrategies:
     def test_by_id_with_real_id(self):

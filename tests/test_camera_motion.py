@@ -172,9 +172,7 @@ class TestTranslationTransformationGetter:
         # but the getter accumulates. Simulate a second observation:
         _, t2 = getter(base_pts + shift1 + shift2, base_pts)
         # Accumulated shift should be shift1+shift2
-        np.testing.assert_allclose(
-            t2.movement_vector, shift1 + shift2, atol=0.2
-        )
+        np.testing.assert_allclose(t2.movement_vector, shift1 + shift2, atol=0.2)
 
 
 # ---------------------------------------------------------------
@@ -218,7 +216,7 @@ class TestHomographyTransformationGetter:
 
     def test_insufficient_points_returns_none_first_call(self):
         """With fewer than 4 points and no prior data, returns (True, None)."""
-        cv2 = pytest.importorskip("cv2")
+        pytest.importorskip("cv2")
         from norfair.camera_motion import HomographyTransformationGetter
 
         getter = HomographyTransformationGetter()
@@ -231,7 +229,7 @@ class TestHomographyTransformationGetter:
 
     def test_insufficient_points_returns_last_known(self):
         """With fewer than 4 points but prior data, returns last known homography."""
-        cv2 = pytest.importorskip("cv2")
+        pytest.importorskip("cv2")
         from norfair.camera_motion import HomographyTransformationGetter
 
         getter = HomographyTransformationGetter()
@@ -250,13 +248,19 @@ class TestHomographyTransformationGetter:
 
     def test_identity_with_matching_points(self):
         """Identical point sets should yield a near-identity homography."""
-        cv2 = pytest.importorskip("cv2")
+        pytest.importorskip("cv2")
         from norfair.camera_motion import HomographyTransformationGetter
 
         getter = HomographyTransformationGetter()
         pts = np.array(
-            [[10.0, 10.0], [100.0, 10.0], [100.0, 100.0], [10.0, 100.0],
-             [50.0, 50.0], [75.0, 25.0]],
+            [
+                [10.0, 10.0],
+                [100.0, 10.0],
+                [100.0, 100.0],
+                [10.0, 100.0],
+                [50.0, 50.0],
+                [75.0, 25.0],
+            ],
             dtype=np.float32,
         )
         update, transform = getter(pts, pts)
@@ -269,14 +273,20 @@ class TestHomographyTransformationGetter:
 
     def test_known_translation_via_homography(self):
         """A known shift in points should produce a translation-like homography."""
-        cv2 = pytest.importorskip("cv2")
+        pytest.importorskip("cv2")
         from norfair.camera_motion import HomographyTransformationGetter
 
         getter = HomographyTransformationGetter()
         shift = np.array([5.0, -3.0])
         prev_pts = np.array(
-            [[10.0, 10.0], [200.0, 10.0], [200.0, 200.0], [10.0, 200.0],
-             [100.0, 100.0], [50.0, 150.0]],
+            [
+                [10.0, 10.0],
+                [200.0, 10.0],
+                [200.0, 200.0],
+                [10.0, 200.0],
+                [100.0, 100.0],
+                [50.0, 150.0],
+            ],
             dtype=np.float32,
         )
         curr_pts = (prev_pts + shift).astype(np.float32)
@@ -299,7 +309,7 @@ class TestMotionEstimator:
 
     def test_first_frame_near_identity(self):
         """The first call compares the frame against itself, yielding near-identity."""
-        cv2 = pytest.importorskip("cv2")
+        pytest.importorskip("cv2")
         from norfair.camera_motion import MotionEstimator
 
         estimator = MotionEstimator()
@@ -316,7 +326,7 @@ class TestMotionEstimator:
 
     def test_identical_frames_produce_near_identity(self):
         """Two identical frames should produce a near-identity transformation."""
-        cv2 = pytest.importorskip("cv2")
+        pytest.importorskip("cv2")
         from norfair.camera_motion import MotionEstimator
 
         # Use TranslationTransformationGetter for simpler results
@@ -370,7 +380,7 @@ class TestMotionEstimator:
 
     def test_with_mask(self):
         """MotionEstimator should accept an optional mask."""
-        cv2 = pytest.importorskip("cv2")
+        pytest.importorskip("cv2")
         from norfair.camera_motion import MotionEstimator
 
         getter = TranslationTransformationGetter()
@@ -382,13 +392,13 @@ class TestMotionEstimator:
 
         # Should not raise
         estimator.update(frame, mask=mask)
-        result = estimator.update(frame, mask=mask)
+        estimator.update(frame, mask=mask)
         # With identical frames and full mask, we should get a valid transform or None
         # (either is fine; the key is no crash)
 
     def test_draw_flow_flag(self):
         """Setting draw_flow=True should not crash."""
-        cv2 = pytest.importorskip("cv2")
+        pytest.importorskip("cv2")
         from norfair.camera_motion import MotionEstimator
 
         estimator = MotionEstimator(draw_flow=True)
@@ -410,7 +420,7 @@ class TestSparseFlowHelpers:
 
     def test_get_sparse_flow_with_identical_images(self):
         """Sparse flow between identical images should yield near-zero displacement."""
-        cv2 = pytest.importorskip("cv2")
+        pytest.importorskip("cv2")
         from norfair.camera_motion import _get_sparse_flow
 
         rng = np.random.RandomState(0)
@@ -424,7 +434,7 @@ class TestSparseFlowHelpers:
 
     def test_get_sparse_flow_returns_matching_shapes(self):
         """curr_pts and prev_pts should have the same shape."""
-        cv2 = pytest.importorskip("cv2")
+        pytest.importorskip("cv2")
         from norfair.camera_motion import _get_sparse_flow
 
         rng = np.random.RandomState(1)
@@ -439,7 +449,7 @@ class TestSparseFlowHelpers:
 
     def test_calc_optical_flow_basic(self):
         """_calc_optical_flow should return arrays or Nones."""
-        cv2 = pytest.importorskip("cv2")
+        pytest.importorskip("cv2")
         from norfair.camera_motion import _calc_optical_flow
 
         rng = np.random.RandomState(2)

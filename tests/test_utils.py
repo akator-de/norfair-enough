@@ -305,8 +305,12 @@ class TestPrintObjectsAsTable:
 
     def test_multiple_objects(self, capsys):
         objs = [
-            self._make_obj(id=1, age=2, hit_counter=1, last_distance=0.5, initializing_id=0),
-            self._make_obj(id=2, age=3, hit_counter=2, last_distance=1.0, initializing_id=1),
+            self._make_obj(
+                id=1, age=2, hit_counter=1, last_distance=0.5, initializing_id=0
+            ),
+            self._make_obj(
+                id=2, age=3, hit_counter=2, last_distance=1.0, initializing_id=1
+            ),
         ]
         print_objects_as_table(objs)
         out = capsys.readouterr().out
@@ -314,7 +318,9 @@ class TestPrintObjectsAsTable:
         assert "2" in out
 
     def test_none_last_distance_shows_question_mark(self, capsys):
-        obj = self._make_obj(id=1, age=1, hit_counter=1, last_distance=None, initializing_id=0)
+        obj = self._make_obj(
+            id=1, age=1, hit_counter=1, last_distance=None, initializing_id=0
+        )
         print_objects_as_table([obj])
         out = capsys.readouterr().out
         assert "?" in out
