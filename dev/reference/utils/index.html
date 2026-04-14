@@ -1150,7 +1150,10 @@ bounding box is degenerate (zero width or height after clipping).</p>
 <span class="normal">115</span>
 <span class="normal">116</span>
 <span class="normal">117</span>
-<span class="normal">118</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_cutout</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_cutout</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the axis-aligned bounding-box cutout of ``points`` in ``image``.</span>
 
 <span class="sd">    Parameters</span>
@@ -1177,6 +1180,9 @@ bounding box is degenerate (zero width or height after clipping).</p>
     <span class="k">if</span> <span class="n">points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;points array is empty&quot;</span><span class="p">)</span>
 
+    <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;image must have at least 2 dimensions, got </span><span class="si">{</span><span class="n">image</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">img_h</span><span class="p">,</span> <span class="n">img_w</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
 
     <span class="n">min_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">points</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">img_w</span><span class="p">))</span>
