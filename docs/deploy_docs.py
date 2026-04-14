@@ -26,8 +26,12 @@ def get_current_version() -> version.Version:
 def get_latest_version() -> version.Version | None:
     "Get the deployed version number tagged as `latest` in mike."
     for line in run_cmd("mike list"):
-        if line.endswith("[latest]"):
-            return version.parse(line.split()[0])
+        if "[latest]" in line:
+            try:
+                return version.parse(line.split()[0])
+            except version.InvalidVersion:
+                logger.warning("Latest deployed version %r is not a valid version, treating as None", line.split()[0])
+                return None
     logger.warning("Could not read the latest version deployed")
 
 
