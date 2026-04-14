@@ -9,7 +9,10 @@ from norfair.utils import validate_points
 def reset_global_count():
     """Reset TrackedObject global count before each test for isolation."""
     _TrackedObjectFactory.global_count = 0
-    yield
+    try:
+        yield
+    finally:
+        _TrackedObjectFactory.global_count = 0
 
 
 @pytest.fixture

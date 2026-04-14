@@ -42,64 +42,66 @@ def test_params():
 @pytest.mark.parametrize(
     "filter_factory", [FilterPyKalmanFilterFactory(), OptimizedKalmanFilterFactory()]
 )
-def test_simple(filter_factory):
-    for delay in [0, 1, 3]:
-        for counter_max in [delay + 1, delay + 3]:
-            #
-            # tests a simple static detection
-            #
-            tracker = Tracker(
-                "euclidean",
-                initialization_delay=delay,
-                distance_threshold=100,
-                hit_counter_max=counter_max,
-                filter_factory=filter_factory,
-            )
+@pytest.mark.parametrize(
+    "delay, counter_max",
+    [(0, 1), (0, 3), (1, 2), (1, 4), (3, 4), (3, 6)],
+)
+def test_simple(filter_factory, delay, counter_max):
+    #
+    # tests a simple static detection
+    #
+    tracker = Tracker(
+        "euclidean",
+        initialization_delay=delay,
+        distance_threshold=100,
+        hit_counter_max=counter_max,
+        filter_factory=filter_factory,
+    )
 
-            detections = [Detection(points=np.array([[1, 1]]))]
+    detections = [Detection(points=np.array([[1, 1]]))]
 
-            # test the delay
-            for _age in range(delay):
-                assert len(tracker.update(detections)) == 0
+    # test the delay
+    for _age in range(delay):
+        assert len(tracker.update(detections)) == 0
 
-            # build up hit_counter from delay+1 to counter_max
-            for age in range(delay, counter_max):
-                tracked_objects = tracker.update(detections)
-                assert len(tracked_objects) == 1
-                obj = tracked_objects[0]
-                np.testing.assert_almost_equal(
-                    tracked_objects[0].estimate, np.array([[1, 1]])
-                )
-                assert obj.age == age
-                assert obj.hit_counter == age + 1
+    # build up hit_counter from delay+1 to counter_max
+    for age in range(delay, counter_max):
+        tracked_objects = tracker.update(detections)
+        assert len(tracked_objects) == 1
+        obj = tracked_objects[0]
+        np.testing.assert_almost_equal(
+            tracked_objects[0].estimate, np.array([[1, 1]])
+        )
+        assert obj.age == age
+        assert obj.hit_counter == age + 1
 
-            # check that counter is capped at counter_max
-            for age in range(counter_max, counter_max + 3):
-                tracked_objects = tracker.update(detections)
-                assert len(tracked_objects) == 1
-                obj = tracked_objects[0]
-                np.testing.assert_almost_equal(
-                    tracked_objects[0].estimate, np.array([[1, 1]])
-                )
-                assert obj.age == age
-                assert obj.hit_counter == counter_max
+    # check that counter is capped at counter_max
+    for age in range(counter_max, counter_max + 3):
+        tracked_objects = tracker.update(detections)
+        assert len(tracked_objects) == 1
+        obj = tracked_objects[0]
+        np.testing.assert_almost_equal(
+            tracked_objects[0].estimate, np.array([[1, 1]])
+        )
+        assert obj.age == age
+        assert obj.hit_counter == counter_max
 
-            # check that counter goes down to 0 wen no detections
-            # Set age explicitly after previous loop (was counter_max + 2)
-            age = counter_max + 2
-            for counter in range(counter_max - 1, -1, -1):
-                age += 1
-                tracked_objects = tracker.update()
-                assert len(tracked_objects) == 1
-                obj = tracked_objects[0]
-                np.testing.assert_almost_equal(
-                    tracked_objects[0].estimate, np.array([[1, 1]])
-                )
-                assert obj.age == age
-                assert obj.hit_counter == counter
+    # check that counter goes down to 0 wen no detections
+    # Set age explicitly after previous loop (was counter_max + 2)
+    age = counter_max + 2
+    for counter in range(counter_max - 1, -1, -1):
+        age += 1
+        tracked_objects = tracker.update()
+        assert len(tracked_objects) == 1
+        obj = tracked_objects[0]
+        np.testing.assert_almost_equal(
+            tracked_objects[0].estimate, np.array([[1, 1]])
+        )
+        assert obj.age == age
+        assert obj.hit_counter == counter
 
-            # check that object dissapears in the next frame
-            assert len(tracker.update()) == 0
+    # check that object dissapears in the next frame
+    assert len(tracker.update()) == 0
 
 
 @pytest.mark.parametrize(
