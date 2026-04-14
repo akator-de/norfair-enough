@@ -101,6 +101,9 @@ def get_cutout(points, image):
     if points.shape[0] == 0:
         raise ValueError("points array is empty")
 
+    image = np.asarray(image)
+    if image.ndim < 2:
+        raise ValueError(f"image must have at least 2 dimensions, got {image.ndim}")
     img_h, img_w = image.shape[:2]
 
     min_x = int(np.clip(np.min(points[:, 0]), 0, img_w))

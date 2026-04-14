@@ -1,5 +1,6 @@
 """Tracking primitives: ``Tracker``, ``TrackedObject`` and ``Detection``."""
 
+import copy
 import logging
 import threading
 from collections.abc import Callable, Hashable, Sequence
@@ -236,14 +237,11 @@ class Tracker:
 
         Notes
         -----
-        This method **mutates** the ``Detection`` objects passed in:
-
-        - ``absolute_points`` is overwritten with absolute coordinates when
-          *coord_transformations* is provided.
-        - ``age`` is set to the matched ``TrackedObject``'s age when the
-          detection is stored internally.
-
-        If you need the original detection unchanged, pass a copy.
+        When *coord_transformations* is provided this method **mutates**
+        ``Detection.absolute_points`` on the caller's objects (overwritten
+        with absolute coordinates).  All other ``Detection`` attributes
+        (including ``age``) are left untouched; the tracker stores shallow
+        copies of detections internally.
 
         """
         if coord_transformations is not None and detections is not None:
@@ -616,8 +614,9 @@ class TrackedObject:
         self.reid_hit_counter: int | None = None
         self.last_distance: float | None = None
         self.current_min_distance: float | None = None
-        self.last_detection: Detection = initial_detection
+        self.last_detection: Detection = copy.copy(initial_detection)
         self.age: int = 0
+        self.last_detection.age = self.age
         self.is_initializing: bool = self.hit_counter <= self.initialization_delay
         self.scores = initial_detection.scores
 
@@ -643,11 +642,12 @@ class TrackedObject:
         self._point_matched_in_current_frame: np.ndarray = (
             self.detected_at_least_once_points.copy()
         )
-        initial_detection.age = self.age
         self.past_detections_length = past_detections_length
         self.past_detections: list[Detection]
         if past_detections_length > 0:
-            self.past_detections = [initial_detection]
+            stored = copy.copy(initial_detection)
+            stored.age = self.age
+            self.past_detections = [stored]
         else:
             self.past_detections = []
 
@@ -780,7 +780,8 @@ class TrackedObject:
         """
         self._conditionally_add_to_past_detections(detection)
 
-        self.last_detection = detection
+        self.last_detection = copy.copy(detection)
+        self.last_detection.age = self.age
         self.hit_counter = min(self.hit_counter + 2 * period, self.hit_counter_max)
 
         self.scores = detection.scores
@@ -877,17 +878,15 @@ class TrackedObject:
         ``TrackedObject`` while distributing them uniformly through the
         object's lifetime.
 
-        Note
-        ----
-        This method sets ``detection.age`` on the caller's ``Detection`` object.
-        Callers that retain references to their detections will observe this
-        mutation. See the issue tracker for the plan to make this non-mutating.
+        The detection is shallow-copied before storage so the caller's
+        original ``Detection`` object is never mutated.
         """
-        detection.age = self.age
         if self.past_detections_length == 0:
             return
+        stored = copy.copy(detection)
+        stored.age = self.age
         if len(self.past_detections) < self.past_detections_length:
-            self.past_detections.append(detection)
+            self.past_detections.append(stored)
         else:
             first_detection_age = self.past_detections[0].age
             if (
@@ -895,13 +894,17 @@ class TrackedObject:
                 and self.age >= first_detection_age * self.past_detections_length
             ):
                 self.past_detections.pop(0)
-                self.past_detections.append(detection)
+                self.past_detections.append(stored)
 
     def merge(self, tracked_object):
-        """Merge another (not-yet-initialized) ``TrackedObject`` into this one."""
+        """Merge another (not-yet-initialized) ``TrackedObject`` into this one.
+
+        Mutable state (filter, counters, arrays) is copied so the
+        discarded ``tracked_object`` is not silently aliased.
+        """
         self.reid_hit_counter = None
         self.hit_counter = self.initial_period * 2
-        self.point_hit_counter = tracked_object.point_hit_counter
+        self.point_hit_counter = tracked_object.point_hit_counter.copy()
         # The not-yet-initialized tracked object was just matched this frame,
         # so adopt its current-frame match mask as well (GH#2).
         self._point_matched_in_current_frame = (
@@ -909,15 +912,14 @@ class TrackedObject:
         )
         self.last_distance = tracked_object.last_distance
         self.current_min_distance = tracked_object.current_min_distance
-        self.last_detection = tracked_object.last_detection
+        self.last_detection = copy.copy(tracked_object.last_detection)
         self.last_detection.age = self.age
         self.detected_at_least_once_points = (
-            tracked_object.detected_at_least_once_points
+            tracked_object.detected_at_least_once_points.copy()
         )
-        self.filter = tracked_object.filter
+        self.filter = copy.deepcopy(tracked_object.filter)
 
         for past_detection in tracked_object.past_detections:
-            past_detection.age = self.age
             self._conditionally_add_to_past_detections(past_detection)
 
     def update_coordinate_transformation(
