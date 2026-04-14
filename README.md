@@ -60,9 +60,7 @@ If the needed dependencies are already present in the system, installing the min
 
 ## Examples & demos
 
-We provide several examples of how the library can be used to add tracking capabilities to different detectors, and also showcase more advanced features. All demos are available in the [`demos/`](https://github.com/akator-de/norfair-enough/tree/main/demos) directory of this repository (originally adapted from [tryolabs/norfair](https://github.com/tryolabs/norfair/tree/master/demos)).
-
-> **Note:** The demo code was originally written in the [tryolabs/norfair](https://github.com/tryolabs/norfair) repository which is no longer actively maintained. Some demos may reference upstream resources that could become unavailable in the future. The demos remain compatible with norfair-enough — just replace `pip install norfair` with `pip install norfair-enough`.
+We provide several examples of how the library can be used to add tracking capabilities to different detectors, and also showcase more advanced features. All demos are available in the [`demos/`](https://github.com/akator-de/norfair-enough/tree/main/demos) directory of this repository.
 
 > Some demos include Dockerfiles for reproducibility. If you have a GPU, install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) for GPU passthrough. CPU-only usage is possible but may require dependency adjustments.
 
@@ -70,63 +68,50 @@ We provide several examples of how the library can be used to add tracking capab
 
 Most tracking demos are showcased with vehicles and pedestrians, but the detectors are generally trained with many more classes from the [COCO dataset](https://cocodataset.org/).
 
-1. [YOLOv7](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov7): tracking object centroids or bounding boxes.
-2. [YOLOv5](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov5): tracking object centroids or bounding boxes.
-3. [YOLOv4](https://github.com/akator-de/norfair-enough/tree/main/demos/yolov4): tracking object centroids.
-4. [Detectron2](https://github.com/akator-de/norfair-enough/tree/main/demos/detectron2): tracking object centroids.
-5. [AlphaPose](https://github.com/akator-de/norfair-enough/tree/main/demos/alphapose): tracking human keypoints (pose estimation) and inserting the tracker into a complex existing pipeline.
-6. [OpenPose](https://github.com/akator-de/norfair-enough/tree/main/demos/openpose): tracking human keypoints.
-7. [YOLOPv2](https://github.com/akator-de/norfair-enough/tree/main/demos/yolopv2): tracking with a model for traffic object detection, drivable road area segmentation, and lane line detection.
-8. [YOLO-NAS](https://github.com/akator-de/norfair-enough/tree/main/demos/yolo_nas): tracking object centroids or bounding boxes.
+1. [Ultralytics YOLO](https://github.com/akator-de/norfair-enough/tree/main/demos/ultralytics): object detection with YOLO11, tracking centroids or bounding boxes.
+2. [Ultralytics YOLO Pose](https://github.com/akator-de/norfair-enough/tree/main/demos/ultralytics_pose): pose estimation with YOLO11-Pose, tracking human keypoints.
 
 ### Advanced features
 
-1. [Speed up pose estimation by extrapolating detections](https://github.com/akator-de/norfair-enough/tree/main/demos/openpose) using [OpenPose](https://github.com/CMU-Perceptual-Computing-Lab/openpose).
-2. [Track both bounding boxes and human keypoints](https://github.com/akator-de/norfair-enough/tree/main/demos/keypoints_bounding_boxes) (multi-class), unifying the detections from a YOLO model and OpenPose.
-3. [Re-identification (ReID)](https://github.com/akator-de/norfair-enough/tree/main/demos/reid) of tracked objects using appearance embeddings. This is a good starting point for scenarios with a lot of occlusion, in which the Kalman filter alone would struggle.
-4. [Accurately track objects even if the camera is moving](https://github.com/akator-de/norfair-enough/tree/main/demos/camera_motion), by estimating camera motion potentially accounting for pan, tilt, rotation, movement in any direction, and zoom.
-5. [Track points in 3D](https://github.com/akator-de/norfair-enough/tree/main/demos/3d_track), using [MediaPipe Objectron](https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/objectron.md).
-6. [Tracking of small objects](https://github.com/akator-de/norfair-enough/tree/main/demos/sahi), using [SAHI: Slicing Aided Hyper Inference](https://github.com/obss/sahi).
+1. [Re-identification (ReID)](https://github.com/akator-de/norfair-enough/tree/main/demos/reid) of tracked objects using appearance embeddings. This is a good starting point for scenarios with a lot of occlusion, in which the Kalman filter alone would struggle.
+2. [Accurately track objects even if the camera is moving](https://github.com/akator-de/norfair-enough/tree/main/demos/camera_motion), by estimating camera motion potentially accounting for pan, tilt, rotation, movement in any direction, and zoom.
+3. [Tracking of small objects](https://github.com/akator-de/norfair-enough/tree/main/demos/sahi), using [SAHI: Slicing Aided Hyper Inference](https://github.com/obss/sahi).
 
-### Benchmarking and profiling
+### Benchmarking
 
-1. [Kalman filter and distance function profiling](https://github.com/akator-de/norfair-enough/tree/main/demos/profiling) using [TRT pose estimator](https://github.com/NVIDIA-AI-IOT/trt_pose).
-2. Computation of [MOT17](https://motchallenge.net/data/MOT17/) scores using [motmetrics4norfair](https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair).
+1. Computation of [MOT17](https://motchallenge.net/data/MOT17/) scores using [motmetrics4norfair](https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair).
 
 ## How it works
 
 The tracker works by estimating the future position of each point based on its past positions. It then tries to match these estimated positions with newly detected points provided by the detector. For this matching to occur, the tracker can rely on any distance function. There are some predefined distances already integrated in the library, and the users can also define their own custom distances. Therefore, each object tracker can be made as simple or as complex as needed.
 
-As an example we use [Detectron2](https://github.com/facebookresearch/detectron2) to get the single point detections to use with this distance function. We just use the centroids of the bounding boxes it produces around cars as our detections, and get the following results.
+As an example we use [Ultralytics YOLO](https://github.com/ultralytics/ultralytics) to get the single point detections to use with this distance function. We just use the centroids of the bounding boxes it produces around cars as our detections, and get the following results.
 
 ![Tracking cars with Norfair Enough](https://media.githubusercontent.com/media/akator-de/norfair-enough/main/docs/videos/traffic.webp)
 
-On the left you can see the points we get from Detectron2, and on the right how the tracker tracks them assigning a unique identifier through time. Even a straightforward distance function like this one can work when the tracking needed is simple.
+On the left you can see the detection points, and on the right how the tracker tracks them assigning a unique identifier through time. Even a straightforward distance function like this one can work when the tracking needed is simple.
 
-The library also provides several useful tools for creating a video inference loop. Here is what the full code for creating the previous example looks like, including the code needed to set up Detectron2:
+The library also provides several useful tools for creating a video inference loop. Here is what the full code for creating the previous example looks like, using Ultralytics YOLO:
 
 ```python
-import cv2
 import numpy as np
-from detectron2.config import get_cfg
-from detectron2.engine import DefaultPredictor
+from ultralytics import YOLO
 
 from norfair import Detection, Tracker, Video, draw_points
 
-# Set up Detectron2 object detector
-cfg = get_cfg()
-cfg.merge_from_file("demos/faster_rcnn_R_50_FPN_3x.yaml")
-cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
-cfg.MODEL.WEIGHTS = "detectron2://COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl"
-detector = DefaultPredictor(cfg)
+# Set up Ultralytics YOLO detector
+model = YOLO("yolo11n.pt")
 
 # Norfair
 video = Video(input_path="video.mp4")
 tracker = Tracker(distance_function="euclidean", distance_threshold=20)
 
 for frame in video:
-    detections = detector(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-    detections = [Detection(p) for p in detections['instances'].pred_boxes.get_centers().cpu().numpy()]
+    results = model(frame, verbose=False)[0]
+    detections = [
+        Detection(points=np.array([(x1 + x2) / 2, (y1 + y2) / 2]).reshape(1, 2))
+        for x1, y1, x2, y2 in results.boxes.xyxy.cpu().numpy()
+    ]
     tracked_objects = tracker.update(detections=detections)
     draw_points(frame, drawables=tracked_objects)
     video.write(frame)

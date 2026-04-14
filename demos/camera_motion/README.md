@@ -9,6 +9,10 @@ What's the motivation for estimating camera movement?
 
 Keep in mind that the estimation of the camera movement works best with a static background. If the scene is too chaotic with a lot of movement, the estimation will lose accuracy. Nevertheless, even when the estimation is incorrect it will not hurt the tracking.
 
+## Detector
+
+This demo uses [Ultralytics YOLO](https://docs.ultralytics.com/) for object detection. By default it loads `yolo11n.pt` (the nano model). You can select a different model with the `--model` flag, e.g. `--model yolo11x.pt`.
+
 ## Example 1: Translation
 
 This method only works for camera pans and tilts.
@@ -29,7 +33,7 @@ In the following video, the players are tracked and their trajectories are drawn
 
 https://user-images.githubusercontent.com/3588715/189200514-b1b25601-2b45-4d2f-9c2f-224b09c9b020.mp4
 
-> Video generated using command `python demo.py --transformation homography --draw-paths --path-history 150 --distance-threshold 200 --track-boxes --max-points=900 --min-distance=14 --save --model yolov5x --hit-counter-max 3 <video>.mp4` on a snippet of this [video](https://www.youtube.com/watch?v=CGFgHjeEkbY&t=1200s).
+> Video generated using command `python demo.py --transformation homography --draw-paths --path-history 150 --distance-threshold 200 --track-boxes --max-points=900 --min-distance=14 --save --model yolo11x.pt --hit-counter-max 3 <video>.mp4` on a snippet of this [video](https://www.youtube.com/watch?v=CGFgHjeEkbY&t=1200s).
 
 ## Instructions
 

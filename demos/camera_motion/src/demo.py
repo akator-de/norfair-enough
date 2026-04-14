@@ -2,7 +2,7 @@ import argparse
 from functools import partial
 
 import numpy as np
-import torch
+from ultralytics import YOLO
 
 from norfair import (
     AbsolutePaths,
@@ -20,28 +20,32 @@ from norfair.camera_motion import (
 from norfair.drawing import draw_boxes, draw_points
 
 
-def yolo_detections_to_norfair_detections(yolo_detections, track_boxes):
+def yolo_detections_to_norfair_detections(yolo_results, track_boxes):
     norfair_detections = []
     boxes = []
-    detections_as_xyxy = yolo_detections.xyxy[0]
-    for detection_as_xyxy in detections_as_xyxy:
-        detection_as_xyxy = detection_as_xyxy.cpu().numpy()
+
+    result = yolo_results[0]
+    xyxy = result.boxes.xyxy.cpu().numpy()
+    confidences = result.boxes.conf.cpu().numpy()
+    class_ids = result.boxes.cls.cpu().numpy()
+
+    for bbox_xyxy, conf, cls_id in zip(xyxy, confidences, class_ids):
         bbox = np.array(
             [
-                [detection_as_xyxy[0].item(), detection_as_xyxy[1].item()],
-                [detection_as_xyxy[2].item(), detection_as_xyxy[3].item()],
+                [bbox_xyxy[0], bbox_xyxy[1]],
+                [bbox_xyxy[2], bbox_xyxy[3]],
             ]
         )
         boxes.append(bbox)
         if track_boxes:
             points = bbox
-            scores = np.array([detection_as_xyxy[4], detection_as_xyxy[4]])
+            scores = np.array([conf, conf])
         else:
             points = bbox.mean(axis=0, keepdims=True)
-            scores = detection_as_xyxy[[4]]
+            scores = np.array([conf])
 
         norfair_detections.append(
-            Detection(points=points, scores=scores, label=detection_as_xyxy[-1].item())
+            Detection(points=points, scores=scores, label=int(cls_id))
         )
 
     return norfair_detections, boxes
@@ -53,8 +57,8 @@ def run():
     parser.add_argument(
         "--model",
         type=str,
-        default="yolov5n",
-        help="YOLO model to use, possible values are yolov5n, yolov5s, yolov5m, yolov5l, yolov5x",
+        default="yolo11n.pt",
+        help="Ultralytics YOLO model to use, e.g. yolo11n.pt, yolo11s.pt, yolo11m.pt, yolo11l.pt, yolo11x.pt",
     )
     parser.add_argument(
         "--confidence-threshold",
@@ -181,11 +185,7 @@ def run():
 
     args = parser.parse_args()
 
-    model = torch.hub.load("ultralytics/yolov5", args.model)
-    model.conf_threshold = 0
-    model.iou_threshold = args.iou_threshold
-    model.image_size = args.image_size
-    model.classes = args.classes
+    model = YOLO(args.model)
 
     use_fixed_camera = args.fixed_camera_scale > 0
     tracked_objects = []
@@ -242,9 +242,16 @@ def run():
             hit_counter_max=args.hit_counter_max,
         )
         for frame in video:
-            detections = model(frame)
+            yolo_results = model(
+                frame,
+                conf=args.confidence_threshold,
+                iou=args.iou_threshold,
+                imgsz=args.image_size,
+                classes=args.classes,
+                verbose=False,
+            )
             detections, boxes = yolo_detections_to_norfair_detections(
-                detections, args.track_boxes
+                yolo_results, args.track_boxes
             )
 
             mask = None

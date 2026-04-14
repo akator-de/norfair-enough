@@ -61,7 +61,7 @@ class Paths:
         if get_points_to_draw is None:
 
             def default_get_points(points):
-                return [np.mean(np.array(points), axis=0)]
+                return np.array([np.mean(np.array(points), axis=0)])
 
             self.get_points_to_draw = default_get_points
         else:
@@ -204,7 +204,7 @@ class AbsolutePaths:
         if get_points_to_draw is None:
 
             def default_get_points(points):
-                return [np.mean(np.array(points), axis=0)]
+                return np.array([np.mean(np.array(points), axis=0)])
 
             self.get_points_to_draw = default_get_points
         else:
