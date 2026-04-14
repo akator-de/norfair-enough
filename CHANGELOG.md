@@ -7,10 +7,18 @@ This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2
 ## [Unreleased]
 
 ### Added
+- Comprehensive test coverage for `camera_motion`, drawing subpackage, `Video`, and utils (#76)
 - Add CodeRabbit-generated unit tests for `Video`, tracker, and package exports (#26)
 - Add CodeRabbit configuration for automated PR reviews (#3)
 
 ### Changed
+- Modernize demos: replace 12 outdated demos with Ultralytics YOLO/Pose/Camera-motion, add Dockerfiles with non-root user (#73)
+- Consistent naming: use "Norfair Enough" instead of bare "Norfair" throughout docs and demos (#75)
+- Modernize README with updated badges, comparison section, and motivation (#74)
+- Optimize greedy matching to avoid O(n²) `list.remove()` (#64)
+- Add OS matrix (Linux/macOS/Windows), fix `pull_request_target` security, packaging polish (#65)
+- Replace `print()` with `logging` in metrics module
+- Add maintainer metadata and project URLs to `pyproject.toml`
 - Document `Detection` mutation behavior in `Tracker.update()` (`.absolute_points`, `.age`) and `Detection` docstrings (#22)
 - Replace fragile `hasattr` type dispatch with `isinstance` in vectorized distance functions (#23)
 - Add context manager support and `close()` method to `Video` for reliable resource cleanup (#20)
@@ -27,6 +35,15 @@ This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2
 - Bump GitHub Actions dependencies: `actions/download-artifact` v6→v7, `actions/labeler` v5→v6 (#17)
 
 ### Fixed
+- Fix MOT20 benchmark link pointing to MOT17 in README
+- Guard Kalman filter against singular/ill-conditioned innovation covariance (#66)
+- Guard distance functions against NaN values and zero division (#67)
+- Guard `cv2.findHomography()` against returning `None` (#68)
+- Guard drawing against NaN/Inf coordinates and enforce rectangle corner ordering (#69)
+- Prevent `Detection.age` mutation and deep-copy mutable refs in `merge()` (#70)
+- Add input validation to `get_cutout` and `print_objects_as_table` (#71)
+- Correct broken anchor and MediaPipe link in README (#72)
+- Add context manager support and close file handles in metrics (#63)
 - Fix missing f-string for camera output filename (`video.py`)
 - Fix `draw_tracked_objects` not returning the frame
 - Fix NaN text position when all tracked points are dead

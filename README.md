@@ -102,7 +102,7 @@ from norfair import Detection, Tracker, Video, draw_points
 # Set up Ultralytics YOLO detector
 model = YOLO("yolo11n.pt")
 
-# Norfair
+# Norfair Enough
 video = Video(input_path="video.mp4")
 tracker = Tracker(distance_function="euclidean", distance_threshold=20)
 
@@ -141,7 +141,7 @@ Norfair Enough stands out by being **detector-agnostic**, supporting **any point
 
 These benchmarks were produced using the [motmetrics4norfair](https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair) demo script. Our CI runs MOT metrics regression tests on every pull request to prevent tracking quality regressions.
 
-[MOT17](https://motchallenge.net/data/MOT17/) and [MOT20](https://motchallenge.net/data/MOT17/) results obtained using [motmetrics4norfair](https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair) demo script on the `train` split. We used detections obtained with [ByteTrack's](https://github.com/ifzhang/ByteTrack) YOLOX object detection model.
+[MOT17](https://motchallenge.net/data/MOT17/) and [MOT20](https://motchallenge.net/data/MOT20/) results obtained using [motmetrics4norfair](https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair) demo script on the `train` split. We used detections obtained with [ByteTrack's](https://github.com/ifzhang/ByteTrack) YOLOX object detection model.
 
 | MOT17 Train |   IDF1 IDP IDR    | Rcll  | Prcn  |  MOTA MOTP  |
 | :---------: | :---------------: | :---: | :---: | :---------: |

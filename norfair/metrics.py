@@ -1,13 +1,15 @@
 """MOTChallenge-style I/O helpers and accumulators for the evaluation suite."""
 
+import logging
 import os
 from collections import OrderedDict
 
 import numpy as np
-from rich import print
 from rich.progress import track
 
 from norfair.tracker import Detection
+
+_logger = logging.getLogger(__name__)
 
 # MotMetrics and pandas are optional dependencies
 try:
@@ -478,7 +480,7 @@ def compare_dataframes(gts, ts):
     accs = []
     names = []
     for k, tsacc in ts.items():
-        print("Comparing ", k, "...")
+        _logger.info("Comparing %s ...", k)
         if k in gts:
             accs.append(
                 mm.utils.compare_to_groundtruth(gts[k], tsacc, "iou", distth=0.5)
@@ -542,7 +544,7 @@ def eval_motChallenge(matrixes_predictions, paths, metrics=None, generate_overal
     if metrics is None:
         metrics = list(mm.metrics.motchallenge_metrics)
     mm.lap.default_solver = "scipy"
-    print("Computing metrics...")
+    _logger.info("Computing metrics...")
     summary_dataframe = mh.compute_many(
         accs, names=names, metrics=metrics, generate_overall=generate_overall
     )

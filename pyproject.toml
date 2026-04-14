@@ -1,11 +1,14 @@
 [project]
 name = "norfair-enough"
 version = "2.4.0"
-description = "Lightweight Python library for adding real-time multi-object tracking to any detector."
+description = "Lightweight Python library for adding real-time multi-object tracking to any detector. Maintained fork of tryolabs/norfair."
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 authors = [
     { name = "Tryolabs", email = "hello@tryolabs.com" },
+]
+maintainers = [
+    { name = "Akator GmbH", email = "info@akator.de" },
 ]
 readme = "README.md"
 requires-python = ">=3.10"
@@ -46,7 +49,11 @@ metrics = ["motmetrics==1.4.0"]
 video = ["opencv-python>=4.2.0,<5.0.0"]
 
 [project.urls]
+Homepage = "https://github.com/akator-de/norfair-enough"
+Documentation = "https://akator-de.github.io/norfair-enough/"
 Repository = "https://github.com/akator-de/norfair-enough"
+Changelog = "https://github.com/akator-de/norfair-enough/blob/main/CHANGELOG.md"
+Issues = "https://github.com/akator-de/norfair-enough/issues"
 
 [dependency-groups]
 dev = [
