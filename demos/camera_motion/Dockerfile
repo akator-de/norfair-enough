@@ -11,4 +11,8 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt && \
     pip install --no-cache-dir norfair-enough
 
+RUN groupadd --system app && useradd --system --gid app --create-home app && \
+    chown -R app:app /demo
+
 WORKDIR /demo/src/
+USER app

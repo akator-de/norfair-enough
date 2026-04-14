@@ -1,6 +1,6 @@
 # Ultralytics YOLO Example
 
-Object detection and tracking using [Ultralytics](https://github.com/ultralytics/ultralytics) YOLO models (YOLOv8, YOLO11, etc.) with Norfair.
+Object detection and tracking using [Ultralytics](https://github.com/ultralytics/ultralytics) YOLO models (YOLOv8, YOLO11, etc.) with Norfair Enough.
 
 ## Instructions
 

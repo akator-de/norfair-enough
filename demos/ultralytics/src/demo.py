@@ -28,7 +28,7 @@ def detections_to_norfair(
 
         if track_points == "centroid":
             x1, y1, x2, y2 = boxes.xyxy[i].tolist()
-            centroid = np.array([(x1 + x2) / 2, (y1 + y2) / 2])
+            centroid = np.array([[(x1 + x2) / 2, (y1 + y2) / 2]])
             detections.append(
                 Detection(points=centroid, scores=np.array([conf]), label=cls)
             )
