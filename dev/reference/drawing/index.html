@@ -5694,7 +5694,7 @@ fade between frames. Use <code>0</code> to keep the path forever.</p>
         <span class="k">if</span> <span class="n">get_points_to_draw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 
             <span class="k">def</span><span class="w"> </span><span class="nf">default_get_points</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
-                <span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)])</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="n">default_get_points</span>
         <span class="k">else</span><span class="p">:</span>
@@ -5839,7 +5839,7 @@ fade between frames. Use <code>0</code> to keep the path forever.</p>
     <span class="k">if</span> <span class="n">get_points_to_draw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">default_get_points</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="n">default_get_points</span>
     <span class="k">else</span><span class="p">:</span>
@@ -6496,7 +6496,7 @@ for camera motion::</p>
         <span class="k">if</span> <span class="n">get_points_to_draw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 
             <span class="k">def</span><span class="w"> </span><span class="nf">default_get_points</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
-                <span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)])</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="n">default_get_points</span>
         <span class="k">else</span><span class="p">:</span>
@@ -6677,7 +6677,7 @@ for camera motion::</p>
     <span class="k">if</span> <span class="n">get_points_to_draw</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">default_get_points</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="n">default_get_points</span>
     <span class="k">else</span><span class="p">:</span>

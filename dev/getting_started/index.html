@@ -973,17 +973,12 @@
 <p>We recommend first deciding and setting up the model and then adding the tracker on top of it.
 Models trained for any form of <a href="https://paperswithcode.com/task/object-detection">object detection</a> or <a href="https://paperswithcode.com/task/keypoint-detection">keypoint detection</a> (including <a href="https://paperswithcode.com/task/pose-estimation">pose estimation</a>) are all supported. You can check some of the integrations we have as examples:</p>
 <ul>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov7">Yolov7</a>, <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov5">Yolov5</a> and <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov4">Yolov4</a></li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/detectron2">Detectron2</a></li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/alphapose">Alphapose</a></li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/openpose">Openpose</a></li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/mmdetection">MMDetection</a></li>
+<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/ultralytics">Ultralytics YOLO</a> — object detection with YOLO11 (centroids and bounding boxes)</li>
+<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/ultralytics_pose">Ultralytics YOLO Pose</a> — pose estimation with YOLO11-Pose</li>
+<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/camera_motion">Camera motion compensation</a>, <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/sahi">SAHI</a>, and <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/reid">ReID</a> demos for advanced features</li>
 </ul>
-<blockquote>
-<p><strong>Note:</strong> These demos were originally written for <a href="https://github.com/tryolabs/norfair">tryolabs/norfair</a> which is no longer actively maintained. Some demos may reference upstream resources that could become unavailable in the future. They remain compatible with norfair-enough — just replace <code>pip install norfair</code> with <code>pip install norfair-enough</code>.</p>
-</blockquote>
 <p>Any other model trained on one of the supported tasks is also supported and should be easy to integrate with the library, regardless of whether it uses Pytorch, TensorFlow, or other.</p>
-<p>If you are unsure of which model to use, <a href="https://github.com/WongKinYiu/yolov7">Yolov7</a> is a good starting point since it's easy to set up and offers models of different sizes pre-trained on object detection and pose estimation.</p>
+<p>If you are unsure of which model to use, <a href="https://docs.ultralytics.com/">Ultralytics YOLO</a> (v8+/v11) is a good starting point since it's easy to set up and offers models of different sizes pre-trained on object detection and pose estimation.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The library is a Detection-Based-Tracker (DBT) and as such, its performance is highly dependent on the performance of the model of choice.</p>

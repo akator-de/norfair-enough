@@ -435,10 +435,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#benchmarking-and-profiling" class="md-nav__link">
+  <a href="#benchmarking" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Benchmarking and profiling
+        Benchmarking
       
     </span>
   </a>
@@ -981,10 +981,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#benchmarking-and-profiling" class="md-nav__link">
+  <a href="#benchmarking" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Benchmarking and profiling
+        Benchmarking
       
     </span>
   </a>
@@ -1146,43 +1146,32 @@ pip<span class="w"> </span>install<span class="w"> </span>norfair-enough<span cl
 <p><a href="https://akator-de.github.io/norfair-enough/dev/getting_started/">Getting started guide</a>.</p>
 <p><a href="https://akator-de.github.io/norfair-enough/dev/reference/">API reference</a>.</p>
 <h2 id="examples--demos">Examples &amp; demos<a class="headerlink" href="#examples--demos" title="Permanent link">#</a></h2>
-<p>We provide several examples of how the library can be used to add tracking capabilities to different detectors, and also showcase more advanced features. All demos are available in the <a href="https://github.com/akator-de/norfair-enough/tree/main/demos"><code>demos/</code></a> directory of this repository (originally adapted from <a href="https://github.com/tryolabs/norfair/tree/master/demos">tryolabs/norfair</a>).</p>
+<p>We provide several examples of how the library can be used to add tracking capabilities to different detectors, and also showcase more advanced features. All demos are available in the <a href="https://github.com/akator-de/norfair-enough/tree/main/demos"><code>demos/</code></a> directory of this repository.</p>
 <blockquote>
-<p><strong>Note:</strong> The demo code was originally written in the <a href="https://github.com/tryolabs/norfair">tryolabs/norfair</a> repository which is no longer actively maintained. Some demos may reference upstream resources that could become unavailable in the future. The demos remain compatible with norfair-enough — just replace <code>pip install norfair</code> with <code>pip install norfair-enough</code>.</p>
 <p>Some demos include Dockerfiles for reproducibility. If you have a GPU, install <a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html">NVIDIA Container Toolkit</a> for GPU passthrough. CPU-only usage is possible but may require dependency adjustments.</p>
 </blockquote>
 <h3 id="adding-tracking-to-different-detectors">Adding tracking to different detectors<a class="headerlink" href="#adding-tracking-to-different-detectors" title="Permanent link">#</a></h3>
 <p>Most tracking demos are showcased with vehicles and pedestrians, but the detectors are generally trained with many more classes from the <a href="https://cocodataset.org/">COCO dataset</a>.</p>
 <ol>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov7">YOLOv7</a>: tracking object centroids or bounding boxes.</li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov5">YOLOv5</a>: tracking object centroids or bounding boxes.</li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolov4">YOLOv4</a>: tracking object centroids.</li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/detectron2">Detectron2</a>: tracking object centroids.</li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/alphapose">AlphaPose</a>: tracking human keypoints (pose estimation) and inserting the tracker into a complex existing pipeline.</li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/openpose">OpenPose</a>: tracking human keypoints.</li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolopv2">YOLOPv2</a>: tracking with a model for traffic object detection, drivable road area segmentation, and lane line detection.</li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/yolo_nas">YOLO-NAS</a>: tracking object centroids or bounding boxes.</li>
+<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/ultralytics">Ultralytics YOLO</a>: object detection with YOLO11, tracking centroids or bounding boxes.</li>
+<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/ultralytics_pose">Ultralytics YOLO Pose</a>: pose estimation with YOLO11-Pose, tracking human keypoints.</li>
 </ol>
 <h3 id="advanced-features">Advanced features<a class="headerlink" href="#advanced-features" title="Permanent link">#</a></h3>
 <ol>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/openpose">Speed up pose estimation by extrapolating detections</a> using <a href="https://github.com/CMU-Perceptual-Computing-Lab/openpose">OpenPose</a>.</li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/keypoints_bounding_boxes">Track both bounding boxes and human keypoints</a> (multi-class), unifying the detections from a YOLO model and OpenPose.</li>
 <li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/reid">Re-identification (ReID)</a> of tracked objects using appearance embeddings. This is a good starting point for scenarios with a lot of occlusion, in which the Kalman filter alone would struggle.</li>
 <li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/camera_motion">Accurately track objects even if the camera is moving</a>, by estimating camera motion potentially accounting for pan, tilt, rotation, movement in any direction, and zoom.</li>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/3d_track">Track points in 3D</a>, using <a href="https://github.com/google-ai-edge/mediapipe/blob/master/docs/solutions/objectron.md">MediaPipe Objectron</a>.</li>
 <li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/sahi">Tracking of small objects</a>, using <a href="https://github.com/obss/sahi">SAHI: Slicing Aided Hyper Inference</a>.</li>
 </ol>
-<h3 id="benchmarking-and-profiling">Benchmarking and profiling<a class="headerlink" href="#benchmarking-and-profiling" title="Permanent link">#</a></h3>
+<h3 id="benchmarking">Benchmarking<a class="headerlink" href="#benchmarking" title="Permanent link">#</a></h3>
 <ol>
-<li><a href="https://github.com/akator-de/norfair-enough/tree/main/demos/profiling">Kalman filter and distance function profiling</a> using <a href="https://github.com/NVIDIA-AI-IOT/trt_pose">TRT pose estimator</a>.</li>
 <li>Computation of <a href="https://motchallenge.net/data/MOT17/">MOT17</a> scores using <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair">motmetrics4norfair</a>.</li>
 </ol>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">#</a></h2>
 <p>The tracker works by estimating the future position of each point based on its past positions. It then tries to match these estimated positions with newly detected points provided by the detector. For this matching to occur, the tracker can rely on any distance function. There are some predefined distances already integrated in the library, and the users can also define their own custom distances. Therefore, each object tracker can be made as simple or as complex as needed.</p>
-<p>As an example we use <a href="https://github.com/facebookresearch/detectron2">Detectron2</a> to get the single point detections to use with this distance function. We just use the centroids of the bounding boxes it produces around cars as our detections, and get the following results.</p>
+<p>As an example we use <a href="https://github.com/ultralytics/ultralytics">Ultralytics YOLO</a> to get the single point detections to use with this distance function. We just use the centroids of the bounding boxes it produces around cars as our detections, and get the following results.</p>
 <p><img alt="Tracking cars with Norfair Enough" src="https://media.githubusercontent.com/media/akator-de/norfair-enough/main/docs/videos/traffic.webp" /></p>
-<p>On the left you can see the points we get from Detectron2, and on the right how the tracker tracks them assigning a unique identifier through time. Even a straightforward distance function like this one can work when the tracking needed is simple.</p>
-<p>The library also provides several useful tools for creating a video inference loop. Here is what the full code for creating the previous example looks like, including the code needed to set up Detectron2:</p>
+<p>On the left you can see the detection points, and on the right how the tracker tracks them assigning a unique identifier through time. Even a straightforward distance function like this one can work when the tracking needed is simple.</p>
+<p>The library also provides several useful tools for creating a video inference loop. Here is what the full code for creating the previous example looks like, using Ultralytics YOLO:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 1</span>
 <span class="normal"> 2</span>
 <span class="normal"> 3</span>
@@ -1203,30 +1192,24 @@ pip<span class="w"> </span>install<span class="w"> </span>norfair-enough<span cl
 <span class="normal">18</span>
 <span class="normal">19</span>
 <span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">detectron2.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_cfg</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">detectron2.engine</span><span class="w"> </span><span class="kn">import</span> <span class="n">DefaultPredictor</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ultralytics</span><span class="w"> </span><span class="kn">import</span> <span class="n">YOLO</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Detection</span><span class="p">,</span> <span class="n">Tracker</span><span class="p">,</span> <span class="n">Video</span><span class="p">,</span> <span class="n">draw_points</span>
 
-<span class="c1"># Set up Detectron2 object detector</span>
-<span class="n">cfg</span> <span class="o">=</span> <span class="n">get_cfg</span><span class="p">()</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">merge_from_file</span><span class="p">(</span><span class="s2">&quot;demos/faster_rcnn_R_50_FPN_3x.yaml&quot;</span><span class="p">)</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">ROI_HEADS</span><span class="o">.</span><span class="n">SCORE_THRESH_TEST</span> <span class="o">=</span> <span class="mf">0.5</span>
-<span class="n">cfg</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">WEIGHTS</span> <span class="o">=</span> <span class="s2">&quot;detectron2://COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x/137849600/model_final_f10217.pkl&quot;</span>
-<span class="n">detector</span> <span class="o">=</span> <span class="n">DefaultPredictor</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+<span class="c1"># Set up Ultralytics YOLO detector</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">YOLO</span><span class="p">(</span><span class="s2">&quot;yolo11n.pt&quot;</span><span class="p">)</span>
 
 <span class="c1"># Norfair</span>
 <span class="n">video</span> <span class="o">=</span> <span class="n">Video</span><span class="p">(</span><span class="n">input_path</span><span class="o">=</span><span class="s2">&quot;video.mp4&quot;</span><span class="p">)</span>
 <span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="n">distance_function</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="n">distance_threshold</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">video</span><span class="p">:</span>
-    <span class="n">detections</span> <span class="o">=</span> <span class="n">detector</span><span class="p">(</span><span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">))</span>
-    <span class="n">detections</span> <span class="o">=</span> <span class="p">[</span><span class="n">Detection</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">detections</span><span class="p">[</span><span class="s1">&#39;instances&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">pred_boxes</span><span class="o">.</span><span class="n">get_centers</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()]</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">detections</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">Detection</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="n">x1</span> <span class="o">+</span> <span class="n">x2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">y1</span> <span class="o">+</span> <span class="n">y2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">boxes</span><span class="o">.</span><span class="n">xyxy</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+    <span class="p">]</span>
     <span class="n">tracked_objects</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">detections</span><span class="o">=</span><span class="n">detections</span><span class="p">)</span>
     <span class="n">draw_points</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">drawables</span><span class="o">=</span><span class="n">tracked_objects</span><span class="p">)</span>
     <span class="n">video</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
