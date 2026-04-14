@@ -8,7 +8,7 @@ import pytest
 
 # Create a mock cv2 module and inject it before importing Video
 @pytest.fixture(scope="function", autouse=True)
-def mock_cv2():
+def mock_cv2(monkeypatch):
     """Mock OpenCV for testing without actual video files."""
     # Create mock cv2
     mock = Mock()
@@ -42,9 +42,8 @@ def mock_cv2():
     mock.resize = Mock(return_value=np.zeros((50, 50, 3), dtype=np.uint8))
     mock.destroyAllWindows = Mock()
 
-    # Inject into sys.modules
-    old_cv2 = sys.modules.get("cv2")
-    sys.modules["cv2"] = mock
+    # Inject into sys.modules via monkeypatch (auto-cleaned up)
+    monkeypatch.setitem(sys.modules, "cv2", mock)
 
     # Reload norfair.video to pick up the mocked cv2
     if "norfair.video" in sys.modules:
@@ -54,21 +53,16 @@ def mock_cv2():
 
         importlib.reload(norfair.video)
 
-    yield mock
+    try:
+        yield mock
+    finally:
+        # Reload again to restore original state
+        if "norfair.video" in sys.modules:
+            import importlib
 
-    # Restore
-    if old_cv2 is not None:
-        sys.modules["cv2"] = old_cv2
-    elif "cv2" in sys.modules:
-        del sys.modules["cv2"]
+            import norfair.video
 
-    # Reload again to restore original state
-    if "norfair.video" in sys.modules:
-        import importlib
-
-        import norfair.video
-
-        importlib.reload(norfair.video)
+            importlib.reload(norfair.video)
 
 
 def test_video_requires_input_source():
