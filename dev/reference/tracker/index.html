@@ -1659,8 +1659,7 @@ detection is stored as a past detection. <code>None</code> until then.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>norfair/tracker.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 937</span>
-<span class="normal"> 938</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 938</span>
 <span class="normal"> 939</span>
 <span class="normal"> 940</span>
 <span class="normal"> 941</span>
@@ -1750,7 +1749,8 @@ detection is stored as a past detection. <code>None</code> until then.</p>
 <span class="normal">1025</span>
 <span class="normal">1026</span>
 <span class="normal">1027</span>
-<span class="normal">1028</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Detection</span><span class="p">:</span>
+<span class="normal">1028</span>
+<span class="normal">1029</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Detection</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A single detection produced by a detector, prepared for use by Norfair.</span>
 
 <span class="sd">    Detections returned by the detector must be converted to a ``Detection``</span>
@@ -1906,8 +1906,7 @@ reference frame. When <code>None</code>, this is a no-op.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/tracker.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1013</span>
-<span class="normal">1014</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1014</span>
 <span class="normal">1015</span>
 <span class="normal">1016</span>
 <span class="normal">1017</span>
@@ -1921,7 +1920,8 @@ reference frame. When <code>None</code>, this is a no-op.</p>
 <span class="normal">1025</span>
 <span class="normal">1026</span>
 <span class="normal">1027</span>
-<span class="normal">1028</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update_coordinate_transformation</span><span class="p">(</span>
+<span class="normal">1028</span>
+<span class="normal">1029</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update_coordinate_transformation</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">coordinate_transformation</span><span class="p">:</span> <span class="n">CoordinatesTransformation</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Rewrite ``absolute_points`` into absolute coordinates.</span>
@@ -3090,8 +3090,8 @@ separate <code>Tracker</code> instances in different threads is safe — the sha
                             <span class="n">candidates_to_remove</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">matched_candidate</span><span class="p">))</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">unmatched_candidates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                            <span class="n">matched_candidate</span>
-                        <span class="p">)</span>  <span class="c1"># pyrefly: ignore[bad-argument-type]</span>
+                            <span class="n">matched_candidate</span>  <span class="c1"># pyrefly: ignore[bad-argument-type]</span>
+                        <span class="p">)</span>
                         <span class="n">unmatched_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">matched_object</span><span class="p">)</span>
 
                 <span class="c1"># Batch-remove merged TrackedObject candidates in a single pass (O(n))</span>
@@ -4466,7 +4466,8 @@ rate before it is converted into a full-fledged tracked object.
 <span class="normal">931</span>
 <span class="normal">932</span>
 <span class="normal">933</span>
-<span class="normal">934</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TrackedObject</span><span class="p">:</span>
+<span class="normal">934</span>
+<span class="normal">935</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">TrackedObject</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Objects returned by the tracker&#39;s ``update`` method on each iteration.</span>
 
 <span class="sd">    They represent the objects currently being tracked by the tracker.</span>
@@ -4719,6 +4720,7 @@ rate before it is converted into a full-fledged tracked object.
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_initializing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">hit_counter</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialization_delay</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">is_initializing</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_ids</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hit_counter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hit_counter_max</span>
 
         <span class="c1"># Reset reid_hit_counter if we are are successfully tracking this object.</span>
         <span class="c1"># If hit_counter was 0 when Tracker.update was called and ReID is being used,</span>
@@ -5434,7 +5436,8 @@ update. Defaults to <code>1</code>.</p>
 <span class="normal">855</span>
 <span class="normal">856</span>
 <span class="normal">857</span>
-<span class="normal">858</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">period</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="normal">858</span>
+<span class="normal">859</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">hit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detection</span><span class="p">:</span> <span class="s2">&quot;Detection&quot;</span><span class="p">,</span> <span class="n">period</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Update this tracked object with a new detection.</span>
 
 <span class="sd">    Parameters</span>
@@ -5457,6 +5460,7 @@ update. Defaults to <code>1</code>.</p>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_initializing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">hit_counter</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialization_delay</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_initializing</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_acquire_ids</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hit_counter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hit_counter_max</span>
 
     <span class="c1"># Reset reid_hit_counter if we are are successfully tracking this object.</span>
     <span class="c1"># If hit_counter was 0 when Tracker.update was called and ReID is being used,</span>
@@ -5546,8 +5550,7 @@ update. Defaults to <code>1</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/tracker.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">860</span>
-<span class="normal">861</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">861</span>
 <span class="normal">862</span>
 <span class="normal">863</span>
 <span class="normal">864</span>
@@ -5558,7 +5561,8 @@ update. Defaults to <code>1</code>.</p>
 <span class="normal">869</span>
 <span class="normal">870</span>
 <span class="normal">871</span>
-<span class="normal">872</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">872</span>
+<span class="normal">873</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a human-readable representation of this tracked object.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_distance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">placeholder_text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[1mObject_</span><span class="si">{}</span><span class="se">\033</span><span class="s2">[0m(age: </span><span class="si">{}</span><span class="s2">, hit_counter: </span><span class="si">{}</span><span class="s2">, last_distance: </span><span class="si">{}</span><span class="s2">, init_id: </span><span class="si">{}</span><span class="s2">)&quot;</span>
@@ -5595,8 +5599,7 @@ discarded <code>tracked_object</code> is not silently aliased.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/tracker.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">899</span>
-<span class="normal">900</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">900</span>
 <span class="normal">901</span>
 <span class="normal">902</span>
 <span class="normal">903</span>
@@ -5619,7 +5622,8 @@ discarded <code>tracked_object</code> is not silently aliased.</p>
 <span class="normal">920</span>
 <span class="normal">921</span>
 <span class="normal">922</span>
-<span class="normal">923</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">):</span>
+<span class="normal">923</span>
+<span class="normal">924</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tracked_object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge another (not-yet-initialized) ``TrackedObject`` into this one.</span>
 
 <span class="sd">    Mutable state (filter, counters, arrays) is copied so the</span>
@@ -5666,12 +5670,12 @@ discarded <code>tracked_object</code> is not silently aliased.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/tracker.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">925</span>
-<span class="normal">926</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">926</span>
 <span class="normal">927</span>
 <span class="normal">928</span>
 <span class="normal">929</span>
-<span class="normal">930</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update_coordinate_transformation</span><span class="p">(</span>
+<span class="normal">930</span>
+<span class="normal">931</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update_coordinate_transformation</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">coordinate_transformation</span><span class="p">:</span> <span class="n">CoordinatesTransformation</span> <span class="o">|</span> <span class="kc">None</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Attach (or refresh) the abs→rel converter from a new coordinate transformation.&quot;&quot;&quot;</span>
