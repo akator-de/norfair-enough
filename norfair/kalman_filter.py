@@ -970,7 +970,7 @@ class KalmanFilter:
             function for this one call, otherwise a slice of self.H will
             be used.
         """
-        if isinstance(z_i, np.ndarray):
+        if isinstance(z_i, np.ndarray) and z_i.ndim > 0:
             length = len(z_i)
         else:
             length = 1

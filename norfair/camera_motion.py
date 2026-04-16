@@ -589,7 +589,8 @@ class MotionEstimator:
         if curr_pts is not None and prev_pts is not None:
             try:
                 update_prvs, coord_transformations = self.transformations_getter(
-                    curr_pts, prev_pts
+                    curr_pts.astype(np.float64, copy=False),
+                    prev_pts.astype(np.float64, copy=False),
                 )
             except (TypeError, ValueError, np.linalg.LinAlgError) as e:
                 logger.warning(e)
