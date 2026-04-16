@@ -6,6 +6,11 @@ This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2
 
 ## [Unreleased]
 
+## [2.4.2] - 2026-04-16
+
+### Fixed
+- Fix `hit_counter` not set to `hit_counter_max` on initialization, causing newly tracked objects to exit after a few frames without detection (#82). Upstream: [tryolabs/norfair#337](https://github.com/tryolabs/norfair/issues/337)
+
 ## [2.4.1] - 2026-04-14
 
 ### Added
