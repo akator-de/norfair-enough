@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from norfair.drawing.color import Color, ColorType
 from norfair.tracker import Detection, TrackedObject
@@ -16,7 +17,7 @@ except ImportError:
     cv2 = DummyOpenCVImport()
 
 
-def _is_finite_point(point: tuple | np.ndarray) -> bool:
+def _is_finite_point(point: tuple | NDArray[np.float64]) -> bool:
     """Return ``True`` when every coordinate in *point* is finite.
 
     NaN and Inf values can appear when the Kalman filter diverges or
@@ -28,7 +29,7 @@ def _is_finite_point(point: tuple | np.ndarray) -> bool:
     return bool(np.all(np.isfinite(point)))
 
 
-def _safe_int_point(point: np.ndarray) -> tuple[int, int] | None:
+def _safe_int_point(point: NDArray[np.float64]) -> tuple[int, int] | None:
     """Convert a coordinate array to an ``(int, int)`` tuple, or ``None`` if non-finite.
 
     Returns
@@ -186,7 +187,7 @@ class Drawer:
     def rectangle(
         cls,
         frame: np.ndarray,
-        points: Sequence[tuple[int, int]] | np.ndarray,
+        points: Sequence[tuple[int, int]] | NDArray[np.integer],
         color: ColorType | None = None,
         thickness: int | None = None,
     ) -> np.ndarray:
@@ -413,11 +414,11 @@ class Drawable:
     def __init__(
         self,
         obj: Detection | TrackedObject | None = None,
-        points: np.ndarray | None = None,
+        points: NDArray[np.float64] | None = None,
         id: Any = None,
         label: Any = None,
-        scores: np.ndarray | None = None,
-        live_points: np.ndarray | None = None,
+        scores: NDArray[np.float64] | None = None,
+        live_points: NDArray[np.bool_] | None = None,
     ) -> None:
         """Initialize the drawable from ``obj`` or explicit fields."""
         if isinstance(obj, Detection):

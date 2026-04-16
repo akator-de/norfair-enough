@@ -7,6 +7,7 @@ from collections.abc import Callable, Hashable, Sequence
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 
 from norfair.camera_motion import CoordinatesTransformation
 
@@ -435,7 +436,9 @@ class Tracker:
 
         return unmatched_candidates, matched_objects, unmatched_objects
 
-    def match_dets_and_objs(self, distance_matrix: np.ndarray, distance_threshold):
+    def match_dets_and_objs(
+        self, distance_matrix: NDArray[np.float64], distance_threshold
+    ):
         """Match detections with tracked objects from a distance matrix.
 
         Instead of minimizing the global distance, this greedy strategy
@@ -669,14 +672,14 @@ class TrackedObject:
             self.detected_at_least_once_points = (
                 initial_detection.scores > self.detection_threshold
             )
-        self.point_hit_counter: np.ndarray = self.detected_at_least_once_points.astype(
-            int
+        self.point_hit_counter: NDArray[np.intp] = (
+            self.detected_at_least_once_points.astype(int)
         )
         # Per-point mask tracking which points were matched in the current frame.
         # On creation, the initial detection counts as the current-frame match.
         # tracker_step() clears this mask before each new frame, and hit() sets
         # it for points that were matched this frame. See GH#2.
-        self._point_matched_in_current_frame: np.ndarray = (
+        self._point_matched_in_current_frame: NDArray[np.bool_] = (
             self.detected_at_least_once_points.copy()
         )
         self.past_detections_length = past_detections_length
@@ -692,7 +695,9 @@ class TrackedObject:
         self.filter = filter_factory.create_filter(initial_detection.absolute_points)
         self.dim_z = self.dim_points * self.num_points
         self.label = initial_detection.label
-        self.abs_to_rel: Callable[[np.ndarray], np.ndarray] | None = None
+        self.abs_to_rel: Callable[[NDArray[np.float64]], NDArray[np.float64]] | None = (
+            None
+        )
         if coord_transformations is not None:
             self.update_coordinate_transformation(coord_transformations)
 
@@ -730,7 +735,7 @@ class TrackedObject:
         return self.reid_hit_counter is None or self.reid_hit_counter >= 0
 
     @property
-    def estimate_velocity(self) -> np.ndarray:
+    def estimate_velocity(self) -> NDArray[np.float64]:
         """Return the velocity estimate of the object from the Kalman filter.
 
         The velocity is expressed in the absolute coordinate system.
@@ -745,19 +750,19 @@ class TrackedObject:
         return self.filter.x.T.flatten()[self.dim_z :].reshape(-1, self.dim_points)
 
     @property
-    def estimate(self) -> np.ndarray:
+    def estimate(self) -> NDArray[np.float64]:
         """Return the position estimate of the object from the Kalman filter.
 
         Returns
         -------
-        np.ndarray
+        NDArray[np.float64]
             An array of shape ``(num_points, dim_points)`` containing the
             position estimate of the object on each axis.
 
         """
         return self.get_estimate()
 
-    def get_estimate(self, absolute=False) -> np.ndarray:
+    def get_estimate(self, absolute=False) -> NDArray[np.float64]:
         """Return the position estimate in either absolute or relative coordinates.
 
         Parameters
@@ -769,7 +774,7 @@ class TrackedObject:
 
         Returns
         -------
-        np.ndarray
+        NDArray[np.float64]
             An array of shape ``(num_points, dim_points)`` containing the
             position estimate of the object on each axis.
 
@@ -1037,15 +1042,15 @@ class Detection:
 
     def __init__(
         self,
-        points: np.ndarray,
-        scores: float | int | np.ndarray | None = None,
+        points: NDArray[np.float64],
+        scores: float | int | NDArray[np.float64] | None = None,
         data: Any = None,
         label: Hashable = None,
         embedding: Any = None,
     ):
         self.points = validate_points(points)
 
-        self.scores: np.ndarray | None
+        self.scores: NDArray[np.float64] | None
         if isinstance(scores, np.ndarray):
             if len(scores) != len(self.points):
                 raise ValueError(

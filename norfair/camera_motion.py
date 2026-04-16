@@ -10,6 +10,7 @@ import logging
 from abc import ABC, abstractmethod
 
 import numpy as np
+from numpy.typing import NDArray
 
 try:
     import cv2
@@ -40,7 +41,7 @@ class CoordinatesTransformation(ABC):
     """
 
     @abstractmethod
-    def abs_to_rel(self, points: np.ndarray) -> np.ndarray:
+    def abs_to_rel(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
         """Map absolute-frame points to the current relative frame.
 
         Parameters
@@ -57,7 +58,7 @@ class CoordinatesTransformation(ABC):
         """
 
     @abstractmethod
-    def rel_to_abs(self, points: np.ndarray) -> np.ndarray:
+    def rel_to_abs(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
         """Map relative-frame points to the absolute frame.
 
         Parameters
@@ -84,7 +85,7 @@ class TransformationGetter(ABC):
 
     @abstractmethod
     def __call__(
-        self, curr_pts: np.ndarray, prev_pts: np.ndarray
+        self, curr_pts: NDArray[np.float64], prev_pts: NDArray[np.float64]
     ) -> tuple[bool, CoordinatesTransformation | None]:
         """Return ``(update_reference, transformation)`` for the current pair."""
 
@@ -106,35 +107,35 @@ class TranslationTransformation(CoordinatesTransformation):
         """Store the ``movement_vector`` used for the translation."""
         self.movement_vector = movement_vector
 
-    def abs_to_rel(self, points: np.ndarray):
+    def abs_to_rel(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
         """Translate absolute points into the current relative frame.
 
         Parameters
         ----------
-        points : np.ndarray
+        points : NDArray[np.float64]
             Array of shape ``(n_points, dim_points)`` in absolute
             coordinates.
 
         Returns
         -------
-        np.ndarray
+        NDArray[np.float64]
             Translated points with the same shape, in relative
             coordinates.
         """
         return points + self.movement_vector
 
-    def rel_to_abs(self, points: np.ndarray):
+    def rel_to_abs(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
         """Translate relative points back into the absolute frame.
 
         Parameters
         ----------
-        points : np.ndarray
+        points : NDArray[np.float64]
             Array of shape ``(n_points, dim_points)`` in relative
             coordinates.
 
         Returns
         -------
-        np.ndarray
+        NDArray[np.float64]
             Translated points with the same shape, in absolute
             coordinates.
         """
@@ -172,7 +173,7 @@ class TranslationTransformationGetter(TransformationGetter):
         self.data = None
 
     def __call__(
-        self, curr_pts: np.ndarray, prev_pts: np.ndarray
+        self, curr_pts: NDArray[np.float64], prev_pts: NDArray[np.float64]
     ) -> tuple[bool, TranslationTransformation]:
         """Return the translation that best matches the optical flow."""
         # get flow
@@ -220,18 +221,18 @@ class HomographyTransformation(CoordinatesTransformation):
         self.homography_matrix = homography_matrix
         self.inverse_homography_matrix = np.linalg.inv(homography_matrix)
 
-    def abs_to_rel(self, points: np.ndarray):
+    def abs_to_rel(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
         """Apply the forward homography to map absolute points to relative.
 
         Parameters
         ----------
-        points : np.ndarray
+        points : NDArray[np.float64]
             Array of shape ``(n_points, dim_points)`` or ``(dim_points,)``
             in absolute coordinates.
 
         Returns
         -------
-        np.ndarray
+        NDArray[np.float64]
             Transformed points with the same shape, in relative
             coordinates.
         """
@@ -249,18 +250,18 @@ class HomographyTransformation(CoordinatesTransformation):
             return result.flatten()
         return result
 
-    def rel_to_abs(self, points: np.ndarray):
+    def rel_to_abs(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
         """Apply the inverse homography to map relative points to absolute.
 
         Parameters
         ----------
-        points : np.ndarray
+        points : NDArray[np.float64]
             Array of shape ``(n_points, dim_points)`` or ``(dim_points,)``
             in relative coordinates.
 
         Returns
         -------
-        np.ndarray
+        NDArray[np.float64]
             Transformed points with the same shape, in absolute
             coordinates.
         """
@@ -335,7 +336,7 @@ class HomographyTransformationGetter(TransformationGetter):
         self.proportion_points_used_threshold = proportion_points_used_threshold
 
     def __call__(
-        self, curr_pts: np.ndarray, prev_pts: np.ndarray
+        self, curr_pts: NDArray[np.float64], prev_pts: NDArray[np.float64]
     ) -> tuple[bool, HomographyTransformation | None]:
         """Return the homography that best matches the optical flow."""
         if not (

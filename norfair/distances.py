@@ -7,6 +7,7 @@ from functools import partial
 from typing import TYPE_CHECKING, overload
 
 import numpy as np
+from numpy.typing import NDArray
 from scipy.spatial.distance import cdist
 
 if TYPE_CHECKING:
@@ -32,7 +33,7 @@ class Distance(ABC):
         self,
         objects: Sequence["TrackedObject"],
         candidates: Sequence["Candidate"] | None,
-    ) -> np.ndarray:
+    ) -> NDArray[np.float64]:
         """Return the distance matrix between ``objects`` and ``candidates``.
 
         Parameters
@@ -93,7 +94,7 @@ class ScalarDistance(Distance):
         self,
         objects: Sequence["TrackedObject"],
         candidates: Sequence["Candidate"] | None,
-    ) -> np.ndarray:
+    ) -> NDArray[np.float64]:
         """Return a distance matrix by calling ``distance_function`` for every pair.
 
         Pairs with mismatched labels are skipped and their entries left at
@@ -119,14 +120,14 @@ class ScalarDistance(Distance):
             distance_matrix = np.full(
                 (num_candidates, len(objects)),
                 fill_value=np.inf,
-                dtype=np.float32,
+                dtype=np.float64,
             )
             return distance_matrix
 
         distance_matrix = np.full(
             (len(candidates), len(objects)),
             fill_value=np.inf,
-            dtype=np.float32,
+            dtype=np.float64,
         )
         for c, candidate in enumerate(candidates):
             for o, obj in enumerate(objects):
@@ -156,7 +157,7 @@ class VectorizedDistance(Distance):
 
     Parameters
     ----------
-    distance_function : Callable[[np.ndarray, np.ndarray], np.ndarray]
+    distance_function : Callable[[NDArray[np.float64], NDArray[np.float64]], NDArray[np.float64]]
         Distance function that accepts two 2D arrays ``(candidates,
         objects)`` and returns a ``(n_candidates, n_objects)`` distance
         matrix.
@@ -165,7 +166,9 @@ class VectorizedDistance(Distance):
 
     def __init__(
         self,
-        distance_function: Callable[[np.ndarray, np.ndarray], np.ndarray],
+        distance_function: Callable[
+            [NDArray[np.float64], NDArray[np.float64]], NDArray[np.float64]
+        ],
     ):
         """Store the vectorized ``distance_function``."""
         self.distance_function = distance_function
@@ -174,7 +177,7 @@ class VectorizedDistance(Distance):
         self,
         objects: Sequence["TrackedObject"],
         candidates: Sequence["Candidate"] | None,
-    ) -> np.ndarray:
+    ) -> NDArray[np.float64]:
         """Return the distance matrix computed per label group.
 
         Objects and candidates are grouped by label; for each label the
@@ -202,14 +205,14 @@ class VectorizedDistance(Distance):
             distance_matrix = np.full(
                 (num_candidates, len(objects)),
                 fill_value=np.inf,
-                dtype=np.float32,
+                dtype=np.float64,
             )
             return distance_matrix
 
         distance_matrix = np.full(
             (len(candidates), len(objects)),
             fill_value=np.inf,
-            dtype=np.float32,
+            dtype=np.float64,
         )
 
         from .tracker import Detection
@@ -246,8 +249,10 @@ class VectorizedDistance(Distance):
         return distance_matrix
 
     def _compute_distance(
-        self, stacked_candidates: np.ndarray, stacked_objects: np.ndarray
-    ) -> np.ndarray:
+        self,
+        stacked_candidates: NDArray[np.float64],
+        stacked_objects: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
         """Compute the pairwise distance between stacked candidates and objects.
 
         Parameters
@@ -290,7 +295,16 @@ class ScipyDistance(VectorizedDistance):
     def __init__(self, metric: str = "euclidean", **kwargs):
         """Configure the scipy metric and any extra ``cdist`` keyword arguments."""
         self.metric = metric
-        super().__init__(distance_function=partial(cdist, metric=self.metric, **kwargs))
+        self._cdist = partial(cdist, metric=self.metric, **kwargs)
+        super().__init__(distance_function=self._cdist_float64)
+
+    def _cdist_float64(
+        self,
+        candidates: NDArray[np.float64],
+        objects: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
+        """Wrap ``cdist`` and ensure the result is ``float64``."""
+        return np.asarray(self._cdist(candidates, objects), dtype=np.float64)
 
 
 def frobenius(detection: "Detection", tracked_object: "TrackedObject") -> float:
@@ -416,12 +430,12 @@ def mean_manhattan(detection: "Detection", tracked_object: "TrackedObject") -> f
     return np.linalg.norm(points - estimate, ord=1, axis=1).mean()
 
 
-def _boxes_area(boxes: np.ndarray) -> np.ndarray:
+def _boxes_area(boxes: NDArray[np.float64]) -> NDArray[np.float64]:
     """Return the area of each bounding box in ``boxes``."""
     return (boxes[2] - boxes[0]) * (boxes[3] - boxes[1])
 
 
-def _validate_bboxes(bboxes: np.ndarray):
+def _validate_bboxes(bboxes: NDArray[np.float64]):
     """Validate that ``bboxes`` is a well-formed ``(N, 4)`` array of boxes."""
     if not (
         isinstance(bboxes, np.ndarray)
@@ -438,7 +452,9 @@ def _validate_bboxes(bboxes: np.ndarray):
         )
 
 
-def iou(candidates: np.ndarray, objects: np.ndarray) -> np.ndarray:
+def iou(
+    candidates: NDArray[np.float64], objects: NDArray[np.float64]
+) -> NDArray[np.float64]:
     """Compute ``1 - IoU`` between two sets of bounding boxes.
 
     Both sets of boxes are expected to be in

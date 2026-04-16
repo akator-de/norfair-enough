@@ -1,6 +1,7 @@
 """Video stabilization drawer built on camera-motion estimates."""
 
 import numpy as np
+from numpy.typing import NDArray
 
 from norfair.camera_motion import TranslationTransformation
 from norfair.utils import warn_once
@@ -66,7 +67,7 @@ class FixedCamera:
     def __init__(self, scale: float = 2, attenuation: float = 0.05):
         """Initialize the background canvas parameters."""
         self.scale = scale
-        self._background: np.ndarray | None = None
+        self._background: NDArray[np.uint8] | None = None
         self._attenuation_factor = 1 - attenuation
 
     def adjust_frame(

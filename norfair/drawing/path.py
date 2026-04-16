@@ -4,6 +4,7 @@ from collections import defaultdict
 from collections.abc import Callable, Sequence
 
 import numpy as np
+from numpy.typing import NDArray
 
 from norfair.drawing.color import Palette
 from norfair.drawing.drawer import Drawer, _safe_int_point
@@ -51,7 +52,8 @@ class Paths:
 
     def __init__(
         self,
-        get_points_to_draw: Callable[[np.ndarray], np.ndarray] | None = None,
+        get_points_to_draw: Callable[[NDArray[np.float64]], NDArray[np.float64]]
+        | None = None,
         thickness: int | None = None,
         color: tuple[int, int, int] | None = None,
         radius: int | None = None,
@@ -65,7 +67,7 @@ class Paths:
 
                 Parameters
                 ----------
-                points : np.ndarray
+                points : NDArray[np.float64]
                     Array of shape ``(N, D)`` representing tracked point
                     coordinates.
 
@@ -85,7 +87,7 @@ class Paths:
         self.radius = radius
         self.thickness = thickness
         self.color = color
-        self.mask: np.ndarray | None = None
+        self.mask: NDArray[np.uint8] | None = None
         self.attenuation_factor = 1 - attenuation
 
     def draw(
@@ -207,7 +209,8 @@ class AbsolutePaths:
 
     def __init__(
         self,
-        get_points_to_draw: Callable[[np.ndarray], np.ndarray] | None = None,
+        get_points_to_draw: Callable[[NDArray[np.float64]], NDArray[np.float64]]
+        | None = None,
         thickness: int | None = None,
         color: tuple[int, int, int] | None = None,
         radius: int | None = None,
@@ -221,7 +224,7 @@ class AbsolutePaths:
 
                 Parameters
                 ----------
-                points : np.ndarray
+                points : NDArray[np.float64]
                     Array of shape ``(N, D)`` representing tracked point
                     coordinates.
 
@@ -241,7 +244,9 @@ class AbsolutePaths:
         self.radius = radius
         self.thickness = thickness
         self.color = color
-        self.past_points: defaultdict[int | None, list[np.ndarray]] = defaultdict(list)
+        self.past_points: defaultdict[int | None, list[NDArray[np.float64]]] = (
+            defaultdict(list)
+        )
         self.max_history = max_history
         self.alphas = np.linspace(0.99, 0.01, max_history)
 

@@ -3,12 +3,13 @@
 from typing import TYPE_CHECKING
 
 import numpy as np
+from numpy.typing import NDArray
 
 if TYPE_CHECKING:
     from .drawer import Drawable
 
 
-def _centroid(tracked_points: np.ndarray) -> tuple[int, int]:
+def _centroid(tracked_points: NDArray[np.float64]) -> tuple[int, int]:
     """Return the integer centroid of ``tracked_points``."""
     num_points = tracked_points.shape[0]
     sum_x = np.sum(tracked_points[:, 0])
