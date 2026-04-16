@@ -413,8 +413,8 @@ class Tracker:
                             candidates_to_remove.add(id(matched_candidate))
                     else:
                         unmatched_candidates.append(
-                            matched_candidate
-                        )  # pyrefly: ignore[bad-argument-type]
+                            matched_candidate  # pyrefly: ignore[bad-argument-type]
+                        )
                         unmatched_objects.append(matched_object)
 
                 # Batch-remove merged TrackedObject candidates in a single pass (O(n))
@@ -789,6 +789,7 @@ class TrackedObject:
         if self.is_initializing and self.hit_counter > self.initialization_delay:
             self.is_initializing = False
             self._acquire_ids()
+            self.hit_counter = self.hit_counter_max
 
         # Reset reid_hit_counter if we are are successfully tracking this object.
         # If hit_counter was 0 when Tracker.update was called and ReID is being used,

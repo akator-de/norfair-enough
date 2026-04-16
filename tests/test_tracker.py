@@ -71,7 +71,11 @@ def test_simple(filter_factory, delay, counter_max):
         obj = tracked_objects[0]
         np.testing.assert_almost_equal(tracked_objects[0].estimate, np.array([[1, 1]]))
         assert obj.age == age
-        assert obj.hit_counter == age + 1
+        if delay > 0:
+            # After initialization, hit_counter jumps to counter_max
+            assert obj.hit_counter == counter_max
+        else:
+            assert obj.hit_counter == age + 1
 
     # check that counter is capped at counter_max
     for age in range(counter_max, counter_max + 3):
@@ -239,7 +243,9 @@ def test_count(delay):
         assert tracker.total_object_count == 1
         assert tracker.current_object_count == 1
 
-        for _ in range(delay + 1, 0, -1):
+        # After initialization, hit_counter is counter_max (for delay>0) or 1 (for delay==0)
+        survive_frames = counter_max if delay > 0 else 1
+        for _ in range(survive_frames, 0, -1):
             assert len(tracker.update()) == 1
             assert tracker.total_object_count == 1
             assert tracker.current_object_count == 1
@@ -262,7 +268,7 @@ def test_count(delay):
         assert tracker.total_object_count == 3
         assert tracker.current_object_count == 2
 
-        for _ in range(delay + 1, 0, -1):
+        for _ in range(survive_frames, 0, -1):
             assert len(tracker.update()) == 2
             assert tracker.total_object_count == 3
             assert tracker.current_object_count == 2
@@ -526,6 +532,38 @@ def test_nan_distance_raises():
     tracker.update([Detection(points=np.array([[1, 1]]))])
     with pytest.raises(ValueError, match="nan"):
         tracker.update([Detection(points=np.array([[1, 1]]))])
+
+
+def test_hit_counter_max_after_initialization():
+    """hit_counter must equal hit_counter_max once a tracked object is initialized.
+
+    Regression test for https://github.com/tryolabs/norfair/issues/337
+    A newly initialized object used to keep its low hit_counter (≈ period)
+    instead of receiving the full hit_counter_max buffer, causing it to
+    disappear after only a few frames without detection.
+    """
+    tracker = Tracker(
+        distance_function="euclidean",
+        distance_threshold=100,
+        hit_counter_max=600,
+        initialization_delay=2,
+    )
+
+    det = [Detection(points=np.array([[1, 1]]))]
+
+    # First two updates: object is still initializing
+    assert len(tracker.update(det)) == 0
+    assert len(tracker.update(det)) == 0
+
+    # Third update: object transitions to initialized
+    tracked = tracker.update(det)
+    assert len(tracked) == 1
+    assert tracked[0].hit_counter == 600  # must be hit_counter_max, not ~6
+
+    # Object must survive many frames without detection
+    for i in range(500):
+        tracked = tracker.update([])
+        assert len(tracked) == 1, f"Object died after {i + 1} frames without detection"
 
 
 def test_period_parameter():
