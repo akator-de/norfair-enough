@@ -5642,9 +5642,7 @@ fade between frames. Use <code>0</code> to keep the path forever.</p>
 <span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Paths</span><span class="p">:</span>
+<span class="normal">138</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Paths</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw the trajectories of points of interest on each tracked object.</span>
 
 <span class="sd">    Parameters</span>
@@ -5698,9 +5696,7 @@ fade between frames. Use <code>0</code> to keep the path forever.</p>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="n">default_get_points</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">get_points_to_draw</span>  <span class="c1"># pyrefly: ignore[bad-assignment]</span>
-            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="n">get_points_to_draw</span>  <span class="c1"># pyrefly: ignore[bad-assignment]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">thickness</span> <span class="o">=</span> <span class="n">thickness</span>
@@ -5825,9 +5821,7 @@ fade between frames. Use <code>0</code> to keep the path forever.</p>
 <span class="normal">71</span>
 <span class="normal">72</span>
 <span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">get_points_to_draw</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">thickness</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -5843,9 +5837,7 @@ fade between frames. Use <code>0</code> to keep the path forever.</p>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="n">default_get_points</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">get_points_to_draw</span>  <span class="c1"># pyrefly: ignore[bad-assignment]</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="n">get_points_to_draw</span>  <span class="c1"># pyrefly: ignore[bad-assignment]</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">thickness</span> <span class="o">=</span> <span class="n">thickness</span>
@@ -5951,7 +5943,9 @@ mask for this frame.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/drawing/path.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 78</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
 <span class="normal"> 79</span>
 <span class="normal"> 80</span>
 <span class="normal"> 81</span>
@@ -6011,9 +6005,7 @@ mask for this frame.</p>
 <span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span>
+<span class="normal">138</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">tracked_objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">TrackedObject</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Update and render the accumulated path mask onto ``frame``.</span>
@@ -6257,7 +6249,9 @@ for camera motion::</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>norfair/drawing/path.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">143</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
 <span class="normal">144</span>
 <span class="normal">145</span>
 <span class="normal">146</span>
@@ -6428,11 +6422,7 @@ for camera motion::</p>
 <span class="normal">311</span>
 <span class="normal">312</span>
 <span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AbsolutePaths</span><span class="p">:</span>
+<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AbsolutePaths</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw tracked-object trajectories in absolute (world) coordinates.</span>
 
 <span class="sd">    Behaves like [`Paths`][norfair.drawing.Paths], but takes camera</span>
@@ -6500,9 +6490,7 @@ for camera motion::</p>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="n">default_get_points</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">get_points_to_draw</span>  <span class="c1"># pyrefly: ignore[bad-assignment]</span>
-            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="n">get_points_to_draw</span>  <span class="c1"># pyrefly: ignore[bad-assignment]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">thickness</span> <span class="o">=</span> <span class="n">thickness</span>
@@ -6640,7 +6628,9 @@ for camera motion::</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/drawing/path.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">195</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
 <span class="normal">196</span>
 <span class="normal">197</span>
 <span class="normal">198</span>
@@ -6661,11 +6651,7 @@ for camera motion::</p>
 <span class="normal">213</span>
 <span class="normal">214</span>
 <span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
-<span class="normal">218</span>
-<span class="normal">219</span>
-<span class="normal">220</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">216</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">get_points_to_draw</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">thickness</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -6681,9 +6667,7 @@ for camera motion::</p>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="n">default_get_points</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">get_points_to_draw</span>  <span class="c1"># pyrefly: ignore[bad-assignment]</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_points_to_draw</span> <span class="o">=</span> <span class="n">get_points_to_draw</span>  <span class="c1"># pyrefly: ignore[bad-assignment]</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">thickness</span> <span class="o">=</span> <span class="n">thickness</span>
@@ -6802,7 +6786,11 @@ to already be in the frame's pixel coordinates.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/drawing/path.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">222</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
 <span class="normal">223</span>
 <span class="normal">224</span>
 <span class="normal">225</span>
@@ -6894,11 +6882,7 @@ to already be in the frame's pixel coordinates.</p>
 <span class="normal">311</span>
 <span class="normal">312</span>
 <span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">tracked_objects</span><span class="p">,</span> <span class="n">coord_transform</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">tracked_objects</span><span class="p">,</span> <span class="n">coord_transform</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Render accumulated absolute paths onto ``frame``.</span>
 
 <span class="sd">    Parameters</span>
