@@ -127,6 +127,10 @@ ignore = [
     "D107",    # missing docstring in __init__ (documented on class)
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["D"]    # no docstrings required in tests
+"docs/**" = ["D"]     # no docstrings required in docs scripts
+
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
