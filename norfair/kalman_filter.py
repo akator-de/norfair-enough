@@ -691,7 +691,7 @@ class KalmanFilter:
 
         if R is None:
             R = self.R
-        elif isscalar(R):
+        elif not isinstance(R, np.ndarray):
             R = eye(self.dim_z) * R
 
         if H is None:
@@ -979,7 +979,7 @@ class KalmanFilter:
 
         if R_i is None:
             R_i = self.R[start:stop, start:stop]
-        elif isscalar(R_i):
+        elif not isinstance(R_i, np.ndarray):
             R_i = eye(length) * R_i
 
         if H_i is None:
@@ -1390,9 +1390,9 @@ class KalmanFilter:
 
         # Update covariance: P = (I - KH)P(I - KH)' + KRK'
         I_KH = self._I - K @ H
-        P = I_KH @ P @ I_KH.T + K @ R @ K.T
+        P_new: NDArray[np.float64] = I_KH @ P @ I_KH.T + K @ R @ K.T
 
-        return x, P
+        return x, P_new
 
     def residual_of(self, z: np.ndarray) -> NDArray[np.float64]:
         """Return the residual for the given measurement (z) without altering the filter."""
