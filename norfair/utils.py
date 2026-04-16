@@ -6,12 +6,13 @@ from functools import cache
 from logging import warning
 
 import numpy as np
+from numpy.typing import NDArray
 from rich import print
 from rich.console import Console
 from rich.table import Table
 
 
-def validate_points(points: np.ndarray) -> np.ndarray:
+def validate_points(points: NDArray[np.float64]) -> NDArray[np.float64]:
     """Normalize ``points`` to ``(n_points, n_dimensions)`` shape.
 
     A 1-D array is interpreted as a single point and reshaped to have

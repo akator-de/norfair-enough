@@ -127,17 +127,30 @@ Adaptation by [cl445], 2025.
 import logging
 import sys
 from collections import deque
+from collections.abc import Callable
 from copy import deepcopy
 from math import exp, log, sqrt
 
 import numpy as np
 from numpy import dot, eye, isscalar, linalg, shape, zeros
+from numpy.typing import NDArray
 from scipy.stats import multivariate_normal
 
 _logger = logging.getLogger(__name__)
 
 
-def logpdf(x, mean=None, cov=1, allow_singular=True):
+def _inv_float64(a: NDArray[np.float64]) -> NDArray[np.float64]:
+    """Wrap ``np.linalg.inv`` with a concrete ``float64`` signature."""
+    result: NDArray[np.float64] = np.linalg.inv(a)
+    return result
+
+
+def logpdf(
+    x: np.ndarray | float,
+    mean: np.ndarray | None = None,
+    cov: NDArray[np.float64] | float = 1,
+    allow_singular: bool = True,
+) -> float:
     """Compute the log-pdf of the normal distribution N(mean, cov) for *x*.
 
     Wrapper around ``scipy.stats.multivariate_normal.logpdf``.
@@ -535,7 +548,7 @@ class KalmanFilter:
 
     """
 
-    def __init__(self, dim_x, dim_z, dim_u=0):
+    def __init__(self, dim_x: int, dim_z: int, dim_u: int = 0) -> None:
         if dim_x < 1:
             raise ValueError("dim_x must be 1 or greater")
         if dim_z < 1:
@@ -543,64 +556,74 @@ class KalmanFilter:
         if dim_u < 0:
             raise ValueError("dim_u must be 0 or greater")
 
-        self.dim_x = dim_x
-        self.dim_z = dim_z
-        self.dim_u = dim_u
+        self.dim_x: int = dim_x
+        self.dim_z: int = dim_z
+        self.dim_u: int = dim_u
 
-        self.x = zeros((dim_x, 1))  # state
-        self.P = eye(dim_x)  # uncertainty covariance
-        self.Q = eye(dim_x)  # process uncertainty
-        self.B = None  # control transition matrix
-        self.F = eye(dim_x)  # state transition matrix
-        self.H = zeros((dim_z, dim_x))  # measurement function
-        self.R = eye(dim_z)  # measurement uncertainty
-        self._alpha_sq = 1.0  # fading memory control
-        self.M = np.zeros((dim_x, dim_z))  # process-measurement cross correlation
-        self.z = np.array([[None] * self.dim_z]).T
+        self.x: NDArray[np.float64] = zeros((dim_x, 1))  # state
+        self.P: NDArray[np.float64] = eye(dim_x)  # uncertainty covariance
+        self.Q: NDArray[np.float64] = eye(dim_x)  # process uncertainty
+        self.B: NDArray[np.float64] | None = None  # control transition matrix
+        self.F: NDArray[np.float64] = eye(dim_x)  # state transition matrix
+        self.H: NDArray[np.float64] = zeros((dim_z, dim_x))  # measurement function
+        self.R: NDArray[np.float64] = eye(dim_z)  # measurement uncertainty
+        self._alpha_sq: float = 1.0  # fading memory control
+        self.M: NDArray[np.float64] = np.zeros(
+            (dim_x, dim_z)
+        )  # process-measurement cross correlation
+        self.z: np.ndarray = np.array([[None] * self.dim_z]).T
 
         # gain and residual are computed during the innovation step. We
         # save them so that in case you want to inspect them for various
         # purposes
-        self.K = np.zeros((dim_x, dim_z))  # kalman gain
-        self.y = zeros((dim_z, 1))
-        self.S = np.zeros((dim_z, dim_z))  # system uncertainty
-        self.SI = np.zeros((dim_z, dim_z))  # inverse system uncertainty
+        self.K: NDArray[np.float64] = np.zeros((dim_x, dim_z))  # kalman gain
+        self.y: NDArray[np.float64] = zeros((dim_z, 1))
+        self.S: NDArray[np.float64] = np.zeros((dim_z, dim_z))  # system uncertainty
+        self.SI: NDArray[np.float64] = np.zeros(
+            (dim_z, dim_z)
+        )  # inverse system uncertainty
 
         # identity matrix. Do not alter this.
-        self._I = np.eye(dim_x)
+        self._I: NDArray[np.float64] = np.eye(dim_x)
 
         # these will always be a copy of x,P after predict() is called
-        self.x_prior = self.x.copy()
-        self.P_prior = self.P.copy()
+        self.x_prior: NDArray[np.float64] = self.x.copy()
+        self.P_prior: NDArray[np.float64] = self.P.copy()
 
         # these will always be a copy of x,P after update() is called
-        self.x_post = self.x.copy()
-        self.P_post = self.P.copy()
+        self.x_post: NDArray[np.float64] = self.x.copy()
+        self.P_post: NDArray[np.float64] = self.P.copy()
 
         # Only computed only if requested via property
-        self._log_likelihood = log(sys.float_info.min)
-        self._likelihood = sys.float_info.min
-        self._mahalanobis = None
+        self._log_likelihood: float | None = log(sys.float_info.min)
+        self._likelihood: float | None = sys.float_info.min
+        self._mahalanobis: float | None = None
 
-        self.inv = np.linalg.inv
+        self.inv: Callable[[NDArray[np.float64]], NDArray[np.float64]] = _inv_float64
 
-    def predict(self, u=None, B=None, F=None, Q=None):
+    def predict(
+        self,
+        u: NDArray[np.float64] | None = None,
+        B: NDArray[np.float64] | None = None,
+        F: NDArray[np.float64] | None = None,
+        Q: NDArray[np.float64] | float | None = None,
+    ) -> None:
         """Predict next state (prior) using the Kalman filter state propagation equations.
 
         Parameters
         ----------
-        u : np.array, default 0
+        u : NDArray[np.float64] or None, default None
             Optional control vector.
 
-        B : np.array(dim_x, dim_u), or None
+        B : NDArray[np.float64] or None, default None
             Optional control transition matrix; a value of None
             will cause the filter to use `self.B`.
 
-        F : np.array(dim_x, dim_x), or None
+        F : NDArray[np.float64] or None, default None
             Optional state transition matrix; a value of None
             will cause the filter to use `self.F`.
 
-        Q : np.array(dim_x, dim_x), scalar, or None
+        Q : NDArray[np.float64], float, or None
             Optional process noise matrix; a value of None will cause the
             filter to use `self.Q`.
         """
@@ -626,27 +649,31 @@ class KalmanFilter:
         self.x_prior = self.x.copy()
         self.P_prior = self.P.copy()
 
-    def update(self, z, R=None, H=None):
-        """
-        Add a new measurement (z) to the Kalman filter.
+    def update(
+        self,
+        z: np.ndarray | None,
+        R: NDArray[np.float64] | float | None = None,
+        H: NDArray[np.float64] | None = None,
+    ) -> None:
+        """Add a new measurement (z) to the Kalman filter.
 
         If z is None, nothing is computed. However, x_post and P_post are
         updated with the prior (x_prior, P_prior), and self.z is set to None.
 
         Parameters
         ----------
-        z : (dim_z, 1): array_like
-            measurement for this update. z can be a scalar if dim_z is 1,
+        z : np.ndarray or None
+            Measurement for this update. z can be a scalar if dim_z is 1,
             otherwise it must be convertible to a column vector.
 
             If you pass in a value of H, z must be a column vector the
             of the correct size.
 
-        R : np.array, scalar, or None
+        R : NDArray[np.float64], float, or None
             Optionally provide R to override the measurement noise for this
             one call, otherwise  self.R will be used.
 
-        H : np.array, or None
+        H : NDArray[np.float64] or None
             Optionally provide H to override the measurement function for this
             one call, otherwise self.H will be used.
         """
@@ -664,7 +691,7 @@ class KalmanFilter:
 
         if R is None:
             R = self.R
-        elif isscalar(R):
+        elif not isinstance(R, np.ndarray):
             R = eye(self.dim_z) * R
 
         if H is None:
@@ -712,7 +739,11 @@ class KalmanFilter:
         self.x_post = self.x.copy()
         self.P_post = self.P.copy()
 
-    def predict_steadystate(self, u=0, B=None):
+    def predict_steadystate(
+        self,
+        u: NDArray[np.float64] | int = 0,
+        B: NDArray[np.float64] | None = None,
+    ) -> None:
         """Predict state (prior) using the Kalman filter state propagation equations.
 
         Only x is updated, P is left unchanged. See
@@ -721,11 +752,11 @@ class KalmanFilter:
 
         Parameters
         ----------
-        u : np.array
+        u : NDArray[np.float64] or int
             Optional control vector. If non-zero, it is multiplied by B
             to create the control input into the system.
 
-        B : np.array(dim_x, dim_u), or None
+        B : NDArray[np.float64] or None
             Optional control transition matrix; a value of None
             will cause the filter to use `self.B`.
         """
@@ -742,7 +773,7 @@ class KalmanFilter:
         self.x_prior = self.x.copy()
         self.P_prior = self.P.copy()
 
-    def update_steadystate(self, z):
+    def update_steadystate(self, z: np.ndarray | None) -> None:
         """Add a new measurement (z) to the Kalman filter without recomputing K, P, or S.
 
         You can use this for LTI systems since the Kalman gain and covariance
@@ -813,7 +844,12 @@ class KalmanFilter:
         self._likelihood = None
         self._mahalanobis = None
 
-    def update_correlated(self, z, R=None, H=None):
+    def update_correlated(
+        self,
+        z: np.ndarray | None,
+        R: NDArray[np.float64] | float | None = None,
+        H: NDArray[np.float64] | None = None,
+    ) -> None:
         """Add a new measurement (z) assuming correlated process and measurement noise.
 
         The correlation is defined in the `self.M` matrix.
@@ -823,15 +859,15 @@ class KalmanFilter:
 
         Parameters
         ----------
-        z : (dim_z, 1): array_like
-            measurement for this update. z can be a scalar if dim_z is 1,
+        z : np.ndarray or None
+            Measurement for this update. z can be a scalar if dim_z is 1,
             otherwise it must be convertible to a column vector.
 
-        R : np.array, scalar, or None
+        R : NDArray[np.float64], float, or None
             Optionally provide R to override the measurement noise for this
             one call, otherwise  self.R will be used.
 
-        H : np.array,  or None
+        H : NDArray[np.float64] or None
             Optionally provide H to override the measurement function for this
             one call, otherwise  self.H will be used.
 
@@ -905,39 +941,45 @@ class KalmanFilter:
         self.x_post = self.x.copy()
         self.P_post = self.P.copy()
 
-    def update_sequential(self, start, z_i, R_i=None, H_i=None):
+    def update_sequential(
+        self,
+        start: int,
+        z_i: NDArray[np.float64] | float,
+        R_i: NDArray[np.float64] | float | None = None,
+        H_i: NDArray[np.float64] | None = None,
+    ) -> None:
         """Add a single input measurement (z_i) to the Kalman filter.
 
         In sequential processing, inputs are processed one at a time.
 
         Parameters
         ----------
-        start : integer
+        start : int
             Index of the first measurement input updated by this call.
 
-        z_i : np.array or scalar
+        z_i : NDArray[np.float64] or float
             Measurement of inputs for this partial update.
 
-        R_i : np.array, scalar, or None
+        R_i : NDArray[np.float64], float, or None
             Optionally provide R_i to override the measurement noise of
             inputs for this one call, otherwise a slice of self.R will
             be used.
 
-        H_i : np.array, or None
+        H_i : NDArray[np.float64] or None
             Optionally provide H[i] to override the partial measurement
             function for this one call, otherwise a slice of self.H will
             be used.
         """
-        if isscalar(z_i):
-            length = 1
-        else:
+        if isinstance(z_i, np.ndarray) and z_i.ndim > 0:
             length = len(z_i)
+        else:
+            length = 1
         z_i = np.reshape(z_i, [length, 1])
         stop = start + length
 
         if R_i is None:
             R_i = self.R[start:stop, start:stop]
-        elif isscalar(R_i):
+        elif not isinstance(R_i, np.ndarray):
             R_i = eye(length) * R_i
 
         if H_i is None:
@@ -978,16 +1020,21 @@ class KalmanFilter:
 
     def batch_filter(
         self,
-        zs,
-        Fs=None,
-        Qs=None,
-        Hs=None,
-        Rs=None,
-        Bs=None,
-        us=None,
-        update_first=False,
-        saver=None,
-    ):
+        zs: list[np.ndarray | None],
+        Fs: list[NDArray[np.float64]] | None = None,
+        Qs: list[NDArray[np.float64]] | None = None,
+        Hs: list[NDArray[np.float64]] | None = None,
+        Rs: list[NDArray[np.float64]] | None = None,
+        Bs: list[NDArray[np.float64] | None] | None = None,
+        us: list[NDArray[np.float64] | None] | None = None,
+        update_first: bool = False,
+        saver: object = None,
+    ) -> tuple[
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+    ]:
         """Batch processes a sequences of measurements.
 
         Parameters
@@ -1096,7 +1143,7 @@ class KalmanFilter:
              (xs, Ps, Ks, Pps) = kf.rts_smoother(mu, cov, Fs=Fs)
         """
         # pylint: disable=too-many-statements
-        n = np.size(zs, 0)
+        n = len(zs)
         if Fs is None:
             Fs = [self.F] * n
         if Qs is None:
@@ -1108,7 +1155,7 @@ class KalmanFilter:
         if Bs is None:
             Bs = [self.B] * n
         if us is None:
-            us = [0] * n
+            us = [None] * n
 
         # mean estimates from Kalman Filter
         if self.x.ndim == 1:
@@ -1123,28 +1170,24 @@ class KalmanFilter:
         covariances_p = zeros((n, self.dim_x, self.dim_x))
 
         if update_first:
-            for i, (z, F, Q, H, R, B, u) in enumerate(
-                zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
-            ):
-                self.update(z, R=R, H=H)
+            for i in range(n):
+                self.update(zs[i], R=Rs[i], H=Hs[i])
                 means[i, :] = self.x
                 covariances[i, :, :] = self.P
 
-                self.predict(u=u, B=B, F=F, Q=Q)
+                self.predict(u=us[i], B=Bs[i], F=Fs[i], Q=Qs[i])
                 means_p[i, :] = self.x
                 covariances_p[i, :, :] = self.P
 
                 if saver is not None:
                     saver.save()
         else:
-            for i, (z, F, Q, H, R, B, u) in enumerate(
-                zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
-            ):
-                self.predict(u=u, B=B, F=F, Q=Q)
+            for i in range(n):
+                self.predict(u=us[i], B=Bs[i], F=Fs[i], Q=Qs[i])
                 means_p[i, :] = self.x
                 covariances_p[i, :, :] = self.P
 
-                self.update(z, R=R, H=H)
+                self.update(zs[i], R=Rs[i], H=Hs[i])
                 means[i, :] = self.x
                 covariances[i, :, :] = self.P
 
@@ -1153,7 +1196,19 @@ class KalmanFilter:
 
         return (means, covariances, means_p, covariances_p)
 
-    def rts_smoother(self, Xs, Ps, Fs=None, Qs=None, inv=np.linalg.inv):
+    def rts_smoother(
+        self,
+        Xs: NDArray[np.float64],
+        Ps: NDArray[np.float64],
+        Fs: list[NDArray[np.float64]] | None = None,
+        Qs: list[NDArray[np.float64]] | None = None,
+        inv: Callable[[NDArray[np.float64]], NDArray[np.float64]] = _inv_float64,
+    ) -> tuple[
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+        NDArray[np.float64],
+    ]:
         """Run the Rauch-Tung-Striebel Kalman smoother on a set of means and covariances.
 
         The usual input would come from the output of
@@ -1230,31 +1285,37 @@ class KalmanFilter:
 
         return (x, P, K, Pp)
 
-    def get_prediction(self, u=None, B=None, F=None, Q=None):
+    def get_prediction(
+        self,
+        u: NDArray[np.float64] | None = None,
+        B: NDArray[np.float64] | None = None,
+        F: NDArray[np.float64] | None = None,
+        Q: NDArray[np.float64] | float | None = None,
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         """Predict next state (prior) and return it without modifying the object.
 
         Use the Kalman filter state propagation equations.
 
         Parameters
         ----------
-        u : np.array, default 0
+        u : NDArray[np.float64] or None, default None
             Optional control vector.
 
-        B : np.array(dim_x, dim_u), or None
+        B : NDArray[np.float64] or None, default None
             Optional control transition matrix; a value of None
             will cause the filter to use `self.B`.
 
-        F : np.array(dim_x, dim_x), or None
+        F : NDArray[np.float64] or None, default None
             Optional state transition matrix; a value of None
             will cause the filter to use `self.F`.
 
-        Q : np.array(dim_x, dim_x), scalar, or None
+        Q : NDArray[np.float64], float, or None
             Optional process noise matrix; a value of None will cause the
             filter to use `self.Q`.
 
         Returns
         -------
-        (x, P) : tuple
+        (x, P) : tuple[NDArray[np.float64], NDArray[np.float64]]
             State vector and covariance array of the prediction.
         """
         if B is None:
@@ -1277,7 +1338,9 @@ class KalmanFilter:
 
         return x, P
 
-    def get_update(self, z: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
+    def get_update(
+        self, z: NDArray[np.float64] | None = None
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         """Compute the new estimate based on measurement `z` without altering the filter.
 
         Parameters
@@ -1327,40 +1390,39 @@ class KalmanFilter:
 
         # Update covariance: P = (I - KH)P(I - KH)' + KRK'
         I_KH = self._I - K @ H
-        P = I_KH @ P @ I_KH.T + K @ R @ K.T
+        P_new: NDArray[np.float64] = I_KH @ P @ I_KH.T + K @ R @ K.T
 
-        return x, P
+        return x, P_new
 
-    def residual_of(self, z):
+    def residual_of(self, z: np.ndarray) -> NDArray[np.float64]:
         """Return the residual for the given measurement (z) without altering the filter."""
         z = reshape_z(z, self.dim_z, self.x.ndim)
         return z - dot(self.H, self.x_prior)
 
-    def measurement_of_state(self, x):
+    def measurement_of_state(self, x: NDArray[np.float64]) -> NDArray[np.float64]:
         """Convert a state into a measurement.
 
         Parameters
         ----------
-        x : np.array
-            kalman state vector
+        x : NDArray[np.float64]
+            Kalman state vector.
 
         Returns
         -------
-        z : (dim_z, 1): array_like
-            measurement for this update. z can be a scalar if dim_z is 1,
-            otherwise it must be convertible to a column vector.
+        NDArray[np.float64]
+            Measurement corresponding to the given state.
         """
         return dot(self.H, x)
 
     @property
-    def log_likelihood(self):
+    def log_likelihood(self) -> float:
         """Log-likelihood of the last measurement."""
         if self._log_likelihood is None:
             self._log_likelihood = logpdf(x=self.y, cov=self.S)
         return self._log_likelihood
 
     @property
-    def likelihood(self):
+    def likelihood(self) -> float:
         """Compute likelihood from the log-likelihood.
 
         The log-likelihood can be very small, meaning a large negative value
@@ -1375,7 +1437,7 @@ class KalmanFilter:
         return self._likelihood
 
     @property
-    def mahalanobis(self):
+    def mahalanobis(self) -> float:
         """Mahalanobis distance of measurement.
 
         E.g. 3 means measurement was 3 standard deviations away from
@@ -1392,7 +1454,7 @@ class KalmanFilter:
         return self._mahalanobis
 
     @property
-    def alpha(self):
+    def alpha(self) -> float:
         """Fading memory setting.
 
         1.0 gives the normal Kalman filter, and values slightly larger than
@@ -1403,7 +1465,7 @@ class KalmanFilter:
         return self._alpha_sq**0.5
 
     @alpha.setter
-    def alpha(self, value):
+    def alpha(self, value: float) -> None:
         """Set the fading memory coefficient.
 
         Parameters
@@ -1416,7 +1478,7 @@ class KalmanFilter:
 
         self._alpha_sq = value**2
 
-    def log_likelihood_of(self, z):
+    def log_likelihood_of(self, z: np.ndarray | None) -> float:
         """Return the log-likelihood of measurement *z* given the current state.
 
         Must be called after ``update()``; calling after ``predict()``
@@ -1471,11 +1533,11 @@ class KalmanFilter:
 
     def test_matrix_dimensions(
         self,
-        z: np.ndarray | None = None,
-        H: np.ndarray | None = None,
-        R: np.ndarray | None = None,
-        F: np.ndarray | None = None,
-        Q: np.ndarray | None = None,
+        z: NDArray[np.float64] | None = None,
+        H: NDArray[np.float64] | None = None,
+        R: NDArray[np.float64] | None = None,
+        F: NDArray[np.float64] | None = None,
+        Q: NDArray[np.float64] | None = None,
     ) -> None:
         """Assert that all filter matrices have consistent dimensions.
 
@@ -1580,20 +1642,20 @@ class KalmanFilter:
 
 
 def update(
-    x: np.ndarray | float,
-    P: np.ndarray | float,
-    z: np.ndarray | None,
-    R: np.ndarray | float,
-    H: np.ndarray | float | tuple | None = None,
+    x: NDArray[np.float64] | float,
+    P: NDArray[np.float64] | float,
+    z: NDArray[np.float64] | None,
+    R: NDArray[np.float64] | float,
+    H: NDArray[np.float64] | float | tuple | None = None,
     return_all: bool = False,
 ) -> (
-    tuple[np.ndarray | float, np.ndarray | float]
+    tuple[NDArray[np.float64] | float, NDArray[np.float64] | float]
     | tuple[
-        np.ndarray | float,
-        np.ndarray | float,
-        np.ndarray | None,
-        np.ndarray | None,
-        np.ndarray | float | None,
+        NDArray[np.float64] | float,
+        NDArray[np.float64] | float,
+        NDArray[np.float64] | None,
+        NDArray[np.float64] | None,
+        NDArray[np.float64] | float | None,
         float | None,
     ]
 ):
@@ -1675,7 +1737,12 @@ def update(
     return x, P
 
 
-def update_steadystate(x, z, K, H=None):
+def update_steadystate(
+    x: NDArray[np.float64] | float,
+    z: NDArray[np.float64] | None,
+    K: NDArray[np.float64] | float,
+    H: NDArray[np.float64] | float | None = None,
+) -> NDArray[np.float64] | float:
     """Add a new measurement (z) to the Kalman filter.
 
     If z is None, nothing is changed.
@@ -1729,7 +1796,15 @@ def update_steadystate(x, z, K, H=None):
     return x + dot(K, y)
 
 
-def predict(x, P, F=1, Q=0, u=0, B=1, alpha=1.0):
+def predict(
+    x: NDArray[np.float64] | float,
+    P: NDArray[np.float64] | float,
+    F: NDArray[np.float64] | float = 1,
+    Q: NDArray[np.float64] | float = 0,
+    u: NDArray[np.float64] | float = 0,
+    B: NDArray[np.float64] | float = 1,
+    alpha: float = 1.0,
+) -> tuple[NDArray[np.float64] | float, NDArray[np.float64] | float]:
     """Predict next state (prior) using the Kalman filter state propagation equations.
 
     Parameters
@@ -1777,7 +1852,12 @@ def predict(x, P, F=1, Q=0, u=0, B=1, alpha=1.0):
     return x, P
 
 
-def predict_steadystate(x, F=1, u=0, B=1):
+def predict_steadystate(
+    x: NDArray[np.float64] | float,
+    F: NDArray[np.float64] | float = 1,
+    u: NDArray[np.float64] | float = 0,
+    B: NDArray[np.float64] | float = 1,
+) -> NDArray[np.float64] | float:
     """Predict next state (prior) using the Kalman filter state propagation equations.
 
     This steady state form only computes x, assuming that the
@@ -1814,8 +1894,23 @@ def predict_steadystate(x, F=1, u=0, B=1):
 
 
 def batch_filter(
-    x, P, zs, Fs, Qs, Hs, Rs, Bs=None, us=None, update_first=False, saver=None
-):
+    x: NDArray[np.float64],
+    P: NDArray[np.float64],
+    zs: list[np.ndarray | None],
+    Fs: list[NDArray[np.float64]],
+    Qs: list[NDArray[np.float64]],
+    Hs: list[NDArray[np.float64]],
+    Rs: list[NDArray[np.float64]],
+    Bs: list[NDArray[np.float64] | float] | None = None,
+    us: list[NDArray[np.float64] | float] | None = None,
+    update_first: bool = False,
+    saver: object = None,
+) -> tuple[
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+]:
     """
     Batch processes a sequences of measurements.
 
@@ -1891,7 +1986,7 @@ def batch_filter(
         (xs, Ps, Ks, Pps) = kf.rts_smoother(mu, cov, Fs=Fs, Qs=None)
 
     """
-    n = np.size(zs, 0)
+    n = len(zs)
     dim_x = x.shape[0]
 
     # mean estimates from Kalman Filter
@@ -1911,27 +2006,23 @@ def batch_filter(
         Bs = [0.0] * n
 
     if update_first:
-        for i, (z, F, Q, H, R, B, u) in enumerate(
-            zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
-        ):
-            x, P = update(x, P, z, R=R, H=H)
+        for i in range(n):
+            x, P = update(x, P, zs[i], R=Rs[i], H=Hs[i])
             means[i, :] = x
             covariances[i, :, :] = P
 
-            x, P = predict(x, P, u=u, B=B, F=F, Q=Q)
+            x, P = predict(x, P, u=us[i], B=Bs[i], F=Fs[i], Q=Qs[i])
             means_p[i, :] = x
             covariances_p[i, :, :] = P
             if saver is not None:
                 saver.save()
     else:
-        for i, (z, F, Q, H, R, B, u) in enumerate(
-            zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
-        ):
-            x, P = predict(x, P, u=u, B=B, F=F, Q=Q)
+        for i in range(n):
+            x, P = predict(x, P, u=us[i], B=Bs[i], F=Fs[i], Q=Qs[i])
             means_p[i, :] = x
             covariances_p[i, :, :] = P
 
-            x, P = update(x, P, z, R=R, H=H)
+            x, P = update(x, P, zs[i], R=Rs[i], H=Hs[i])
             means[i, :] = x
             covariances[i, :, :] = P
             if saver is not None:
@@ -1940,7 +2031,17 @@ def batch_filter(
     return (means, covariances, means_p, covariances_p)
 
 
-def rts_smoother(Xs, Ps, Fs, Qs):
+def rts_smoother(
+    Xs: NDArray[np.float64],
+    Ps: NDArray[np.float64],
+    Fs: list[NDArray[np.float64]],
+    Qs: list[NDArray[np.float64]],
+) -> tuple[
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+    NDArray[np.float64],
+]:
     """Run the Rauch-Tung-Striebel Kalman smoother on a set of means and covariances.
 
     The usual input would come from the output of

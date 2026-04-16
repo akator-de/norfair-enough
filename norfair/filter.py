@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import Protocol
 
 import numpy as np
+from numpy.typing import NDArray
 
 from .kalman_filter import KalmanFilter
 
@@ -47,12 +48,12 @@ class FilterFactory(ABC):
     """
 
     @abstractmethod
-    def create_filter(self, initial_detection: np.ndarray) -> Filter:
+    def create_filter(self, initial_detection: NDArray[np.float64]) -> Filter:
         """Return a new filter seeded with ``initial_detection``.
 
         Parameters
         ----------
-        initial_detection : np.ndarray
+        initial_detection : NDArray[np.float64]
             Array of shape ``(n_points, n_dimensions)`` with the initial
             detection coordinates used to seed the filter state.
 
@@ -121,7 +122,7 @@ class FilterPyKalmanFilterFactory(FilterFactory):
         self.Q = Q
         self.P = P
 
-    def create_filter(self, initial_detection: np.ndarray) -> KalmanFilter:
+    def create_filter(self, initial_detection: NDArray[np.float64]) -> KalmanFilter:
         """Return a new Kalman filter seeded with ``initial_detection``.
 
         The returned filter is used by each new
@@ -131,7 +132,7 @@ class FilterPyKalmanFilterFactory(FilterFactory):
 
         Parameters
         ----------
-        initial_detection : np.ndarray
+        initial_detection : NDArray[np.float64]
             Array of shape ``(n_points, n_dimensions)`` corresponding to
             [`Detection.points`][norfair.tracker.Detection] of the tracked
             object being born, used as the initial position estimate.
@@ -231,12 +232,12 @@ class NoFilterFactory(FilterFactory):
     for real-world tracking.
     """
 
-    def create_filter(self, initial_detection: np.ndarray):
+    def create_filter(self, initial_detection: NDArray[np.float64]):
         """Return a :class:`NoFilter` seeded with ``initial_detection``.
 
         Parameters
         ----------
-        initial_detection : np.ndarray
+        initial_detection : NDArray[np.float64]
             Array of shape ``(n_points, n_dimensions)`` with the initial
             detection coordinates used to seed the filter state.
 
@@ -421,12 +422,12 @@ class OptimizedKalmanFilterFactory(FilterFactory):
         self.pos_vel_covariance = pos_vel_covariance
         self.vel_variance = vel_variance
 
-    def create_filter(self, initial_detection: np.ndarray):
+    def create_filter(self, initial_detection: NDArray[np.float64]):
         """Return an :class:`OptimizedKalmanFilter` seeded with ``initial_detection``.
 
         Parameters
         ----------
-        initial_detection : np.ndarray
+        initial_detection : NDArray[np.float64]
             Array of shape ``(n_points, n_dimensions)`` with the initial
             detection coordinates used to seed the filter state.
 

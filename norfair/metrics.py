@@ -299,7 +299,7 @@ class Accumulators:
     def __init__(self):
         """Initialize the per-sequence prediction buffers."""
         self.matrixes_predictions = []
-        self.paths = []
+        self.paths: np.ndarray = np.array([], dtype=str)
 
     def create_accumulator(self, input_path, information_file=None):
         """Start collecting predictions for the sequence at ``input_path``.
@@ -320,8 +320,7 @@ class Accumulators:
         file_name = os.path.split(input_path)[1]
 
         self.frame_number = 1
-        # Save the path of this video in a list
-        # pyrefly: ignore[bad-assignment]
+        # Save the path of this video
         self.paths = np.hstack((self.paths, input_path))
         # Initialize a matrix where we will save our predictions for this video (in the MOTChallenge format)
         self.matrix_predictions = []

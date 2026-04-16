@@ -4,6 +4,7 @@ from collections import defaultdict
 from collections.abc import Callable, Sequence
 
 import numpy as np
+from numpy.typing import NDArray
 
 from norfair.drawing.color import Palette
 from norfair.drawing.drawer import Drawer, _safe_int_point
@@ -51,39 +52,43 @@ class Paths:
 
     def __init__(
         self,
-        get_points_to_draw: Callable[[np.ndarray], np.ndarray] | None = None,
+        get_points_to_draw: Callable[[NDArray[np.float64]], NDArray[np.float64]]
+        | None = None,
         thickness: int | None = None,
         color: tuple[int, int, int] | None = None,
         radius: int | None = None,
         attenuation: float = 0.01,
     ):
         """Configure the path drawer with its rendering knobs."""
+        self.get_points_to_draw: Callable[[NDArray[np.float64]], NDArray[np.float64]]
         if get_points_to_draw is None:
 
-            def default_get_points(points):
+            def default_get_points(
+                points: NDArray[np.float64],
+            ) -> NDArray[np.float64]:
                 """Return the centroid of *points* as a single-element array.
 
                 Parameters
                 ----------
-                points : np.ndarray
+                points : NDArray[np.float64]
                     Array of shape ``(N, D)`` representing tracked point
                     coordinates.
 
                 Returns
                 -------
-                np.ndarray
+                NDArray[np.float64]
                     Array of shape ``(1, D)`` containing the centroid.
                 """
                 return np.array([np.mean(np.array(points), axis=0)])
 
             self.get_points_to_draw = default_get_points
         else:
-            self.get_points_to_draw = get_points_to_draw  # pyrefly: ignore[bad-assignment]
+            self.get_points_to_draw = get_points_to_draw
 
         self.radius = radius
         self.thickness = thickness
         self.color = color
-        self.mask: np.ndarray | None = None
+        self.mask: NDArray[np.uint8] | None = None
         self.attenuation_factor = 1 - attenuation
 
     def draw(
@@ -205,39 +210,45 @@ class AbsolutePaths:
 
     def __init__(
         self,
-        get_points_to_draw: Callable[[np.ndarray], np.ndarray] | None = None,
+        get_points_to_draw: Callable[[NDArray[np.float64]], NDArray[np.float64]]
+        | None = None,
         thickness: int | None = None,
         color: tuple[int, int, int] | None = None,
         radius: int | None = None,
         max_history=20,
     ):
         """Configure the absolute-coordinates path drawer."""
+        self.get_points_to_draw: Callable[[NDArray[np.float64]], NDArray[np.float64]]
         if get_points_to_draw is None:
 
-            def default_get_points(points):
+            def default_get_points(
+                points: NDArray[np.float64],
+            ) -> NDArray[np.float64]:
                 """Return the centroid of *points* as a single-element array.
 
                 Parameters
                 ----------
-                points : np.ndarray
+                points : NDArray[np.float64]
                     Array of shape ``(N, D)`` representing tracked point
                     coordinates.
 
                 Returns
                 -------
-                np.ndarray
+                NDArray[np.float64]
                     Array of shape ``(1, D)`` containing the centroid.
                 """
                 return np.array([np.mean(np.array(points), axis=0)])
 
             self.get_points_to_draw = default_get_points
         else:
-            self.get_points_to_draw = get_points_to_draw  # pyrefly: ignore[bad-assignment]
+            self.get_points_to_draw = get_points_to_draw
 
         self.radius = radius
         self.thickness = thickness
         self.color = color
-        self.past_points: defaultdict[int | None, list[np.ndarray]] = defaultdict(list)
+        self.past_points: defaultdict[int | None, list[NDArray[np.float64]]] = (
+            defaultdict(list)
+        )
         self.max_history = max_history
         self.alphas = np.linspace(0.99, 0.01, max_history)
 
@@ -327,7 +338,6 @@ class AbsolutePaths:
 
                 alpha = self.alphas[i]
                 frame = Drawer.alpha_blend(overlay, frame, alpha=alpha)
-            # pyrefly: ignore[bad-argument-type]
             self.past_points[obj.id].insert(0, points_to_draw)
             self.past_points[obj.id] = self.past_points[obj.id][: self.max_history]
 
