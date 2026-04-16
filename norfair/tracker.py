@@ -311,6 +311,8 @@ class Tracker:
 
         # Create new tracked objects from remaining unmatched detections
         for detection in unmatched_detections:
+            if not isinstance(detection, Detection):
+                continue
             self.tracked_objects.append(
                 self._obj_factory.create(
                     initial_detection=detection,
@@ -361,9 +363,13 @@ class Tracker:
         distance_function: Distance,
         distance_threshold: float,
         objects: Sequence["TrackedObject"],
-        candidates: list["Detection"] | list["TrackedObject"] | None,
+        candidates: Sequence["Detection | TrackedObject"] | None,
         period: int,
-    ) -> tuple[list, list["TrackedObject"], list["TrackedObject"]]:
+    ) -> tuple[
+        list["Detection | TrackedObject"],
+        list["TrackedObject"],
+        list["TrackedObject"],
+    ]:
         if candidates is not None and len(candidates) > 0:
             distance_matrix = distance_function.get_distances(objects, candidates)
             if np.isnan(distance_matrix).any():
@@ -383,11 +389,7 @@ class Tracker:
             )
             if len(matched_cand_indices) > 0:
                 unmatched_candidates = [
-                    d
-                    for i, d in enumerate(
-                        candidates  # pyrefly: ignore[bad-argument-type]
-                    )
-                    if i not in matched_cand_indices
+                    d for i, d in enumerate(candidates) if i not in matched_cand_indices
                 ]
                 unmatched_objects = [
                     d for i, d in enumerate(objects) if i not in matched_obj_indices
@@ -413,9 +415,7 @@ class Tracker:
                             # Collect for batch removal instead of O(n) per-call list.remove()
                             candidates_to_remove.add(id(matched_candidate))
                     else:
-                        unmatched_candidates.append(
-                            matched_candidate  # pyrefly: ignore[bad-argument-type]
-                        )
+                        unmatched_candidates.append(matched_candidate)
                         unmatched_objects.append(matched_object)
 
                 # Batch-remove merged TrackedObject candidates in a single pass (O(n))

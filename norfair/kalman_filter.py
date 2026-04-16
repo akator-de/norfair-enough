@@ -964,10 +964,10 @@ class KalmanFilter:
             function for this one call, otherwise a slice of self.H will
             be used.
         """
-        if isscalar(z_i):
-            length = 1
+        if isinstance(z_i, np.ndarray):
+            length = len(z_i)
         else:
-            length = len(z_i)  # pyrefly: ignore[bad-argument-type]
+            length = 1
         z_i = np.reshape(z_i, [length, 1])
         stop = start + length
 

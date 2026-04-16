@@ -435,11 +435,17 @@ class Drawable:
             self.scores = obj.scores
             self.live_points = obj.live_points
         elif obj is None:
-            self.points = points  # pyrefly: ignore[bad-assignment]
+            if points is None:
+                raise ValueError("points is required when obj is None")
+            self.points = points
             self.id = id
             self.label = label
             self.scores = scores
-            self.live_points = live_points  # pyrefly: ignore[bad-assignment]
+            self.live_points = (
+                live_points
+                if live_points is not None
+                else np.ones(points.shape[0], dtype=np.bool_)
+            )
         else:
             raise ValueError(
                 f"Expecting a Detection or a TrackedObject but received {type(obj)}"
