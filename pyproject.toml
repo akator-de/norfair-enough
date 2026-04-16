@@ -116,14 +116,19 @@ line-length = 88
 extend-exclude = ["demos"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM"]
+select = ["E", "F", "I", "UP", "B", "SIM", "D"]
 ignore = [
     "E501",    # line length is handled by ruff format
     "SIM108",  # ternary operator suggestions reduce readability
     "SIM115",  # context manager for open() not always applicable
     "B008",    # function calls in defaults (used for factory pattern)
     "B905",    # zip() strict= is noisy for existing code
+    "D105",    # missing docstring in magic method (__repr__ etc.)
+    "D107",    # missing docstring in __init__ (documented on class)
 ]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
 
 [tool.ruff.lint.isort]
 force-single-line = false

@@ -91,7 +91,6 @@ class FixedCamera:
             camera motion.
 
         """
-
         # initialize background if necessary
         background: np.ndarray
         if self._background is None:

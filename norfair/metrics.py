@@ -245,7 +245,20 @@ class DetectionFileParser:
             self.sorted_by_frame.append(self.get_dets_from_frame(frame_number))
 
     def get_dets_from_frame(self, frame_number):
-        """Return the list of Norfair ``Detection`` for ``frame_number``."""
+        """Return the list of Norfair ``Detection`` for ``frame_number``.
+
+        Parameters
+        ----------
+        frame_number : int
+            1-based frame index to retrieve detections for.
+
+        Returns
+        -------
+        list of Detection
+            Norfair ``Detection`` objects parsed from the raw detection
+            matrix for the requested frame. Empty list if no detections
+            exist for that frame.
+        """
         indexes = np.argwhere(self.matrix_detections[:, 0] == frame_number)
         detections = []
         if len(indexes) > 0:
@@ -396,7 +409,16 @@ class Accumulators:
         return self.summary_dataframe
 
     def save_metrics(self, save_path=".", file_name="metrics.txt"):
-        """Write the rendered ``summary_text`` to ``save_path/file_name``."""
+        """Write the rendered ``summary_text`` to ``save_path/file_name``.
+
+        Parameters
+        ----------
+        save_path : str, optional
+            Directory where the metrics file is written. Created if it
+            does not exist. Defaults to ``"."``.
+        file_name : str, optional
+            Name of the output file. Defaults to ``"metrics.txt"``.
+        """
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
@@ -433,7 +455,6 @@ def load_motchallenge(matrix_data, min_confidence=-1):
         ``('FrameId', 'Id')``.
 
     """
-
     df = pd.DataFrame(
         data=matrix_data,
         columns=[

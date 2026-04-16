@@ -24,7 +24,18 @@ class Filter(Protocol):
         R: np.ndarray | None = None,
         H: np.ndarray | None = None,
     ) -> None:
-        """Incorporate a new measurement ``z`` into the state."""
+        """Incorporate a new measurement ``z`` into the state.
+
+        Parameters
+        ----------
+        z : np.ndarray
+            Measurement vector (column vector of flattened detection points).
+        R : np.ndarray or None, optional
+            Measurement noise matrix. When ``None``, the filter's default is used.
+        H : np.ndarray or None, optional
+            Observation matrix mapping state to measurement space. When ``None``,
+            the filter's default is used.
+        """
         ...
 
 
@@ -37,7 +48,19 @@ class FilterFactory(ABC):
 
     @abstractmethod
     def create_filter(self, initial_detection: np.ndarray) -> Filter:
-        """Return a new filter seeded with ``initial_detection``."""
+        """Return a new filter seeded with ``initial_detection``.
+
+        Parameters
+        ----------
+        initial_detection : np.ndarray
+            Array of shape ``(n_points, n_dimensions)`` with the initial
+            detection coordinates used to seed the filter state.
+
+        Returns
+        -------
+        Filter
+            A freshly initialized filter instance for the new tracked object.
+        """
         ...
 
 
@@ -209,7 +232,19 @@ class NoFilterFactory(FilterFactory):
     """
 
     def create_filter(self, initial_detection: np.ndarray):
-        """Return a :class:`NoFilter` seeded with ``initial_detection``."""
+        """Return a :class:`NoFilter` seeded with ``initial_detection``.
+
+        Parameters
+        ----------
+        initial_detection : np.ndarray
+            Array of shape ``(n_points, n_dimensions)`` with the initial
+            detection coordinates used to seed the filter state.
+
+        Returns
+        -------
+        NoFilter
+            A null filter whose position state is set to ``initial_detection``.
+        """
         num_points = initial_detection.shape[0]
         dim_points = initial_detection.shape[1]
         dim_z = dim_points * num_points  # flattened positions
@@ -387,7 +422,19 @@ class OptimizedKalmanFilterFactory(FilterFactory):
         self.vel_variance = vel_variance
 
     def create_filter(self, initial_detection: np.ndarray):
-        """Return an :class:`OptimizedKalmanFilter` seeded with ``initial_detection``."""
+        """Return an :class:`OptimizedKalmanFilter` seeded with ``initial_detection``.
+
+        Parameters
+        ----------
+        initial_detection : np.ndarray
+            Array of shape ``(n_points, n_dimensions)`` with the initial
+            detection coordinates used to seed the filter state.
+
+        Returns
+        -------
+        OptimizedKalmanFilter
+            A freshly initialized optimized Kalman filter.
+        """
         num_points = initial_detection.shape[0]
         dim_points = initial_detection.shape[1]
         dim_z = dim_points * num_points  # flattened positions

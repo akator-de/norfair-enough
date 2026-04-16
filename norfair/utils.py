@@ -17,6 +17,22 @@ def validate_points(points: np.ndarray) -> np.ndarray:
     A 1-D array is interpreted as a single point and reshaped to have
     one row; anything with more than two dimensions is rejected via
     :func:`raise_detection_error_message`.
+
+    Parameters
+    ----------
+    points : np.ndarray
+        Array of point coordinates. May be 1-D (single point) or 2-D
+        (multiple points).
+
+    Returns
+    -------
+    np.ndarray
+        Array reshaped to ``(n_points, n_dimensions)``.
+
+    Raises
+    ------
+    ValueError
+        If ``points`` has more than two dimensions.
     """
     # If the user is tracking only a single point, reformat it slightly.
     if len(points.shape) == 1:
@@ -27,7 +43,20 @@ def validate_points(points: np.ndarray) -> np.ndarray:
 
 
 def raise_detection_error_message(points):
-    """Raise a ``ValueError`` describing a malformed ``Detection.points``."""
+    """Raise a ``ValueError`` describing a malformed ``Detection.points``.
+
+    Parameters
+    ----------
+    points : np.ndarray
+        The malformed points array whose shape will be included in the
+        error message.
+
+    Raises
+    ------
+    ValueError
+        Always raised with a message describing the expected shape and
+        a link to the ``Detection`` documentation.
+    """
     message = "\n[red]INPUT ERROR:[/red]\n"
     message += f"Each `Detection` object should have a property `points` of shape (n_points, n_dimensions), not {points.shape}. Check your `Detection` list creation code.\n"
     message += "You can read the documentation for the `Detection` class here:\n"
@@ -36,7 +65,16 @@ def raise_detection_error_message(points):
 
 
 def print_objects_as_table(tracked_objects: Sequence):
-    """Pretty-print a table summarizing ``tracked_objects`` for debugging."""
+    """Pretty-print a table summarizing ``tracked_objects`` for debugging.
+
+    Parameters
+    ----------
+    tracked_objects : Sequence
+        Sequence of tracked objects. Each element is expected to have
+        ``id``, ``age``, ``hit_counter``, ``last_distance``, and
+        ``initializing_id`` attributes (missing attributes are shown
+        as ``"?"``).
+    """
     print()
     console = Console()
     table = Table(show_header=True, header_style="bold magenta")
@@ -63,6 +101,17 @@ def get_terminal_size(default: tuple[int, int] = (80, 24)) -> tuple[int, int]:
 
     Tries stdin, stdout and stderr in order, returning the first
     successful query.
+
+    Parameters
+    ----------
+    default : tuple of (int, int), optional
+        Fallback ``(columns, lines)`` used when the terminal size
+        cannot be determined. Defaults to ``(80, 24)``.
+
+    Returns
+    -------
+    tuple of (int, int)
+        ``(columns, lines)`` of the current terminal.
     """
     columns, lines = default
     for fd in range(0, 3):  # First in order 0=Std In, 1=Std Out, 2=Std Error
@@ -157,5 +206,12 @@ Please, install Norfair with `pip install norfair-enough\[metrics]`, or `pip ins
 # lru_cache will prevent re-run the function if the message is the same
 @cache
 def warn_once(message):
-    """Emit ``message`` via ``logging.warning`` at most once per process."""
+    """Emit ``message`` via ``logging.warning`` at most once per process.
+
+    Parameters
+    ----------
+    message : str
+        The warning text to log. Repeated calls with the same
+        ``message`` are suppressed by ``functools.cache``.
+    """
     warning(message)

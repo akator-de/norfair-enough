@@ -5,11 +5,11 @@
 # pylint: disable=invalid-name, too-many-arguments, too-many-branches,
 # pylint: disable=too-many-locals, too-many-instance-attributes, too-many-lines
 
-"""
-This module implements the linear Kalman filter in both an object
-oriented and procedural form. The KalmanFilter class implements
-the filter by storing the various matrices in instance variables,
-minimizing the amount of bookkeeping you have to do.
+"""Linear Kalman filter in object-oriented and procedural form.
+
+The KalmanFilter class implements the filter by storing the various
+matrices in instance variables, minimizing the amount of bookkeeping
+you have to do.
 
 All Kalman filters operate with a predict->update cycle. The
 predict step, implemented with the method or function predict(),
@@ -138,19 +138,26 @@ _logger = logging.getLogger(__name__)
 
 
 def logpdf(x, mean=None, cov=1, allow_singular=True):
+    """Compute the log-pdf of the normal distribution N(mean, cov) for *x*.
+
+    Wrapper around ``scipy.stats.multivariate_normal.logpdf``.
+
+    Parameters
+    ----------
+    x : array_like
+        Data point(s) at which to evaluate the log-pdf.
+    mean : array_like or None, optional
+        Mean of the distribution.  ``None`` implies a zero mean.
+    cov : array_like or scalar, optional
+        Covariance matrix (or scalar variance).  Defaults to ``1``.
+    allow_singular : bool, optional
+        Whether to allow a singular covariance matrix.
+
+    Returns
+    -------
+    float
+        Log of the probability density evaluated at *x*.
     """
-    Computes the log of the probability density function of the normal
-    N(mean, cov) for the data x. The normal may be univariate or multivariate.
-
-    Wrapper for older versions of scipy.multivariate_normal.logpdf which
-    don't support support the allow_singular keyword prior to verion 0.15.0.
-
-    If it is not supported, and cov is singular or not PSD you may get
-    an exception.
-
-    `x` and `mean` may be column vectors, row vectors, or lists.
-    """
-
     if mean is not None:
         flat_mean = np.asarray(mean).flatten()
     else:
@@ -162,8 +169,23 @@ def logpdf(x, mean=None, cov=1, allow_singular=True):
 
 
 def reshape_z(z, dim_z, ndim):
-    """ensure z is a (dim_z, 1) shaped vector"""
+    """Reshape measurement *z* into the shape expected by the filter.
 
+    Parameters
+    ----------
+    z : array_like
+        Measurement vector.
+    dim_z : int
+        Expected measurement dimensionality.
+    ndim : int
+        Target number of dimensions (0, 1, or 2).
+
+    Returns
+    -------
+    np.ndarray
+        Measurement reshaped to ``(dim_z, 1)``, ``(dim_z,)``, or scalar
+        depending on *ndim*.
+    """
     z = np.atleast_2d(z)
     if z.shape[1] == dim_z:
         z = z.T
@@ -183,12 +205,21 @@ def reshape_z(z, dim_z, ndim):
 
 
 def pretty_str(label, arr):
-    """
-    Generates a pretty printed NumPy array with an assignment. Optionally
-    transposes column vectors so they are drawn on one line. Strictly speaking
-    arr can be any time convertible by `str(arr)`, but the output may not
-    be what you want if the type of the variable is not a scalar or an
-    ndarray.
+    """Format *arr* as ``label = <value>`` for human-readable output.
+
+    Column vectors are transposed so they print on a single line.
+
+    Parameters
+    ----------
+    label : str
+        Variable name shown before the ``=`` sign.
+    arr : array_like
+        Value to format (typically a NumPy array or scalar).
+
+    Returns
+    -------
+    str
+        Formatted string suitable for ``print()``.
 
     Examples
     --------
@@ -201,7 +232,17 @@ def pretty_str(label, arr):
     """
 
     def is_col(a):
-        """return true if a is a column vector"""
+        """Return ``True`` if *a* is a column vector (shape ``(n, 1)``).
+
+        Parameters
+        ----------
+        a : array_like
+            Object to test.
+
+        Returns
+        -------
+        bool
+        """
         try:
             return a.shape[0] > 1 and a.shape[1] == 1
         except (AttributeError, IndexError):
@@ -241,9 +282,10 @@ def pretty_str(label, arr):
 
 
 class KalmanFilter:
-    r"""Implements a Kalman filter. You are responsible for setting the
-    various state variables to reasonable values; the defaults  will
-    not give you a functional filter.
+    r"""Implement a Kalman filter.
+
+    You are responsible for setting the various state variables to reasonable
+    values; the defaults will not give you a functional filter.
 
     For now the best documentation is my free book Kalman and Bayesian
     Filters in Python [2]_. The test files in this directory also give you a
@@ -267,7 +309,6 @@ class KalmanFilter:
 
     Examples
     --------
-
     Here is a filter that tracks position and velocity using a sensor that only
     reads position.
 
@@ -544,13 +585,10 @@ class KalmanFilter:
         self.inv = np.linalg.inv
 
     def predict(self, u=None, B=None, F=None, Q=None):
-        """
-        Predict next state (prior) using the Kalman filter state propagation
-        equations.
+        """Predict next state (prior) using the Kalman filter state propagation equations.
 
         Parameters
         ----------
-
         u : np.array, default 0
             Optional control vector.
 
@@ -566,7 +604,6 @@ class KalmanFilter:
             Optional process noise matrix; a value of None will cause the
             filter to use `self.Q`.
         """
-
         if B is None:
             B = self.B
         if F is None:
@@ -613,7 +650,6 @@ class KalmanFilter:
             Optionally provide H to override the measurement function for this
             one call, otherwise self.H will be used.
         """
-
         # set to None to force recompute
         self._log_likelihood = None
         self._likelihood = None
@@ -677,15 +713,14 @@ class KalmanFilter:
         self.P_post = self.P.copy()
 
     def predict_steadystate(self, u=0, B=None):
-        """
-        Predict state (prior) using the Kalman filter state propagation
-        equations. Only x is updated, P is left unchanged. See
+        """Predict state (prior) using the Kalman filter state propagation equations.
+
+        Only x is updated, P is left unchanged. See
         update_steadstate() for a longer explanation of when to use this
         method.
 
         Parameters
         ----------
-
         u : np.array
             Optional control vector. If non-zero, it is multiplied by B
             to create the control input into the system.
@@ -694,7 +729,6 @@ class KalmanFilter:
             Optional control transition matrix; a value of None
             will cause the filter to use `self.B`.
         """
-
         if B is None:
             B = self.B
 
@@ -709,10 +743,7 @@ class KalmanFilter:
         self.P_prior = self.P.copy()
 
     def update_steadystate(self, z):
-        """
-        Add a new measurement (z) to the Kalman filter without recomputing
-        the Kalman gain K, the state covariance P, or the system
-        uncertainty S.
+        """Add a new measurement (z) to the Kalman filter without recomputing K, P, or S.
 
         You can use this for LTI systems since the Kalman gain and covariance
         converge to a fixed value. Precompute these and assign them explicitly,
@@ -751,7 +782,6 @@ class KalmanFilter:
         >>>     cv.predict_steadystate()
         >>>     cv.update_steadystate([i, i, i])
         """
-
         # set to None to force recompute
         self._log_likelihood = None
         self._likelihood = None
@@ -784,10 +814,9 @@ class KalmanFilter:
         self._mahalanobis = None
 
     def update_correlated(self, z, R=None, H=None):
-        """Add a new measurement (z) to the Kalman filter assuming that
-        process noise and measurement noise are correlated as defined in
-        the `self.M` matrix.
+        """Add a new measurement (z) assuming correlated process and measurement noise.
 
+        The correlation is defined in the `self.M` matrix.
         A partial derivation can be found in [1]
 
         If z is None, nothing is changed.
@@ -812,7 +841,6 @@ class KalmanFilter:
         .. [1] Bulut, Y. (2011). Applied Kalman filter theory (Doctoral dissertation, Northeastern University).  # pylint: disable=line-too-long
                http://people.duke.edu/~hpgavin/SystemID/References/Balut-KalmanFilter-PhD-NEU-2011.pdf
         """
-
         # set to None to force recompute
         self._log_likelihood = None
         self._likelihood = None
@@ -878,8 +906,8 @@ class KalmanFilter:
         self.P_post = self.P.copy()
 
     def update_sequential(self, start, z_i, R_i=None, H_i=None):
-        """
-        Add a single input measurement (z_i) to the Kalman filter.
+        """Add a single input measurement (z_i) to the Kalman filter.
+
         In sequential processing, inputs are processed one at a time.
 
         Parameters
@@ -900,7 +928,6 @@ class KalmanFilter:
             function for this one call, otherwise a slice of self.H will
             be used.
         """
-
         if isscalar(z_i):
             length = 1
         else:
@@ -963,9 +990,8 @@ class KalmanFilter:
     ):
         """Batch processes a sequences of measurements.
 
-         Parameters
-         ----------
-
+        Parameters
+        ----------
          zs : list-like
              list of measurements at each time step `self.dt`. Missing
              measurements must be represented by `None`.
@@ -1033,9 +1059,8 @@ class KalmanFilter:
              filterpy.common.Saver object. If provided, saver.save() will be
              called after every epoch
 
-         Returns
-         -------
-
+        Returns
+        -------
          means : np.array((n,dim_x,1))
              array of the state for each time step after the update. Each entry
              is an np.array. In other words `means[k,:]` is the state at step
@@ -1054,8 +1079,8 @@ class KalmanFilter:
              array of the covariances for each time step after the prediction.
              In other words `covariance[k,:,:]` is the covariance at step `k`.
 
-         Examples
-         --------
+        Examples
+        --------
 
          .. code-block:: Python
 
@@ -1070,7 +1095,6 @@ class KalmanFilter:
              (mu, cov, _, _) = kf.batch_filter(zs, Fs=Fs)
              (xs, Ps, Ks, Pps) = kf.rts_smoother(mu, cov, Fs=Fs)
         """
-
         # pylint: disable=too-many-statements
         n = np.size(zs, 0)
         if Fs is None:
@@ -1130,14 +1154,13 @@ class KalmanFilter:
         return (means, covariances, means_p, covariances_p)
 
     def rts_smoother(self, Xs, Ps, Fs=None, Qs=None, inv=np.linalg.inv):
-        """
-        Runs the Rauch-Tung-Striebel Kalman smoother on a set of
-        means and covariances computed by a Kalman filter. The usual input
-        would come from the output of `KalmanFilter.batch_filter()`.
+        """Run the Rauch-Tung-Striebel Kalman smoother on a set of means and covariances.
+
+        The usual input would come from the output of
+        `KalmanFilter.batch_filter()`.
 
         Parameters
         ----------
-
         Xs : numpy.array
            array of the means (state variable x) of the output of a Kalman
            filter.
@@ -1160,7 +1183,6 @@ class KalmanFilter:
 
         Returns
         -------
-
         x : numpy.ndarray
            smoothed means
 
@@ -1184,7 +1206,6 @@ class KalmanFilter:
             (x, P, K, Pp) = rts_smoother(mu, cov, kf.F, kf.Q)
 
         """
-
         if len(Xs) != len(Ps):
             raise ValueError("length of Xs and Ps must be the same")
 
@@ -1210,13 +1231,12 @@ class KalmanFilter:
         return (x, P, K, Pp)
 
     def get_prediction(self, u=None, B=None, F=None, Q=None):
-        """
-        Predict next state (prior) using the Kalman filter state propagation
-        equations and returns it without modifying the object.
+        """Predict next state (prior) and return it without modifying the object.
+
+        Use the Kalman filter state propagation equations.
 
         Parameters
         ----------
-
         u : np.array, default 0
             Optional control vector.
 
@@ -1234,11 +1254,9 @@ class KalmanFilter:
 
         Returns
         -------
-
         (x, P) : tuple
             State vector and covariance array of the prediction.
         """
-
         if B is None:
             B = self.B
         if F is None:
@@ -1260,9 +1278,7 @@ class KalmanFilter:
         return x, P
 
     def get_update(self, z: np.ndarray | None = None) -> tuple[np.ndarray, np.ndarray]:
-        """
-        Computes the new estimate based on measurement `z` and returns it
-        without altering the state of the filter.
+        """Compute the new estimate based on measurement `z` without altering the filter.
 
         Parameters
         ----------
@@ -1316,50 +1332,41 @@ class KalmanFilter:
         return x, P
 
     def residual_of(self, z):
-        """
-        Returns the residual for the given measurement (z). Does not alter
-        the state of the filter.
-        """
+        """Return the residual for the given measurement (z) without altering the filter."""
         z = reshape_z(z, self.dim_z, self.x.ndim)
         return z - dot(self.H, self.x_prior)
 
     def measurement_of_state(self, x):
-        """
-        Helper function that converts a state into a measurement.
+        """Convert a state into a measurement.
 
         Parameters
         ----------
-
         x : np.array
             kalman state vector
 
         Returns
         -------
-
         z : (dim_z, 1): array_like
             measurement for this update. z can be a scalar if dim_z is 1,
             otherwise it must be convertible to a column vector.
         """
-
         return dot(self.H, x)
 
     @property
     def log_likelihood(self):
-        """
-        log-likelihood of the last measurement.
-        """
+        """Log-likelihood of the last measurement."""
         if self._log_likelihood is None:
             self._log_likelihood = logpdf(x=self.y, cov=self.S)
         return self._log_likelihood
 
     @property
     def likelihood(self):
-        """
-        Computed from the log-likelihood. The log-likelihood can be very
-        small,  meaning a large negative value such as -28000. Taking the
-        exp() of that results in 0.0, which can break typical algorithms
-        which multiply by this value, so by default we always return a
-        number >= sys.float_info.min.
+        """Compute likelihood from the log-likelihood.
+
+        The log-likelihood can be very small, meaning a large negative value
+        such as -28000. Taking the exp() of that results in 0.0, which can
+        break typical algorithms which multiply by this value, so by default
+        we always return a number >= sys.float_info.min.
         """
         if self._likelihood is None:
             self._likelihood = exp(self.log_likelihood)
@@ -1369,9 +1376,10 @@ class KalmanFilter:
 
     @property
     def mahalanobis(self):
-        """ "
-        Mahalanobis distance of measurement. E.g. 3 means measurement
-        was 3 standard deviations away from the predicted value.
+        """Mahalanobis distance of measurement.
+
+        E.g. 3 means measurement was 3 standard deviations away from
+        the predicted value.
 
         Returns
         -------
@@ -1385,33 +1393,51 @@ class KalmanFilter:
 
     @property
     def alpha(self):
-        """
-        Fading memory setting. 1.0 gives the normal Kalman filter, and
-        values slightly larger than 1.0 (such as 1.02) give a fading
-        memory effect - previous measurements have less influence on the
-        filter's estimates. This formulation of the Fading memory filter
-        (there are many) is due to Dan Simon [1]_.
+        """Fading memory setting.
+
+        1.0 gives the normal Kalman filter, and values slightly larger than
+        1.0 (such as 1.02) give a fading memory effect - previous measurements
+        have less influence on the filter's estimates. This formulation of the
+        Fading memory filter (there are many) is due to Dan Simon [1]_.
         """
         return self._alpha_sq**0.5
 
     @alpha.setter
     def alpha(self, value):
+        """Set the fading memory coefficient.
+
+        Parameters
+        ----------
+        value : float
+            Fading memory coefficient.  Must be ``>= 1``.
+        """
         if not np.isscalar(value) or value < 1:
             raise ValueError("alpha must be a float greater than 1")
 
         self._alpha_sq = value**2
 
     def log_likelihood_of(self, z):
-        """
-        log likelihood of the measurement `z`. This should only be called
-        after a call to update(). Calling after predict() will yield an
-        incorrect result."""
+        """Return the log-likelihood of measurement *z* given the current state.
 
+        Must be called after ``update()``; calling after ``predict()``
+        yields an incorrect result.
+
+        Parameters
+        ----------
+        z : array_like or None
+            Measurement vector.  If ``None``, returns ``log(sys.float_info.min)``.
+
+        Returns
+        -------
+        float
+            Log-likelihood of the measurement.
+        """
         if z is None:
             return log(sys.float_info.min)
         return logpdf(z, dot(self.H, self.x), self.S)
 
     def __repr__(self):
+        """Return a string representation of the KalmanFilter."""
         return "\n".join(
             [
                 "KalmanFilter object",
@@ -1451,20 +1477,23 @@ class KalmanFilter:
         F: np.ndarray | None = None,
         Q: np.ndarray | None = None,
     ) -> None:
-        """
-        Performs a series of asserts to check that the size of everything
-        is what it should be. This can help you debug problems in your design.
+        """Assert that all filter matrices have consistent dimensions.
 
-        If you pass in H, R, F, Q those will be used instead of this object's
-        value for those matrices.
+        Useful for debugging design problems.  When an override matrix is
+        provided it is checked instead of the instance attribute.
 
-        Testing `z` (the measurement) is problematic. x is a vector, and can be
-        implemented as either a 1D array or as an n x 1 column vector. Thus Hx
-        can be of different shapes. Then, if Hx is a single value, it can
-        be either a 1D array or 2D vector. If either is true, z can reasonably
-        be a scalar (either '3' or np.array('3') are scalars under this
-        definition), a 1D, 1 element array, or a 2D, 1 element array. You are
-        allowed to pass in any combination that works.
+        Parameters
+        ----------
+        z : np.ndarray or None, optional
+            Measurement vector to validate.
+        H : np.ndarray or None, optional
+            Observation matrix override.
+        R : np.ndarray or None, optional
+            Measurement noise covariance override.
+        F : np.ndarray or None, optional
+            State transition matrix override.
+        Q : np.ndarray or None, optional
+            Process noise covariance override.
         """
         if H is None:
             H = self.H
@@ -1647,14 +1676,12 @@ def update(
 
 
 def update_steadystate(x, z, K, H=None):
-    """
-    Add a new measurement (z) to the Kalman filter. If z is None, nothing
-    is changed.
+    """Add a new measurement (z) to the Kalman filter.
 
+    If z is None, nothing is changed.
 
     Parameters
     ----------
-
     x : numpy.array(dim_x, 1), or float
         State estimate vector
 
@@ -1671,13 +1698,11 @@ def update_steadystate(x, z, K, H=None):
 
     Returns
     -------
-
     x : numpy.array
         Posterior state estimate vector
 
     Examples
     --------
-
     This can handle either the multidimensional or unidimensional case. If
     all parameters are floats instead of arrays the filter will still work,
     and return floats for x, P as the result.
@@ -1685,7 +1710,6 @@ def update_steadystate(x, z, K, H=None):
     >>> update_steadystate(1, 2, 1)  # univariate
     >>> update_steadystate(x, P, z, H)
     """
-
     if z is None:
         return x
 
@@ -1706,13 +1730,10 @@ def update_steadystate(x, z, K, H=None):
 
 
 def predict(x, P, F=1, Q=0, u=0, B=1, alpha=1.0):
-    """
-    Predict next state (prior) using the Kalman filter state propagation
-    equations.
+    """Predict next state (prior) using the Kalman filter state propagation equations.
 
     Parameters
     ----------
-
     x : numpy.array
         State estimate vector
 
@@ -1742,14 +1763,12 @@ def predict(x, P, F=1, Q=0, u=0, B=1, alpha=1.0):
 
     Returns
     -------
-
     x : numpy.array
         Prior state estimate vector
 
     P : numpy.array
         Prior covariance matrix
     """
-
     if np.isscalar(F):
         F = np.array(F)
     x = dot(F, x) + dot(B, u)
@@ -1759,14 +1778,13 @@ def predict(x, P, F=1, Q=0, u=0, B=1, alpha=1.0):
 
 
 def predict_steadystate(x, F=1, u=0, B=1):
-    """
-    Predict next state (prior) using the Kalman filter state propagation
-    equations. This steady state form only computes x, assuming that the
+    """Predict next state (prior) using the Kalman filter state propagation equations.
+
+    This steady state form only computes x, assuming that the
     covariance is constant.
 
     Parameters
     ----------
-
     x : numpy.array
         State estimate vector
 
@@ -1785,11 +1803,9 @@ def predict_steadystate(x, F=1, u=0, B=1):
 
     Returns
     -------
-
     x : numpy.array
         Prior state estimate vector
     """
-
     if np.isscalar(F):
         F = np.array(F)
     x = dot(F, x) + dot(B, u)
@@ -1805,7 +1821,6 @@ def batch_filter(
 
     Parameters
     ----------
-
     zs : list-like
         list of measurements at each time step. Missing measurements must be
         represented by None.
@@ -1844,7 +1859,6 @@ def batch_filter(
 
     Returns
     -------
-
     means : np.array((n,dim_x,1))
         array of the state for each time step after the update. Each entry
         is an np.array. In other words `means[k,:]` is the state at step
@@ -1877,7 +1891,6 @@ def batch_filter(
         (xs, Ps, Ks, Pps) = kf.rts_smoother(mu, cov, Fs=Fs, Qs=None)
 
     """
-
     n = np.size(zs, 0)
     dim_x = x.shape[0]
 
@@ -1928,14 +1941,13 @@ def batch_filter(
 
 
 def rts_smoother(Xs, Ps, Fs, Qs):
-    """
-    Runs the Rauch-Tung-Striebel Kalman smoother on a set of
-    means and covariances computed by a Kalman filter. The usual input
-    would come from the output of `KalmanFilter.batch_filter()`.
+    """Run the Rauch-Tung-Striebel Kalman smoother on a set of means and covariances.
+
+    The usual input would come from the output of
+    `KalmanFilter.batch_filter()`.
 
     Parameters
     ----------
-
     Xs : numpy.array
        array of the means (state variable x) of the output of a Kalman
        filter.
@@ -1951,7 +1963,6 @@ def rts_smoother(Xs, Ps, Fs, Qs):
 
     Returns
     -------
-
     x : numpy.ndarray
        smoothed means
 
@@ -1974,7 +1985,6 @@ def rts_smoother(Xs, Ps, Fs, Qs):
         (mu, cov, _, _) = kalman.batch_filter(zs)
         (x, P, K, pP) = rts_smoother(mu, cov, kf.F, kf.Q)
     """
-
     if len(Xs) != len(Ps):
         raise ValueError("length of Xs and Ps must be the same")
 
