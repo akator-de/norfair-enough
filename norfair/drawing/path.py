@@ -65,9 +65,7 @@ class Paths:
 
             self.get_points_to_draw = default_get_points
         else:
-            self.get_points_to_draw = (
-                get_points_to_draw  # pyrefly: ignore[bad-assignment]
-            )
+            self.get_points_to_draw = get_points_to_draw  # pyrefly: ignore[bad-assignment]
 
         self.radius = radius
         self.thickness = thickness
@@ -208,9 +206,7 @@ class AbsolutePaths:
 
             self.get_points_to_draw = default_get_points
         else:
-            self.get_points_to_draw = (
-                get_points_to_draw  # pyrefly: ignore[bad-assignment]
-            )
+            self.get_points_to_draw = get_points_to_draw  # pyrefly: ignore[bad-assignment]
 
         self.radius = radius
         self.thickness = thickness
