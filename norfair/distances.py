@@ -605,6 +605,22 @@ def create_keypoints_voting_distance(
     def keypoints_voting_distance(
         detection: "Detection", tracked_object: "TrackedObject"
     ) -> float:
+        """Return a voting-based distance in ``[0, 1]`` using nearby keypoints.
+
+        Parameters
+        ----------
+        detection : Detection
+            Incoming detection whose keypoints and scores are compared.
+        tracked_object : TrackedObject
+            Existing tracked object providing the estimated keypoints.
+
+        Returns
+        -------
+        float
+            Distance in ``[0, 1]``. Returns ``1.0`` when scores are
+            unavailable or no keypoints match, tends towards ``0`` as more
+            keypoints match.
+        """
         if detection.scores is None or tracked_object.last_detection.scores is None:
             return 1.0
         distances = np.linalg.norm(detection.points - tracked_object.estimate, axis=1)
@@ -652,7 +668,21 @@ def create_normalized_mean_euclidean_distance(
     def normalized__mean_euclidean_distance(
         detection: "Detection", tracked_object: "TrackedObject"
     ) -> float:
-        """Normalized mean Euclidean distance between detection and tracked object."""
+        """Compute the normalized mean Euclidean distance between detection and tracked object.
+
+        Parameters
+        ----------
+        detection : Detection
+            Incoming detection whose points are compared.
+        tracked_object : TrackedObject
+            Existing tracked object providing the estimated points.
+
+        Returns
+        -------
+        float
+            Mean Euclidean distance across all point pairs, normalized by
+            image width and height so it lies in ``[0, 1]``.
+        """
         # calculate distances and normalized it by width and height
         difference = (detection.points - tracked_object.estimate).astype(float)
         difference[:, 0] /= width

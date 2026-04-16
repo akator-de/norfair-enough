@@ -510,6 +510,41 @@ class _TrackedObjectFactory:
         reid_hit_counter_max: int | None,
         coord_transformations: CoordinatesTransformation | None,
     ) -> "TrackedObject":
+        """Create a new ``TrackedObject`` and register it with the factory.
+
+        Parameters
+        ----------
+        initial_detection : Detection
+            First detection used to seed the new tracked object.
+        hit_counter_max : int
+            Maximum value for the hit counter (controls how long an
+            unmatched object survives).
+        initialization_delay : int
+            Number of consecutive hits required before the object is
+            considered fully initialized.
+        pointwise_hit_counter_max : int
+            Maximum hit-counter value tracked per individual point.
+        detection_threshold : float
+            Confidence threshold below which individual detection points
+            are ignored.
+        period : int
+            Tracker period (frames between ``update`` calls).
+        filter_factory : FilterFactory
+            Factory used to create the Kalman filter for each point.
+        past_detections_length : int
+            Maximum number of past detections to store on the object.
+        reid_hit_counter_max : int or None
+            If not ``None``, maximum hit counter used for re-identification
+            of lost objects.
+        coord_transformations : CoordinatesTransformation or None
+            Optional coordinate transformation for camera-motion
+            compensation.
+
+        Returns
+        -------
+        TrackedObject
+            The newly created and registered tracked object.
+        """
         obj = TrackedObject(
             obj_factory=self,
             initial_detection=initial_detection,
@@ -526,10 +561,12 @@ class _TrackedObjectFactory:
         return obj
 
     def get_initializing_id(self) -> int:
+        """Return the next initializing-phase identifier."""
         self.initializing_count += 1
         return self.initializing_count
 
     def get_ids(self) -> tuple[int, int]:
+        """Return a ``(local_id, global_id)`` pair, incrementing both counters."""
         self.count += 1
         with _TrackedObjectFactory._lock:
             _TrackedObjectFactory.global_count += 1
@@ -902,6 +939,12 @@ class TrackedObject:
 
         Mutable state (filter, counters, arrays) is copied so the
         discarded ``tracked_object`` is not silently aliased.
+
+        Parameters
+        ----------
+        tracked_object : TrackedObject
+            Another tracked object (typically not yet fully initialized)
+            whose state will be absorbed into this one.
         """
         self.reid_hit_counter = None
         self.hit_counter = self.initial_period * 2
@@ -926,7 +969,15 @@ class TrackedObject:
     def update_coordinate_transformation(
         self, coordinate_transformation: CoordinatesTransformation | None
     ):
-        """Attach (or refresh) the abs→rel converter from a new coordinate transformation."""
+        """Attach (or refresh) the abs→rel converter from a new coordinate transformation.
+
+        Parameters
+        ----------
+        coordinate_transformation : CoordinatesTransformation or None
+            The new coordinate transformation whose ``abs_to_rel`` method
+            will be stored. If ``None``, the existing converter is left
+            unchanged.
+        """
         if coordinate_transformation is not None:
             self.abs_to_rel = coordinate_transformation.abs_to_rel
 

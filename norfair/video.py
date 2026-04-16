@@ -379,7 +379,19 @@ class Video:
             raise RuntimeError("Unreachable")
 
     def abbreviate_description(self, description: str) -> str:
-        """Shorten ``description`` so the progress bar fits small terminals."""
+        """Shorten ``description`` so the progress bar fits small terminals.
+
+        Parameters
+        ----------
+        description : str
+            The full description string to abbreviate.
+
+        Returns
+        -------
+        str
+            The original ``description`` if it fits, otherwise a
+            truncated version with ``" ... "`` in the middle.
+        """
         terminal_columns, _ = get_terminal_size()
         space_for_description = (
             int(terminal_columns) - 25
@@ -476,7 +488,13 @@ class VideoFromFrames:
         raise StopIteration()
 
     def update(self, frame):
-        """Append ``frame`` to the output video and release on the last frame."""
+        """Append ``frame`` to the output video and release on the last frame.
+
+        Parameters
+        ----------
+        frame : np.ndarray
+            The OpenCV frame to write to the output video.
+        """
         self.video.write(frame)
         cv2.waitKey(1)
 

@@ -41,11 +41,37 @@ class CoordinatesTransformation(ABC):
 
     @abstractmethod
     def abs_to_rel(self, points: np.ndarray) -> np.ndarray:
-        """Map absolute-frame points to the current relative frame."""
+        """Map absolute-frame points to the current relative frame.
+
+        Parameters
+        ----------
+        points : np.ndarray
+            Array of shape ``(n_points, dim_points)`` in absolute
+            coordinates.
+
+        Returns
+        -------
+        np.ndarray
+            Transformed points with the same shape, in relative
+            coordinates.
+        """
 
     @abstractmethod
     def rel_to_abs(self, points: np.ndarray) -> np.ndarray:
-        """Map relative-frame points to the absolute frame."""
+        """Map relative-frame points to the absolute frame.
+
+        Parameters
+        ----------
+        points : np.ndarray
+            Array of shape ``(n_points, dim_points)`` in relative
+            coordinates.
+
+        Returns
+        -------
+        np.ndarray
+            Transformed points with the same shape, in absolute
+            coordinates.
+        """
 
 
 class TransformationGetter(ABC):
@@ -81,11 +107,37 @@ class TranslationTransformation(CoordinatesTransformation):
         self.movement_vector = movement_vector
 
     def abs_to_rel(self, points: np.ndarray):
-        """Translate absolute points into the current relative frame."""
+        """Translate absolute points into the current relative frame.
+
+        Parameters
+        ----------
+        points : np.ndarray
+            Array of shape ``(n_points, dim_points)`` in absolute
+            coordinates.
+
+        Returns
+        -------
+        np.ndarray
+            Translated points with the same shape, in relative
+            coordinates.
+        """
         return points + self.movement_vector
 
     def rel_to_abs(self, points: np.ndarray):
-        """Translate relative points back into the absolute frame."""
+        """Translate relative points back into the absolute frame.
+
+        Parameters
+        ----------
+        points : np.ndarray
+            Array of shape ``(n_points, dim_points)`` in relative
+            coordinates.
+
+        Returns
+        -------
+        np.ndarray
+            Translated points with the same shape, in absolute
+            coordinates.
+        """
         return points - self.movement_vector
 
 
@@ -169,7 +221,20 @@ class HomographyTransformation(CoordinatesTransformation):
         self.inverse_homography_matrix = np.linalg.inv(homography_matrix)
 
     def abs_to_rel(self, points: np.ndarray):
-        """Apply the forward homography to map absolute points to relative."""
+        """Apply the forward homography to map absolute points to relative.
+
+        Parameters
+        ----------
+        points : np.ndarray
+            Array of shape ``(n_points, dim_points)`` or ``(dim_points,)``
+            in absolute coordinates.
+
+        Returns
+        -------
+        np.ndarray
+            Transformed points with the same shape, in relative
+            coordinates.
+        """
         single_point = points.ndim == 1
         if single_point:
             points = points.reshape(1, -1)
@@ -185,7 +250,20 @@ class HomographyTransformation(CoordinatesTransformation):
         return result
 
     def rel_to_abs(self, points: np.ndarray):
-        """Apply the inverse homography to map relative points to absolute."""
+        """Apply the inverse homography to map relative points to absolute.
+
+        Parameters
+        ----------
+        points : np.ndarray
+            Array of shape ``(n_points, dim_points)`` or ``(dim_points,)``
+            in relative coordinates.
+
+        Returns
+        -------
+        np.ndarray
+            Transformed points with the same shape, in absolute
+            coordinates.
+        """
         single_point = points.ndim == 1
         if single_point:
             points = points.reshape(1, -1)

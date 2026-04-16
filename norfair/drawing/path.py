@@ -61,6 +61,19 @@ class Paths:
         if get_points_to_draw is None:
 
             def default_get_points(points):
+                """Return the centroid of *points* as a single-element array.
+
+                Parameters
+                ----------
+                points : np.ndarray
+                    Array of shape ``(N, D)`` representing tracked point
+                    coordinates.
+
+                Returns
+                -------
+                np.ndarray
+                    Array of shape ``(1, D)`` containing the centroid.
+                """
                 return np.array([np.mean(np.array(points), axis=0)])
 
             self.get_points_to_draw = default_get_points
@@ -202,6 +215,19 @@ class AbsolutePaths:
         if get_points_to_draw is None:
 
             def default_get_points(points):
+                """Return the centroid of *points* as a single-element array.
+
+                Parameters
+                ----------
+                points : np.ndarray
+                    Array of shape ``(N, D)`` representing tracked point
+                    coordinates.
+
+                Returns
+                -------
+                np.ndarray
+                    Array of shape ``(1, D)`` containing the centroid.
+                """
                 return np.array([np.mean(np.array(points), axis=0)])
 
             self.get_points_to_draw = default_get_points
