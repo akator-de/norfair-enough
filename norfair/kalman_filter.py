@@ -139,6 +139,12 @@ from scipy.stats import multivariate_normal
 _logger = logging.getLogger(__name__)
 
 
+def _inv_float64(a: NDArray[np.float64]) -> NDArray[np.float64]:
+    """Wrap ``np.linalg.inv`` with a concrete ``float64`` signature."""
+    result: NDArray[np.float64] = np.linalg.inv(a)
+    return result
+
+
 def logpdf(
     x: np.ndarray | float,
     mean: np.ndarray | None = None,
@@ -593,7 +599,7 @@ class KalmanFilter:
         self._likelihood: float | None = sys.float_info.min
         self._mahalanobis: float | None = None
 
-        self.inv: Callable[[NDArray[np.float64]], NDArray[np.float64]] = np.linalg.inv
+        self.inv: Callable[[NDArray[np.float64]], NDArray[np.float64]] = _inv_float64
 
     def predict(
         self,
@@ -1020,7 +1026,7 @@ class KalmanFilter:
         Hs: list[NDArray[np.float64]] | None = None,
         Rs: list[NDArray[np.float64]] | None = None,
         Bs: list[NDArray[np.float64] | None] | None = None,
-        us: list[NDArray[np.float64] | int] | None = None,
+        us: list[NDArray[np.float64] | None] | None = None,
         update_first: bool = False,
         saver: object = None,
     ) -> tuple[
@@ -1149,7 +1155,7 @@ class KalmanFilter:
         if Bs is None:
             Bs = [self.B] * n
         if us is None:
-            us = [0] * n
+            us = [None] * n
 
         # mean estimates from Kalman Filter
         if self.x.ndim == 1:
@@ -1164,28 +1170,24 @@ class KalmanFilter:
         covariances_p = zeros((n, self.dim_x, self.dim_x))
 
         if update_first:
-            for i, (z, F, Q, H, R, B, u) in enumerate(
-                zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
-            ):
-                self.update(z, R=R, H=H)
+            for i in range(n):
+                self.update(zs[i], R=Rs[i], H=Hs[i])
                 means[i, :] = self.x
                 covariances[i, :, :] = self.P
 
-                self.predict(u=u, B=B, F=F, Q=Q)
+                self.predict(u=us[i], B=Bs[i], F=Fs[i], Q=Qs[i])
                 means_p[i, :] = self.x
                 covariances_p[i, :, :] = self.P
 
                 if saver is not None:
                     saver.save()
         else:
-            for i, (z, F, Q, H, R, B, u) in enumerate(
-                zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
-            ):
-                self.predict(u=u, B=B, F=F, Q=Q)
+            for i in range(n):
+                self.predict(u=us[i], B=Bs[i], F=Fs[i], Q=Qs[i])
                 means_p[i, :] = self.x
                 covariances_p[i, :, :] = self.P
 
-                self.update(z, R=R, H=H)
+                self.update(zs[i], R=Rs[i], H=Hs[i])
                 means[i, :] = self.x
                 covariances[i, :, :] = self.P
 
@@ -1200,9 +1202,7 @@ class KalmanFilter:
         Ps: NDArray[np.float64],
         Fs: list[NDArray[np.float64]] | None = None,
         Qs: list[NDArray[np.float64]] | None = None,
-        inv: Callable[
-            [NDArray[np.float64]], NDArray[np.float64]
-        ] = np.linalg.inv,  # pyrefly: ignore[bad-function-definition]
+        inv: Callable[[NDArray[np.float64]], NDArray[np.float64]] = _inv_float64,
     ) -> tuple[
         NDArray[np.float64],
         NDArray[np.float64],
@@ -2006,27 +2006,23 @@ def batch_filter(
         Bs = [0.0] * n
 
     if update_first:
-        for i, (z, F, Q, H, R, B, u) in enumerate(
-            zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
-        ):
-            x, P = update(x, P, z, R=R, H=H)
+        for i in range(n):
+            x, P = update(x, P, zs[i], R=Rs[i], H=Hs[i])
             means[i, :] = x
             covariances[i, :, :] = P
 
-            x, P = predict(x, P, u=u, B=B, F=F, Q=Q)
+            x, P = predict(x, P, u=us[i], B=Bs[i], F=Fs[i], Q=Qs[i])
             means_p[i, :] = x
             covariances_p[i, :, :] = P
             if saver is not None:
                 saver.save()
     else:
-        for i, (z, F, Q, H, R, B, u) in enumerate(
-            zip(zs, Fs, Qs, Hs, Rs, Bs, us)  # pyrefly: ignore[bad-argument-type]
-        ):
-            x, P = predict(x, P, u=u, B=B, F=F, Q=Q)
+        for i in range(n):
+            x, P = predict(x, P, u=us[i], B=Bs[i], F=Fs[i], Q=Qs[i])
             means_p[i, :] = x
             covariances_p[i, :, :] = P
 
-            x, P = update(x, P, z, R=R, H=H)
+            x, P = update(x, P, zs[i], R=Rs[i], H=Hs[i])
             means[i, :] = x
             covariances[i, :, :] = P
             if saver is not None:
