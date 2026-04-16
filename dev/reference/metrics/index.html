@@ -3818,8 +3818,7 @@ frame-by-frame via :meth:<code>update</code>, and finally evaluated with
 <span class="normal">427</span>
 <span class="normal">428</span>
 <span class="normal">429</span>
-<span class="normal">430</span>
-<span class="normal">431</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Accumulators</span><span class="p">:</span>
+<span class="normal">430</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Accumulators</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect tracker outputs across sequences for MOT metrics evaluation.</span>
 
 <span class="sd">    Each sequence is opened with :meth:`create_accumulator`, fed</span>
@@ -3830,7 +3829,7 @@ frame-by-frame via :meth:<code>update</code>, and finally evaluated with
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the per-sequence prediction buffers.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrixes_predictions</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">create_accumulator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">information_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Start collecting predictions for the sequence at ``input_path``.</span>
@@ -3851,8 +3850,7 @@ frame-by-frame via :meth:<code>update</code>, and finally evaluated with
         <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">input_path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">frame_number</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="c1"># Save the path of this video in a list</span>
-        <span class="c1"># pyrefly: ignore[bad-assignment]</span>
+        <span class="c1"># Save the path of this video</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">paths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">,</span> <span class="n">input_path</span><span class="p">))</span>
         <span class="c1"># Initialize a matrix where we will save our predictions for this video (in the MOTChallenge format)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">matrix_predictions</span> <span class="o">=</span> <span class="p">[]</span>
@@ -3998,7 +3996,7 @@ frame-by-frame via :meth:<code>update</code>, and finally evaluated with
 
 
 <h3 id="norfair.metrics.Accumulators.paths" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span></code>
+            <code class="highlight language-python"><span class="n">paths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-instance-attribute"><code>instance-attribute</code></small>
@@ -4038,7 +4036,7 @@ frame-by-frame via :meth:<code>update</code>, and finally evaluated with
 <span class="normal">302</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the per-sequence prediction buffers.&quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">matrixes_predictions</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">paths</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -4144,8 +4142,7 @@ loaded from <code>input_path/seqinfo.ini</code>.</p>
 <span class="normal">336</span>
 <span class="normal">337</span>
 <span class="normal">338</span>
-<span class="normal">339</span>
-<span class="normal">340</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_accumulator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">information_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">339</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_accumulator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_path</span><span class="p">,</span> <span class="n">information_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Start collecting predictions for the sequence at ``input_path``.</span>
 
 <span class="sd">    Parameters</span>
@@ -4164,8 +4161,7 @@ loaded from <code>input_path/seqinfo.ini</code>.</p>
     <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">input_path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">frame_number</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="c1"># Save the path of this video in a list</span>
-    <span class="c1"># pyrefly: ignore[bad-assignment]</span>
+    <span class="c1"># Save the path of this video</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">paths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">,</span> <span class="n">input_path</span><span class="p">))</span>
     <span class="c1"># Initialize a matrix where we will save our predictions for this video (in the MOTChallenge format)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">matrix_predictions</span> <span class="o">=</span> <span class="p">[]</span>
@@ -4236,7 +4232,8 @@ frame is recorded as empty but still advances the counter.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/metrics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">342</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">341</span>
+<span class="normal">342</span>
 <span class="normal">343</span>
 <span class="normal">344</span>
 <span class="normal">345</span>
@@ -4267,8 +4264,7 @@ frame is recorded as empty but still advances the counter.</p>
 <span class="normal">370</span>
 <span class="normal">371</span>
 <span class="normal">372</span>
-<span class="normal">373</span>
-<span class="normal">374</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">373</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Append ``predictions`` for the current frame and advance the bar.</span>
 
 <span class="sd">    Parameters</span>
@@ -4396,7 +4392,8 @@ requested). Also stored on <code>self.summary_dataframe</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/metrics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">376</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">375</span>
+<span class="normal">376</span>
 <span class="normal">377</span>
 <span class="normal">378</span>
 <span class="normal">379</span>
@@ -4428,8 +4425,7 @@ requested). Also stored on <code>self.summary_dataframe</code>.</p>
 <span class="normal">405</span>
 <span class="normal">406</span>
 <span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_metrics</span><span class="p">(</span>
+<span class="normal">408</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compute_metrics</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">generate_overall</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -4533,7 +4529,8 @@ does not exist. Defaults to <code>"."</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/metrics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">411</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">410</span>
+<span class="normal">411</span>
 <span class="normal">412</span>
 <span class="normal">413</span>
 <span class="normal">414</span>
@@ -4548,8 +4545,7 @@ does not exist. Defaults to <code>"."</code>.</p>
 <span class="normal">423</span>
 <span class="normal">424</span>
 <span class="normal">425</span>
-<span class="normal">426</span>
-<span class="normal">427</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">save_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s2">&quot;metrics.txt&quot;</span><span class="p">):</span>
+<span class="normal">426</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">save_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s2">&quot;metrics.txt&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Write the rendered ``summary_text`` to ``save_path/file_name``.</span>
 
 <span class="sd">    Parameters</span>
@@ -4588,9 +4584,9 @@ does not exist. Defaults to <code>"."</code>.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/metrics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">429</span>
-<span class="normal">430</span>
-<span class="normal">431</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">print_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">428</span>
+<span class="normal">429</span>
+<span class="normal">430</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">print_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print the rendered ``summary_text`` to stdout.&quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">summary_text</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -4701,7 +4697,8 @@ invalid rectangles are ignored during matching.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/metrics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">434</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">433</span>
+<span class="normal">434</span>
 <span class="normal">435</span>
 <span class="normal">436</span>
 <span class="normal">437</span>
@@ -4747,8 +4744,7 @@ invalid rectangles are ignored during matching.</p>
 <span class="normal">477</span>
 <span class="normal">478</span>
 <span class="normal">479</span>
-<span class="normal">480</span>
-<span class="normal">481</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_motchallenge</span><span class="p">(</span><span class="n">matrix_data</span><span class="p">,</span> <span class="n">min_confidence</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<span class="normal">480</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_motchallenge</span><span class="p">(</span><span class="n">matrix_data</span><span class="p">,</span> <span class="n">min_confidence</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load MOTChallenge-formatted predictions from a numpy array.</span>
 
 <span class="sd">    Adapted from ``motmetrics.io.loadtxt`` but reading from an</span>
@@ -4889,7 +4885,8 @@ sequence names, in matching order.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/metrics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">484</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">483</span>
+<span class="normal">484</span>
 <span class="normal">485</span>
 <span class="normal">486</span>
 <span class="normal">487</span>
@@ -4915,8 +4912,7 @@ sequence names, in matching order.</p>
 <span class="normal">507</span>
 <span class="normal">508</span>
 <span class="normal">509</span>
-<span class="normal">510</span>
-<span class="normal">511</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compare_dataframes</span><span class="p">(</span><span class="n">gts</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+<span class="normal">510</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">compare_dataframes</span><span class="p">(</span><span class="n">gts</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a ``motmetrics`` accumulator per sequence.</span>
 
 <span class="sd">    Parameters</span>
@@ -5073,7 +5069,8 @@ and the raw metrics dataframe.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/metrics.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">514</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">513</span>
+<span class="normal">514</span>
 <span class="normal">515</span>
 <span class="normal">516</span>
 <span class="normal">517</span>
@@ -5135,8 +5132,7 @@ and the raw metrics dataframe.</p>
 <span class="normal">573</span>
 <span class="normal">574</span>
 <span class="normal">575</span>
-<span class="normal">576</span>
-<span class="normal">577</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">eval_motChallenge</span><span class="p">(</span><span class="n">matrixes_predictions</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">generate_overall</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="normal">576</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">eval_motChallenge</span><span class="p">(</span><span class="n">matrixes_predictions</span><span class="p">,</span> <span class="n">paths</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">generate_overall</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Evaluate tracker predictions against MOTChallenge ground truth.</span>
 
 <span class="sd">    Parameters</span>
