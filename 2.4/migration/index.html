@@ -1,0 +1,1274 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../getting_started/">
+      
+      
+        <link rel="next" href="../reference/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../img/icon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Migration Guide - norfair-enough</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../css/custom.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#migration-guide-tryolabsnorfair--norfair-enough" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="norfair-enough" class="md-header__button md-logo" aria-label="norfair-enough" data-md-component="logo">
+      
+  <img src="../img/logo-dark.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            norfair-enough
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Migration Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/akator-de/norfair-enough" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    akator-de/norfair-enough
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../getting_started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Migration Guide
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../reference/" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="norfair-enough" class="md-nav__button md-logo" aria-label="norfair-enough" data-md-component="logo">
+      
+  <img src="../img/logo-dark.svg" alt="logo">
+
+    </a>
+    norfair-enough
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/akator-de/norfair-enough" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    akator-de/norfair-enough
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python version
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency changes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deprecated-drawing-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecated drawing APIs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behavior-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Behavior changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Behavior changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#trackerupdate-may-mutate-detection-objects----behavior-now-documented" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tracker.update() may mutate Detection objects -- behavior now documented
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stricter-input-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stricter input validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-notable-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other notable fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#newly-exported-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Newly exported symbols
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repository differences
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#staying-on-upstream-tryolabsnorfair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Staying on upstream tryolabs/norfair
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/tracker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tracker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/drawing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Drawing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/video/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/distances/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distances
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/camera_motion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Camera Motion
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/filter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Utils
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tldr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TL;DR
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python version
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency changes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deprecated-drawing-apis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deprecated drawing APIs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behavior-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Behavior changes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Behavior changes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#trackerupdate-may-mutate-detection-objects----behavior-now-documented" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tracker.update() may mutate Detection objects -- behavior now documented
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stricter-input-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stricter input validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-notable-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other notable fixes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#newly-exported-symbols" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Newly exported symbols
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-differences" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repository differences
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#staying-on-upstream-tryolabsnorfair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Staying on upstream tryolabs/norfair
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="migration-guide-tryolabsnorfair--norfair-enough">Migration Guide: tryolabs/norfair → norfair-enough<a class="headerlink" href="#migration-guide-tryolabsnorfair--norfair-enough" title="Permanent link">#</a></h1>
+<p><code>norfair-enough</code> is a maintained fork of <a href="https://github.com/tryolabs/norfair"><code>tryolabs/norfair</code></a>,
+based on upstream v2.3.0. This guide describes what you need to change when moving an existing
+project from the upstream package to <code>norfair-enough</code>.</p>
+<h2 id="tldr">TL;DR<a class="headerlink" href="#tldr" title="Permanent link">#</a></h2>
+<ul>
+<li>Uninstall <code>norfair</code>, install <code>norfair-enough</code>.</li>
+<li>The import path stays the same: <code>from norfair import ...</code>.</li>
+<li>Make sure you are on Python 3.10 or newer.</li>
+<li>Most code continues to work unchanged; a few APIs have been deprecated or behavior has been
+  tightened.</li>
+</ul>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">#</a></h2>
+<p>Replace the upstream package with the fork:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>pip<span class="w"> </span>uninstall<span class="w"> </span>norfair
+pip<span class="w"> </span>install<span class="w"> </span>norfair-enough
+</code></pre></div></td></tr></table></div>
+<div class="admonition warning">
+<p class="admonition-title">Do not install both packages at the same time</p>
+<p>Both <code>norfair</code> and <code>norfair-enough</code> ship the same top-level Python module (<code>norfair</code>).
+Installing both into the same environment will lead to undefined import behavior.
+Always uninstall one before installing the other.</p>
+</div>
+<p>Imports do <strong>not</strong> change — <code>norfair-enough</code> keeps the original module name:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">norfair</span><span class="w"> </span><span class="kn">import</span> <span class="n">Detection</span><span class="p">,</span> <span class="n">Tracker</span><span class="p">,</span> <span class="n">draw_points</span>
+</code></pre></div></td></tr></table></div>
+<p>If you install from source, use the fork's repository URL:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;git+https://github.com/akator-de/norfair-enough.git@main#egg=norfair-enough&quot;</span>
+</code></pre></div></td></tr></table></div>
+<h2 id="python-version">Python version<a class="headerlink" href="#python-version" title="Permanent link">#</a></h2>
+<p><code>norfair-enough</code> requires <strong>Python 3.10 or newer</strong>.</p>
+<p>Upstream <code>norfair</code> historically supported earlier Python versions (3.8/3.9).
+If your project is still on Python 3.8 or 3.9 you will need to upgrade your interpreter
+before migrating. The fork follows the upstream decision (v2.4.0) to drop older Python
+versions — see <a href="https://github.com/akator-de/norfair-enough/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</p>
+<p>The CI matrix for <code>norfair-enough</code> covers Python 3.10 through 3.13.</p>
+<h2 id="dependency-changes">Dependency changes<a class="headerlink" href="#dependency-changes" title="Permanent link">#</a></h2>
+<ul>
+<li><strong><code>filterpy</code> is no longer a dependency.</strong> The fork ships an internal Kalman filter
+  implementation derived from the original FilterPy <code>KalmanFilter</code> class (MIT, Roger R. Labbe Jr.).
+  <code>FilterPyKalmanFilterFactory</code> still exists for backwards compatibility but now uses the
+  internal implementation — you can remove <code>filterpy</code> from your own requirements.</li>
+<li><strong>NumPy 2.x is supported</strong> alongside NumPy 1.23+. No code change required on your side.</li>
+</ul>
+<h2 id="deprecated-drawing-apis">Deprecated drawing APIs<a class="headerlink" href="#deprecated-drawing-apis" title="Permanent link">#</a></h2>
+<p>The following drawing helpers are <strong>deprecated</strong> in <code>norfair-enough</code> but still work. They now
+emit a deprecation warning on first use. Migrate at your convenience:</p>
+<table>
+<thead>
+<tr>
+<th>Deprecated</th>
+<th>Replacement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>draw_tracked_objects(...)</code></td>
+<td><code>draw_points(...)</code></td>
+</tr>
+<tr>
+<td><code>draw_tracked_boxes(...)</code></td>
+<td><code>draw_boxes(...)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Both replacements accept tracked objects directly, so most call sites only need a rename.</p>
+<p>Additional deprecated parameters on <code>draw_points</code>:</p>
+<ul>
+<li><code>color_by_label=True</code> → use <code>color="by_label"</code></li>
+<li><code>detections=...</code>      → use <code>drawables=...</code></li>
+<li><code>label_size=...</code>      → use <code>text_size=...</code></li>
+</ul>
+<p>Additional deprecated parameters on <code>draw_boxes</code>:</p>
+<ul>
+<li><code>color_by_label=True</code> → use <code>color="by_label"</code></li>
+<li><code>detections=...</code>      → use <code>drawables=...</code></li>
+<li><code>label_size=...</code>      → use <code>text_size=...</code></li>
+<li><code>random_color=True</code>   → use <code>color="random"</code></li>
+<li><code>line_color=...</code>      → use <code>color=...</code></li>
+<li><code>line_width=...</code>      → use <code>thickness=...</code></li>
+</ul>
+<p>See the [Drawing reference][norfair.drawing] for the full current API.</p>
+<h2 id="behavior-changes">Behavior changes<a class="headerlink" href="#behavior-changes" title="Permanent link">#</a></h2>
+<h3 id="trackerupdate-may-mutate-detection-objects----behavior-now-documented"><code>Tracker.update()</code> may mutate <code>Detection</code> objects -- behavior now documented<a class="headerlink" href="#trackerupdate-may-mutate-detection-objects----behavior-now-documented" title="Permanent link">#</a></h3>
+<p>In both upstream <code>norfair</code> and <code>norfair-enough</code>, <code>Tracker.update()</code> may mutate attributes
+on the <code>Detection</code> instances you pass in (for example <code>detection.absolute_points</code> when
+<code>coord_transformations</code> is provided, and <code>detection.age</code> when detections are mapped to
+tracked objects).</p>
+<p>The difference in <code>norfair-enough</code> is that this mutation behavior is now documented
+explicitly in the docstrings for <code>Tracker.update()</code> and <code>Detection</code>. If your code reuses
+<code>Detection</code> objects after calling <code>Tracker.update()</code> -- for drawing, logging, or further
+processing -- be aware of these mutations and review your code accordingly. In most
+real-world pipelines this is invisible.</p>
+<h3 id="stricter-input-validation">Stricter input validation<a class="headerlink" href="#stricter-input-validation" title="Permanent link">#</a></h3>
+<ul>
+<li><code>Tracker</code> and related APIs now raise <code>ValueError</code> for invalid input that previously
+  triggered <code>assert</code> statements. If you run Python with <code>-O</code>, the previous assertions
+  were silently skipped; now the checks always run.</li>
+<li>The <code>iou</code> distance function validates both candidates and objects (previously only one
+  side was checked).</li>
+</ul>
+<h3 id="other-notable-fixes">Other notable fixes<a class="headerlink" href="#other-notable-fixes" title="Permanent link">#</a></h3>
+<p>These are bug fixes relative to upstream v2.3.0. If your code accidentally depended on
+the buggy behavior you may see different results:</p>
+<ul>
+<li><code>draw_tracked_objects</code> now returns the frame (previously returned <code>None</code>).</li>
+<li><code>distance_matrix.any()</code> no longer incorrectly skips zero distances during matching.</li>
+<li><code>hex_to_bgr</code> now accepts uppercase hex color strings.</li>
+<li><code>PredictionsTextFile</code> fixes file-handle leaks.</li>
+<li><code>AbsolutePaths</code> fixes memory leaks for destroyed objects.</li>
+<li><code>Accumulators.update</code> fixes quadratic array growth.</li>
+<li><code>Video</code> output filenames now handle paths and file extensions portably; it also supports
+  the context manager protocol (<code>with Video(...) as v:</code>) and exposes a <code>close()</code> method
+  for reliable resource cleanup.</li>
+<li><code>TrackedObject.global_id</code> counter is now thread-safe.</li>
+</ul>
+<p>For the full list of fixes and changes, see
+<a href="https://github.com/akator-de/norfair-enough/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</p>
+<h2 id="newly-exported-symbols">Newly exported symbols<a class="headerlink" href="#newly-exported-symbols" title="Permanent link">#</a></h2>
+<p>The following symbols are now exported directly from the top-level <code>norfair</code> package and
+no longer need to be imported from submodules:</p>
+<ul>
+<li><code>TrackedObject</code></li>
+<li><code>Distance</code></li>
+<li><code>FilterFactory</code></li>
+<li><code>ColorLike</code></li>
+<li>camera motion classes</li>
+<li>metrics classes</li>
+</ul>
+<p>Old imports continue to work.</p>
+<h2 id="repository-differences">Repository differences<a class="headerlink" href="#repository-differences" title="Permanent link">#</a></h2>
+<ul>
+<li><strong>Demos</strong>: the fork ships modernized demos under <code>demos/</code>. Some have been updated to
+  newer model versions and dependencies.</li>
+<li><strong>Tooling</strong>: <code>norfair-enough</code> uses <a href="https://docs.astral.sh/ruff/"><code>ruff</code></a> for linting and
+  <code>pytest</code> for tests, with a CI matrix covering Python 3.10–3.13.</li>
+<li><strong>Packaging</strong>: published on PyPI as
+  <a href="https://pypi.org/project/norfair-enough/"><code>norfair-enough</code></a>.</li>
+</ul>
+<h2 id="staying-on-upstream-tryolabsnorfair">Staying on upstream <code>tryolabs/norfair</code><a class="headerlink" href="#staying-on-upstream-tryolabsnorfair" title="Permanent link">#</a></h2>
+<p>Upstream <code>tryolabs/norfair</code> is no longer actively maintained. If you prefer to stay on it,
+you can continue to install it from
+<a href="https://github.com/tryolabs/norfair">its repository</a> or PyPI — but be aware that bug fixes
+and new Python/NumPy compatibility work will not flow back. <code>norfair-enough</code> exists precisely
+to keep this codebase alive for users who need it.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.tabs"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../js/math.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
