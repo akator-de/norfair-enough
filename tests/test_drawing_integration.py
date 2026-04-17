@@ -463,7 +463,7 @@ class TestAbsolutePaths:
         np.testing.assert_array_equal(result, original)
 
     def test_past_points_capped_at_max_history(self):
-        """``past_points`` must never exceed ``max_history`` entries (#91)."""
+        """``past_points`` must never exceed ``max_history`` entries."""
         abs_paths = AbsolutePaths(max_history=3)
         transform = MockCoordTransform()
         for i in range(10):

@@ -247,8 +247,7 @@ class AbsolutePaths:
         self.thickness = thickness
         self.color = color
         self.max_history = max_history
-        # ``appendleft`` + ``maxlen`` keeps the most-recent-first ordering
-        # without repeated O(n) ``list.insert(0, …)`` + slicing (#91).
+        # Bounded history per object; most recent sample lives at index 0.
         self.past_points: defaultdict[int | None, deque[NDArray[np.float64]]] = (
             defaultdict(lambda: deque(maxlen=self.max_history))
         )
