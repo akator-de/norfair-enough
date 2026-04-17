@@ -1,16 +1,10 @@
 """Shared pytest fixtures.
 
-.. note::
-   The test suite assumes **serial, single-process execution**. The
-   autouse ``reset_global_count`` fixture mutates a class-level counter
-   on :class:`norfair.tracker._TrackedObjectFactory`; running tests in
-   parallel threads (not processes) would let one test's reset clobber
-   another test's in-flight state. ``pytest-xdist`` (process-level
-   parallelism) is safe because each worker has its own Python process
-   and therefore its own counter, but tests that share the same
-   interpreter via threads or subprocesses are not isolated.
-
-   See issue #98.
+The autouse ``reset_global_count`` fixture mutates a class-level counter
+on :class:`norfair.tracker._TrackedObjectFactory`. It is safe under
+process-level parallelism (``pytest-xdist``) because each worker owns
+its own Python process and therefore its own counter; in-process thread
+parallelism is not supported.
 """
 
 import numpy as np
