@@ -251,9 +251,8 @@ class AbsolutePaths:
         )
         self.max_history = max_history
         self.alphas = np.linspace(0.99, 0.01, max_history)
-        # Persistent scratch buffer reused across frames/objects/history
-        # iterations to avoid repeated full-frame allocations inside the
-        # rendering loop (#92).
+        # Scratch buffer reused across draw iterations. Lazy-allocated in
+        # ``draw`` to match the incoming frame's shape/dtype.
         self._overlay_scratch: np.ndarray | None = None
 
     def draw(self, frame, tracked_objects, coord_transform=None):
@@ -284,9 +283,8 @@ class AbsolutePaths:
         if self.thickness is None:
             self.thickness = int(max(frame_scale / 7, 1))
 
-        # (Re-)allocate the scratch buffer once per frame size, then reuse
-        # it across every history iteration so we avoid per-iteration
-        # Python-level allocation churn (#92).
+        # (Re-)allocate the scratch buffer when the frame's shape or dtype
+        # changes; otherwise the existing buffer is reused as-is.
         if (
             self._overlay_scratch is None
             or self._overlay_scratch.shape != frame.shape
@@ -325,12 +323,11 @@ class AbsolutePaths:
                 )
 
             last = points_to_draw
-            # Reuse the persistent scratch buffer via in-place copy
-            # (``np.copyto``) instead of allocating a fresh array per
-            # history iteration (#92).
             assert self._overlay_scratch is not None
             overlay = self._overlay_scratch
             for i, past_points in enumerate(self.past_points[obj.id]):
+                # Refill the scratch buffer with the current frame before
+                # drawing the segment that will be blended back onto it.
                 np.copyto(overlay, frame)
                 last_rel = (
                     coord_transform.abs_to_rel(last)
