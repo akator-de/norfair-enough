@@ -158,12 +158,11 @@ class TestTranslationTransformationGetter:
 
     def test_returned_movement_vector_is_not_aliased_to_internal_state(self):
         """Returned ``movement_vector`` must not share memory with the getter's
-        internal ``data`` buffer — otherwise external mutations to one silently
-        affect the other (#88)."""
+        internal ``data`` buffer."""
         getter = TranslationTransformationGetter(
             bin_size=0.2, proportion_points_used_threshold=0.5
         )
-        # Non-uniform flow so update_prvs becomes True and self.data is set.
+        # Non-uniform flow drives ``update_prvs=True`` so ``self.data`` is set.
         prev_pts = np.array([[0.0, 0.0]] * 10)
         rng = np.random.RandomState(0)
         curr_pts = prev_pts + rng.rand(10, 2) * 100
@@ -171,7 +170,7 @@ class TestTranslationTransformationGetter:
 
         assert getter.data is not None
         assert not np.shares_memory(transform.movement_vector, getter.data), (
-            "movement_vector aliases internal getter.data — mutation would leak"
+            "movement_vector aliases internal getter.data"
         )
 
     def test_accumulation_across_calls(self):

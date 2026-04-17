@@ -188,20 +188,18 @@ class TranslationTransformationGetter(TransformationGetter):
         proportion_points_used = counts[max_index] / len(prev_pts)
         update_prvs = proportion_points_used < self.proportion_points_used_threshold
 
-        # ``unique_flows[max_index]`` is a view; copy so in-place ops below
-        # don't silently mutate ``unique_flows`` or any stored reference (#88).
+        # ``unique_flows[max_index]`` is a view; copy to decouple the
+        # accumulator from ``unique_flows``.
         flow_mode = unique_flows[max_index].copy()
 
-        # Accumulate against the previously stored mode so we report the total
-        # translation since the first frame. On the very first call `self.data`
-        # is still None and there is nothing to accumulate against — leave the
-        # freshly computed mode untouched.
+        # ``self.data`` holds the accumulated translation since the first
+        # frame; ``None`` on the very first call.
         if self.data is not None:
             flow_mode = flow_mode + self.data
 
         if update_prvs:
-            # Store a separate copy so the returned transform's
-            # ``movement_vector`` and ``self.data`` can't alias each other (#88).
+            # Separate copy so ``movement_vector`` and ``self.data`` stay
+            # independent.
             self.data = flow_mode.copy()
 
         return update_prvs, TranslationTransformation(flow_mode)
