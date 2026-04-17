@@ -8,6 +8,20 @@ from norfair.camera_motion import (
 )
 
 
+def test_homography_singular_matrix_raises_value_error():
+    """Singular homography matrices should raise a clear ``ValueError`` (#86)."""
+    # Row of zeros => determinant 0 => matrix is singular.
+    singular = np.array(
+        [
+            [1.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0],
+        ]
+    )
+    with pytest.raises(ValueError, match="singular|invertible"):
+        HomographyTransformation(singular)
+
+
 def test_homography_1d_point():
     """Test that HomographyTransformation handles 1D point arrays without crashing."""
     # Identity homography — points should pass through unchanged
