@@ -251,6 +251,10 @@ class AbsolutePaths:
         )
         self.max_history = max_history
         self.alphas = np.linspace(0.99, 0.01, max_history)
+        # Persistent scratch buffer reused across frames/objects/history
+        # iterations to avoid repeated full-frame allocations inside the
+        # rendering loop (#92).
+        self._overlay_scratch: np.ndarray | None = None
 
     def draw(self, frame, tracked_objects, coord_transform=None):
         """Render accumulated absolute paths onto ``frame``.
@@ -279,6 +283,17 @@ class AbsolutePaths:
             self.radius = int(max(frame_scale * 0.7, 1))
         if self.thickness is None:
             self.thickness = int(max(frame_scale / 7, 1))
+
+        # (Re-)allocate the scratch buffer once per frame size, then reuse
+        # it across every history iteration so we avoid per-iteration
+        # Python-level allocation churn (#92).
+        if (
+            self._overlay_scratch is None
+            or self._overlay_scratch.shape != frame.shape
+            or self._overlay_scratch.dtype != frame.dtype
+        ):
+            self._overlay_scratch = np.empty_like(frame)
+
         for obj in tracked_objects:
             if not obj.live_points.any():
                 continue
@@ -310,8 +325,13 @@ class AbsolutePaths:
                 )
 
             last = points_to_draw
+            # Reuse the persistent scratch buffer via in-place copy
+            # (``np.copyto``) instead of allocating a fresh array per
+            # history iteration (#92).
+            assert self._overlay_scratch is not None
+            overlay = self._overlay_scratch
             for i, past_points in enumerate(self.past_points[obj.id]):
-                overlay = frame.copy()
+                np.copyto(overlay, frame)
                 last_rel = (
                     coord_transform.abs_to_rel(last)
                     if coord_transform is not None
