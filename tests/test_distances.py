@@ -392,3 +392,35 @@ def test_scalar_distance_label_mismatch(mock_obj, mock_det):
 
     # Should be inf because labels don't match
     assert dist_matrix[0, 0] == np.inf
+
+
+def test_vectorized_distance_does_not_merge_none_and_str_none(mock_obj, mock_det):
+    """VectorizedDistance must treat ``label=None`` and ``label='None'`` as
+    distinct labels, not merge them via ``str`` coercion (#97)."""
+
+    def _vec_fn(cands, objs):
+        diff = cands[:, None, :] - objs[None, :, :]
+        return np.linalg.norm(diff, axis=-1)
+
+    vec = VectorizedDistance(_vec_fn)
+
+    # Objects: one with None, one with the literal string "None".
+    obj_none = mock_obj([[1, 2], [3, 4]], label=None)
+    obj_str_none = mock_obj([[1, 2], [3, 4]], label="None")
+
+    # Candidates mirror the objects.
+    det_none = mock_det([[1, 2], [3, 4]], label=None)
+    det_str_none = mock_det([[1, 2], [3, 4]], label="None")
+
+    dist_matrix = vec.get_distances([obj_none, obj_str_none], [det_none, det_str_none])
+
+    # Same-label pairs match (distance 0)
+    assert dist_matrix[0, 0] == 0
+    assert dist_matrix[1, 1] == 0
+    # Cross-label pairs must stay at np.inf — None and "None" are different.
+    assert dist_matrix[0, 1] == np.inf, (
+        "candidate label=None should not match object label='None'"
+    )
+    assert dist_matrix[1, 0] == np.inf, (
+        "candidate label='None' should not match object label=None"
+    )
