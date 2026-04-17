@@ -170,7 +170,7 @@ class FilterPyKalmanFilterFactory(FilterFactory):
         filter.Q[dim_z:, dim_z:] *= self.Q
 
         # Initial state: numpy.array(dim_x, 1)
-        filter.x[:dim_z] = np.expand_dims(initial_detection.flatten(), 0).T
+        filter.x[:dim_z] = initial_detection.reshape(-1, 1)
         filter.x[dim_z:] = 0
 
         # Estimation uncertainty: numpy.array(dim_x, dim_x)
