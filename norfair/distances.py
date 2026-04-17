@@ -218,8 +218,8 @@ class VectorizedDistance(Distance):
 
         from .tracker import Detection
 
-        # Group by the raw Hashable label rather than its ``str`` coercion so
-        # ``None`` and the string ``"None"`` are treated as distinct (#97).
+        # Group by the raw Hashable label so ``None`` and the string
+        # ``"None"`` remain distinct keys.
         obj_groups: dict = defaultdict(list)
         for i, o in enumerate(objects):
             obj_groups[o.label].append(i)
