@@ -4,11 +4,11 @@ from norfair.filter import NoFilter, NoFilterFactory, OptimizedKalmanFilterFacto
 
 
 def test_optimized_filter_vel_variance_stays_non_negative():
-    """``vel_variance`` must never become negative after an update (#89).
+    """``vel_variance`` must stay non-negative after an update.
 
-    With an unusually large ``pos_vel_covariance`` and a small ``vel_variance``,
-    the algebraic update subtracts a large term and would otherwise drive the
-    variance far below zero, corrupting subsequent iterations.
+    A large ``pos_vel_covariance`` paired with a small ``vel_variance``
+    subtracts a large term from the running variance; numerical
+    cancellation would otherwise drive it below zero.
     """
     factory = OptimizedKalmanFilterFactory(
         R=0.01,
