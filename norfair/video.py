@@ -221,6 +221,11 @@ class Video:
         try:
             with self.progress_bar as progress_bar:
                 start = time.time()
+                # Refresh the progress bar at most ~20 Hz rather than on
+                # every single frame: the Rich renderer is a non-trivial
+                # share of frame time on fast pipelines (#96).
+                refresh_interval = 0.05
+                next_refresh_at = start
 
                 # Iterate over video
                 while True:
@@ -228,12 +233,21 @@ class Video:
                     if ret is False or frame is None:
                         break
                     self.frame_counter += 1
-                    elapsed = time.time() - start
+                    now = time.time()
+                    elapsed = now - start
                     process_fps = self.frame_counter / elapsed if elapsed > 0 else 0.0
+                    refresh_now = now >= next_refresh_at
                     progress_bar.update(
-                        self.task, advance=1, refresh=True, process_fps=process_fps
+                        self.task,
+                        advance=1,
+                        refresh=refresh_now,
+                        process_fps=process_fps,
                     )
+                    if refresh_now:
+                        next_refresh_at = now + refresh_interval
                     yield frame
+                # Final render so the bar reaches 100% regardless of throttle.
+                progress_bar.refresh()
         finally:
             self.close()
 
