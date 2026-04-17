@@ -632,32 +632,30 @@ class TestFixedCamera:
         assert _frame_has_nonzero(result)
 
     def test_attenuation_no_uint8_wraparound(self):
-        """The attenuation branch must clip before casting to uint8 so bright
-        pixels don't wrap around to near-zero values (#90).
+        """Attenuation factors >= 1 must saturate bright pixels at the uint8
+        maximum rather than wrap to small values.
 
-        Uses ``attenuation=-1.0`` (factor = 2.0) as a degenerate but valid
-        user-supplied setting — 255 * 2.0 = 510, which wraps to 254 without
-        clipping and destroys the image content.
+        ``attenuation=-1.0`` gives an attenuation factor of ``2.0``; a
+        background value of 200 scales to 400, which without clipping wraps
+        to ``400 % 256 == 144`` once cast to uint8.
         """
         from norfair.camera_motion import TranslationTransformation
 
         camera = FixedCamera(scale=2, attenuation=-1.0)
 
-        # Seed the background directly with a known uniform bright state so
-        # the attenuation branch (factor > 1) is exercised deterministically.
+        # Uniform bright background so the attenuation branch is exercised.
         camera._background = np.full((400, 400, 3), 200, dtype=np.uint8)
 
-        # Offset the frame enough so its paste region doesn't cover the full
-        # background — the attenuated border area must survive intact.
+        # Offset the frame so the paste region leaves attenuated border area
+        # visible in the output.
         frame = _black_frame()
         transform = TranslationTransformation(movement_vector=np.array([50, 50]))
         result = camera.adjust_frame(frame, transform)
 
         assert result.dtype == np.uint8
-        # After factor 2.0: 200 * 2 = 400. With correct clipping the result
-        # stays at 255; with silent wraparound it becomes 400 % 256 = 144.
+        # Expected: 200 * 2.0 saturates to 255; without clipping it wraps to 144.
         assert result.max() >= 255, (
-            f"attenuation wrapped around: max={result.max()} (expected >= 255 after clipping)"
+            f"attenuation wrapped around: max={result.max()} (expected >= 255)"
         )
 
 

@@ -107,8 +107,8 @@ class FixedCamera:
                 frame.dtype,
             )
         else:
-            # Clip before casting so degenerate attenuation factors (>= 1)
-            # don't silently wrap bright pixels on unsigned dtypes (#90).
+            # Clip to the destination integer range before casting so values
+            # above the dtype limit saturate instead of wrapping around.
             info = (
                 np.iinfo(frame.dtype)
                 if np.issubdtype(frame.dtype, np.integer)
