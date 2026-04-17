@@ -711,11 +711,9 @@ class KalmanFilter:
         try:
             if np.linalg.cond(self.S) > 1e12:
                 raise np.linalg.LinAlgError("ill-conditioned")
-            # K = PH' @ inv(S), obtained via solve for improved numerical
-            # stability and to avoid explicitly forming the full inverse (#87).
+            # K = PH' @ inv(S), obtained via ``solve`` for numerical stability.
             self.K = np.linalg.solve(self.S, PHT.T).T
-            # SI kept available for consumers that inspect it
-            # (mahalanobis, __repr__); computed here once.
+            # SI is exposed for ``mahalanobis`` and ``__repr__``.
             self.SI = self.inv(self.S)
         except np.linalg.LinAlgError:
             _logger.warning(
@@ -923,7 +921,8 @@ class KalmanFilter:
         try:
             if np.linalg.cond(self.S) > 1e12:
                 raise np.linalg.LinAlgError("ill-conditioned")
-            # K = (PH' + M) @ inv(S), obtained via solve for stability (#87).
+            # K = (PH' + M) @ inv(S), obtained via ``solve`` for numerical
+            # stability.
             self.K = np.linalg.solve(self.S, PHT_M.T).T
             self.SI = self.inv(self.S)
         except np.linalg.LinAlgError:
