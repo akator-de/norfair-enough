@@ -9,7 +9,7 @@ from norfair.camera_motion import (
 
 
 def test_homography_singular_matrix_raises_value_error():
-    """Singular homography matrices should raise a clear ``ValueError`` (#86)."""
+    """Singular homography matrices raise ``ValueError``."""
     # Row of zeros => determinant 0 => matrix is singular.
     singular = np.array(
         [
