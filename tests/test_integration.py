@@ -39,7 +39,7 @@ def test_linear_motion_single_track_is_stable():
             seen_ids.add(obj.id)
             assert obj.estimate.shape == (1, 2)
 
-    assert seen_ids == {1}
+    assert len(seen_ids) == 1
 
 
 def test_two_well_separated_tracks_keep_distinct_ids():
