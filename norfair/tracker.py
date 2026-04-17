@@ -395,9 +395,8 @@ class Tracker:
                     d for i, d in enumerate(objects) if i not in matched_obj_indices
                 ]
                 matched_objects = []
-                # Identity-based set: TrackedObject uses default (id-based)
-                # __hash__/__eq__, so ``in`` / ``not in`` check object identity,
-                # not structural equality. Batch-remove below is O(n) total.
+                # TrackedObject uses default id-based ``__hash__``/``__eq__``,
+                # so ``in`` below checks object identity.
                 candidates_to_remove: set[TrackedObject] = set()
 
                 # Handle matched people/detections
@@ -420,7 +419,6 @@ class Tracker:
                         unmatched_candidates.append(matched_candidate)
                         unmatched_objects.append(matched_object)
 
-                # Batch-remove merged TrackedObject candidates in a single pass (O(n))
                 if candidates_to_remove:
                     self.tracked_objects = [
                         o for o in self.tracked_objects if o not in candidates_to_remove
