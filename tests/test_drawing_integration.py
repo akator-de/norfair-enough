@@ -631,6 +631,35 @@ class TestFixedCamera:
         result = camera.adjust_frame(frame, transform)
         assert _frame_has_nonzero(result)
 
+    def test_attenuation_no_uint8_wraparound(self):
+        """The attenuation branch must clip before casting to uint8 so bright
+        pixels don't wrap around to near-zero values (#90).
+
+        Uses ``attenuation=-1.0`` (factor = 2.0) as a degenerate but valid
+        user-supplied setting — 255 * 2.0 = 510, which wraps to 254 without
+        clipping and destroys the image content.
+        """
+        from norfair.camera_motion import TranslationTransformation
+
+        camera = FixedCamera(scale=2, attenuation=-1.0)
+
+        # Seed the background directly with a known uniform bright state so
+        # the attenuation branch (factor > 1) is exercised deterministically.
+        camera._background = np.full((400, 400, 3), 200, dtype=np.uint8)
+
+        # Offset the frame enough so its paste region doesn't cover the full
+        # background — the attenuated border area must survive intact.
+        frame = _black_frame()
+        transform = TranslationTransformation(movement_vector=np.array([50, 50]))
+        result = camera.adjust_frame(frame, transform)
+
+        assert result.dtype == np.uint8
+        # After factor 2.0: 200 * 2 = 400. With correct clipping the result
+        # stays at 255; with silent wraparound it becomes 400 % 256 = 144.
+        assert result.max() >= 255, (
+            f"attenuation wrapped around: max={result.max()} (expected >= 255 after clipping)"
+        )
+
 
 # ---------------------------------------------------------------------------
 # Drawable wrapper

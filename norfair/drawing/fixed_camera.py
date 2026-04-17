@@ -107,9 +107,17 @@ class FixedCamera:
                 frame.dtype,
             )
         else:
-            background = (self._background * self._attenuation_factor).astype(
-                frame.dtype
+            # Clip before casting so degenerate attenuation factors (>= 1)
+            # don't silently wrap bright pixels on unsigned dtypes (#90).
+            info = (
+                np.iinfo(frame.dtype)
+                if np.issubdtype(frame.dtype, np.integer)
+                else None
             )
+            scaled = self._background * self._attenuation_factor
+            if info is not None:
+                scaled = np.clip(scaled, info.min, info.max)
+            background = scaled.astype(frame.dtype)
 
         # top_left is the anchor coordinate from where we start drawing the fame on top of the background
         # aim to draw it in the center of the background but transformations will move this point
