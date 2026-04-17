@@ -5659,7 +5659,9 @@ fade between frames. Use <code>0</code> to keep the path forever.</p>
 <span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
-<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Paths</span><span class="p">:</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Paths</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw the trajectories of points of interest on each tracked object.</span>
 
 <span class="sd">    Parameters</span>
@@ -5772,7 +5774,9 @@ fade between frames. Use <code>0</code> to keep the path forever.</p>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
 
-        <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">attenuation_factor</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+        <span class="c1"># Saturate values before the uint8 cast: ``attenuation_factor`` can be</span>
+        <span class="c1"># &gt;= 1 (e.g. ``attenuation == 0``), and an unclipped cast wraps.</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">attenuation_factor</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">tracked_objects</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">abs_to_rel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -6073,7 +6077,9 @@ mask for this frame.</p>
 <span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
-<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">tracked_objects</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">TrackedObject</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Update and render the accumulated path mask onto ``frame``.</span>
@@ -6107,7 +6113,9 @@ mask for this frame.</p>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
 
-    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">attenuation_factor</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+    <span class="c1"># Saturate values before the uint8 cast: ``attenuation_factor`` can be</span>
+    <span class="c1"># &gt;= 1 (e.g. ``attenuation == 0``), and an unclipped cast wraps.</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">attenuation_factor</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">tracked_objects</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">abs_to_rel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -6317,9 +6325,7 @@ for camera motion::</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>norfair/drawing/path.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">161</span>
 <span class="normal">162</span>
 <span class="normal">163</span>
 <span class="normal">164</span>
@@ -6508,7 +6514,9 @@ for camera motion::</p>
 <span class="normal">347</span>
 <span class="normal">348</span>
 <span class="normal">349</span>
-<span class="normal">350</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AbsolutePaths</span><span class="p">:</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AbsolutePaths</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw tracked-object trajectories in absolute (world) coordinates.</span>
 
 <span class="sd">    Behaves like [`Paths`][norfair.drawing.Paths], but takes camera</span>
@@ -6732,9 +6740,7 @@ for camera motion::</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/drawing/path.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">213</span>
 <span class="normal">214</span>
 <span class="normal">215</span>
 <span class="normal">216</span>
@@ -6774,7 +6780,9 @@ for camera motion::</p>
 <span class="normal">250</span>
 <span class="normal">251</span>
 <span class="normal">252</span>
-<span class="normal">253</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">get_points_to_draw</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
     <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -6928,9 +6936,7 @@ to already be in the frame's pixel coordinates.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/drawing/path.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">255</span>
-<span class="normal">256</span>
-<span class="normal">257</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">257</span>
 <span class="normal">258</span>
 <span class="normal">259</span>
 <span class="normal">260</span>
@@ -7023,7 +7029,9 @@ to already be in the frame's pixel coordinates.</p>
 <span class="normal">347</span>
 <span class="normal">348</span>
 <span class="normal">349</span>
-<span class="normal">350</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">tracked_objects</span><span class="p">,</span> <span class="n">coord_transform</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">350</span>
+<span class="normal">351</span>
+<span class="normal">352</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">tracked_objects</span><span class="p">,</span> <span class="n">coord_transform</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Render accumulated absolute paths onto ``frame``.</span>
 
 <span class="sd">    Parameters</span>
@@ -7458,7 +7466,15 @@ camera moves a lot.</p>
 <span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
-<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">FixedCamera</span><span class="p">:</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">FixedCamera</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Stabilize the video by compensating for estimated camera motion.</span>
 
 <span class="sd">    The drawer renders on a larger canvas and shifts the original</span>
@@ -7559,9 +7575,17 @@ camera moves a lot.</p>
                 <span class="n">frame</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">background</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_background</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attenuation_factor</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
-                <span class="n">frame</span><span class="o">.</span><span class="n">dtype</span>
+            <span class="c1"># Saturate values to the destination integer range before casting</span>
+            <span class="c1"># to prevent uint/int overflow.</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
+                <span class="k">else</span> <span class="kc">None</span>
             <span class="p">)</span>
+            <span class="n">scaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_background</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attenuation_factor</span>
+            <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">scaled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">scaled</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+            <span class="n">background</span> <span class="o">=</span> <span class="n">scaled</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
         <span class="c1"># top_left is the anchor coordinate from where we start drawing the fame on top of the background</span>
         <span class="c1"># aim to draw it in the center of the background but transformations will move this point</span>
@@ -7829,7 +7853,15 @@ camera motion.</p>
 <span class="normal">154</span>
 <span class="normal">155</span>
 <span class="normal">156</span>
-<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">adjust_frame</span><span class="p">(</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">adjust_frame</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">coord_transformation</span><span class="p">:</span> <span class="n">TranslationTransformation</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Render the next frame onto the stabilized background canvas.</span>
@@ -7867,9 +7899,17 @@ camera motion.</p>
             <span class="n">frame</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">background</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_background</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attenuation_factor</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
-            <span class="n">frame</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="c1"># Saturate values to the destination integer range before casting</span>
+        <span class="c1"># to prevent uint/int overflow.</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span>
         <span class="p">)</span>
+        <span class="n">scaled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_background</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attenuation_factor</span>
+        <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">scaled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">scaled</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+        <span class="n">background</span> <span class="o">=</span> <span class="n">scaled</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="c1"># top_left is the anchor coordinate from where we start drawing the fame on top of the background</span>
     <span class="c1"># aim to draw it in the center of the background but transformations will move this point</span>
