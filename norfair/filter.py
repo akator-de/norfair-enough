@@ -282,13 +282,13 @@ class OptimizedKalmanFilter:
         self.x = np.zeros((dim_x, 1))
 
         # matrix P from Kalman
-        self.pos_variance = np.zeros((dim_z, 1)) + pos_variance
-        self.pos_vel_covariance = np.zeros((dim_z, 1)) + pos_vel_covariance
-        self.vel_variance = np.zeros((dim_z, 1)) + vel_variance
+        self.pos_variance = np.full((dim_z, 1), pos_variance, dtype=float)
+        self.pos_vel_covariance = np.full((dim_z, 1), pos_vel_covariance, dtype=float)
+        self.vel_variance = np.full((dim_z, 1), vel_variance, dtype=float)
 
         self.q_Q = q
 
-        self.default_r = r * np.ones((dim_z, 1))
+        self.default_r = np.full((dim_z, 1), r, dtype=float)
 
     def predict(self):
         """Advance positions by the current velocity estimate."""
