@@ -170,6 +170,23 @@ class TestTranslationTransformationGetter:
         # With random flow, few points share the same bin => update_prvs should be True
         assert update_prvs
 
+    def test_returned_movement_vector_is_not_aliased_to_internal_state(self):
+        """Returned ``movement_vector`` must not share memory with the getter's
+        internal ``data`` buffer."""
+        getter = TranslationTransformationGetter(
+            bin_size=0.2, proportion_points_used_threshold=0.5
+        )
+        # Non-uniform flow drives ``update_prvs=True`` so ``self.data`` is set.
+        prev_pts = np.array([[0.0, 0.0]] * 10)
+        rng = np.random.RandomState(0)
+        curr_pts = prev_pts + rng.rand(10, 2) * 100
+        _, transform = getter(curr_pts, prev_pts)
+
+        assert getter.data is not None
+        assert not np.shares_memory(transform.movement_vector, getter.data), (
+            "movement_vector aliases internal getter.data"
+        )
+
     def test_accumulation_across_calls(self):
         """The getter accumulates flow across consecutive calls."""
         getter = TranslationTransformationGetter(bin_size=0.2)
