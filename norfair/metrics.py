@@ -299,9 +299,7 @@ class Accumulators:
     def __init__(self):
         """Initialize the per-sequence prediction buffers."""
         self.matrixes_predictions = []
-        # ``paths`` accumulates one entry per call to ``create_accumulator``;
-        # a plain list is O(1) amortized append instead of the O(n²) behaviour
-        # of ``np.hstack`` rebuilding the array each time (#93).
+        # One entry per registered sequence.
         self.paths: list[str] = []
 
     def create_accumulator(self, input_path, information_file=None):
