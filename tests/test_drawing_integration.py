@@ -632,12 +632,11 @@ class TestFixedCamera:
         assert _frame_has_nonzero(result)
 
     def test_attenuation_no_uint8_wraparound(self):
-        """Attenuation factors >= 1 must saturate bright pixels at the uint8
-        maximum rather than wrap to small values.
+        """Attenuation factors >= 1 saturate bright pixels at the uint8 maximum.
 
-        ``attenuation=-1.0`` gives an attenuation factor of ``2.0``; a
-        background value of 200 scales to 400, which without clipping wraps
-        to ``400 % 256 == 144`` once cast to uint8.
+        ``attenuation=-1.0`` yields an attenuation factor of ``2.0``. A
+        background value of 200 scales to 400; an unclipped cast to uint8
+        would wrap it to ``400 % 256 == 144``.
         """
         from norfair.camera_motion import TranslationTransformation
 
