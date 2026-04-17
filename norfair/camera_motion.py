@@ -219,9 +219,23 @@ class HomographyTransformation(CoordinatesTransformation):
     """
 
     def __init__(self, homography_matrix: np.ndarray):
-        """Store the homography and pre-compute its inverse."""
+        """Store the homography and pre-compute its inverse.
+
+        Raises
+        ------
+        ValueError
+            If ``homography_matrix`` is singular (non-invertible) and no
+            mapping back from relative to absolute coordinates is possible.
+        """
         self.homography_matrix = homography_matrix
-        self.inverse_homography_matrix = np.linalg.inv(homography_matrix)
+        try:
+            self.inverse_homography_matrix = np.linalg.inv(homography_matrix)
+        except np.linalg.LinAlgError as exc:
+            raise ValueError(
+                "homography_matrix is singular (non-invertible); cannot compute "
+                "rel_to_abs transform. Check your homography estimation "
+                "(e.g. degenerate point configuration)."
+            ) from exc
 
     def abs_to_rel(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
         """Apply the forward homography to map absolute points to relative.
