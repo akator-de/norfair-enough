@@ -24,8 +24,8 @@ def test_optimized_filter_vel_variance_stays_non_negative():
     measurement = np.array([[1.0], [1.0]])
     f.update(measurement)
 
-    assert np.all(f.vel_variance >= 0), (
-        f"vel_variance went negative: {f.vel_variance.flatten()}"
+    assert np.all(f.vel_variance >= 1e-12), (
+        f"vel_variance dropped below the 1e-12 floor: {f.vel_variance.flatten()}"
     )
 
 
