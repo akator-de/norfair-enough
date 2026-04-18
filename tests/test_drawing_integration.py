@@ -462,6 +462,19 @@ class TestAbsolutePaths:
         # No live points => nothing drawn, frame should be unchanged
         np.testing.assert_array_equal(result, original)
 
+    def test_past_points_capped_at_max_history(self):
+        """``past_points`` must never exceed ``max_history`` entries."""
+        abs_paths = AbsolutePaths(max_history=3)
+        transform = MockCoordTransform()
+        for i in range(10):
+            frame = _black_frame()
+            obj = MockTrackedObject(
+                estimate=np.array([[30 + i, 30 + i], [60 + i, 60 + i]]),
+                obj_id=1,
+            )
+            abs_paths.draw(frame, [obj], coord_transform=transform)
+        assert len(abs_paths.past_points[1]) == 3
+
     def test_cleanup_dead_object_ids(self):
         """Past points for objects no longer tracked should be cleaned up."""
         abs_paths = AbsolutePaths()
