@@ -359,6 +359,9 @@ class OptimizedKalmanFilter:
             * vel_var_plus_pos_vel_cov_over_added_variances
             * added_variances
         )
+        # Numerical cancellation in the subtraction above can produce
+        # negative variances; clamp to the same floor as ``added_variances``.
+        self.vel_variance = np.maximum(self.vel_variance, 1e-12)
 
 
 class OptimizedKalmanFilterFactory(FilterFactory):

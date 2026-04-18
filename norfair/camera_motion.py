@@ -188,17 +188,19 @@ class TranslationTransformationGetter(TransformationGetter):
         proportion_points_used = counts[max_index] / len(prev_pts)
         update_prvs = proportion_points_used < self.proportion_points_used_threshold
 
-        flow_mode = unique_flows[max_index]
+        # ``unique_flows[max_index]`` is a view; copy to decouple the
+        # accumulator from ``unique_flows``.
+        flow_mode = unique_flows[max_index].copy()
 
-        # Accumulate against the previously stored mode so we report the total
-        # translation since the first frame. On the very first call `self.data`
-        # is still None and there is nothing to accumulate against — leave the
-        # freshly computed mode untouched.
+        # ``self.data`` holds the accumulated translation since the first
+        # frame; ``None`` on the very first call.
         if self.data is not None:
-            flow_mode += self.data
+            flow_mode = flow_mode + self.data
 
         if update_prvs:
-            self.data = flow_mode
+            # Separate copy so ``movement_vector`` and ``self.data`` stay
+            # independent.
+            self.data = flow_mode.copy()
 
         return update_prvs, TranslationTransformation(flow_mode)
 
@@ -217,9 +219,23 @@ class HomographyTransformation(CoordinatesTransformation):
     """
 
     def __init__(self, homography_matrix: np.ndarray):
-        """Store the homography and pre-compute its inverse."""
+        """Store the homography and pre-compute its inverse.
+
+        Raises
+        ------
+        ValueError
+            If ``homography_matrix`` is singular (non-invertible) and no
+            mapping back from relative to absolute coordinates is possible.
+        """
         self.homography_matrix = homography_matrix
-        self.inverse_homography_matrix = np.linalg.inv(homography_matrix)
+        try:
+            self.inverse_homography_matrix = np.linalg.inv(homography_matrix)
+        except np.linalg.LinAlgError as exc:
+            raise ValueError(
+                "homography_matrix is singular (non-invertible); cannot compute "
+                "rel_to_abs transform. Check your homography estimation "
+                "(e.g. degenerate point configuration)."
+            ) from exc
 
     def abs_to_rel(self, points: NDArray[np.float64]) -> NDArray[np.float64]:
         """Apply the forward homography to map absolute points to relative.
