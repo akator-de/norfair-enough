@@ -7,7 +7,6 @@ from logging import warning
 
 import numpy as np
 from numpy.typing import NDArray
-from rich import print
 from rich.console import Console
 from rich.table import Table
 

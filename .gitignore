@@ -142,11 +142,6 @@ cython_debug/
 .vscode/
 *.swp
 
-# MOT Challenge dataset
-MOT17Labels.zip
-test/
-train/
-
 # Claude Code
 .claude/
 CLAUDE.md
