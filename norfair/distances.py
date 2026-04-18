@@ -2,6 +2,7 @@
 
 import logging
 from abc import ABC, abstractmethod
+from collections import defaultdict
 from collections.abc import Callable, Sequence
 from functools import partial
 from typing import TYPE_CHECKING, overload
@@ -217,32 +218,34 @@ class VectorizedDistance(Distance):
 
         from .tracker import Detection
 
-        object_labels = np.array([o.label for o in objects]).astype(str)
-        candidate_labels = np.array([c.label for c in candidates]).astype(str)
+        # Group by the raw Hashable label so ``None`` and the string
+        # ``"None"`` remain distinct keys.
+        obj_groups: dict = defaultdict(list)
+        for i, o in enumerate(objects):
+            obj_groups[o.label].append(i)
+        cand_groups: dict = defaultdict(list)
+        for i, c in enumerate(candidates):
+            cand_groups[c.label].append(i)
 
         # iterate over labels that are present both in objects and detections
-        for label in np.intersect1d(
-            np.unique(object_labels), np.unique(candidate_labels)
-        ):
-            # generate masks of the subset of object and detections for this label
-            obj_mask = object_labels == label
-            cand_mask = candidate_labels == label
+        for label, obj_idx in obj_groups.items():
+            cand_idx = cand_groups.get(label)
+            if not cand_idx:
+                continue
 
-            # Use the already-computed boolean masks instead of re-comparing labels
-            stacked_objects = np.stack(
-                [o.estimate.ravel() for o, m in zip(objects, obj_mask) if m]
-            )
+            stacked_objects = np.stack([objects[i].estimate.ravel() for i in obj_idx])
             stacked_candidates = np.stack(
                 [
-                    c.points.ravel() if isinstance(c, Detection) else c.estimate.ravel()
-                    for c, m in zip(candidates, cand_mask)
-                    if m
+                    candidates[i].points.ravel()
+                    if isinstance(candidates[i], Detection)
+                    else candidates[i].estimate.ravel()
+                    for i in cand_idx
                 ]
             )
 
             # calculate the pairwise distances between objects and candidates with this label
             # and assign the result to the correct positions inside distance_matrix
-            distance_matrix[np.ix_(cand_mask, obj_mask)] = self._compute_distance(
+            distance_matrix[np.ix_(cand_idx, obj_idx)] = self._compute_distance(
                 stacked_candidates, stacked_objects
             )
 
