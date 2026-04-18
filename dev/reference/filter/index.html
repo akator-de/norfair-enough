@@ -1758,7 +1758,7 @@ falls back to a pseudo-inverse to maintain numerical stability.</p>
         <span class="nb">filter</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="n">dim_z</span><span class="p">:,</span> <span class="n">dim_z</span><span class="p">:]</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span>
 
         <span class="c1"># Initial state: numpy.array(dim_x, 1)</span>
-        <span class="nb">filter</span><span class="o">.</span><span class="n">x</span><span class="p">[:</span><span class="n">dim_z</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">initial_detection</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="nb">filter</span><span class="o">.</span><span class="n">x</span><span class="p">[:</span><span class="n">dim_z</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_detection</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="nb">filter</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">dim_z</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="c1"># Estimation uncertainty: numpy.array(dim_x, dim_x)</span>
@@ -1959,7 +1959,7 @@ object being born, used as the initial position estimate.</p>
     <span class="nb">filter</span><span class="o">.</span><span class="n">Q</span><span class="p">[</span><span class="n">dim_z</span><span class="p">:,</span> <span class="n">dim_z</span><span class="p">:]</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Q</span>
 
     <span class="c1"># Initial state: numpy.array(dim_x, 1)</span>
-    <span class="nb">filter</span><span class="o">.</span><span class="n">x</span><span class="p">[:</span><span class="n">dim_z</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">initial_detection</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="nb">filter</span><span class="o">.</span><span class="n">x</span><span class="p">[:</span><span class="n">dim_z</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_detection</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="nb">filter</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">dim_z</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c1"># Estimation uncertainty: numpy.array(dim_x, dim_x)</span>
