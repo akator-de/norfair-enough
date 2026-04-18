@@ -43,20 +43,40 @@ def test_linear_motion_single_track_is_stable():
 
 
 def test_two_well_separated_tracks_keep_distinct_ids():
-    """Two parallel trajectories with large separation produce two stable IDs."""
+    """Two parallel trajectories with large separation produce two stable IDs.
+
+    The IDs assigned at the first post-initialization frame must remain
+    pinned to the same y-position on every subsequent frame — catching
+    transient swaps, not just the final state.
+    """
     tracker = Tracker(
         distance_function="euclidean",
         distance_threshold=20.0,
         initialization_delay=2,
     )
 
+    top_id: int | None = None
+    bottom_id: int | None = None
+
     tracked: list = []
     for frame in range(25):
         x = 10.0 + frame * 2.0
         tracked = tracker.update(_detections([[[x, 50.0]], [[x, 250.0]]]))
+        if len(tracked) != 2:
+            continue
+        by_y = {
+            ("top" if obj.estimate[0, 1] < 150 else "bottom"): obj.id for obj in tracked
+        }
+        if top_id is None:
+            top_id, bottom_id = by_y["top"], by_y["bottom"]
+            assert top_id != bottom_id
+        else:
+            assert by_y["top"] == top_id, f"top track ID swapped at frame {frame}"
+            assert by_y["bottom"] == bottom_id, (
+                f"bottom track ID swapped at frame {frame}"
+            )
 
-    assert len(tracked) == 2
-    assert len({obj.id for obj in tracked}) == 2
+    assert top_id is not None and bottom_id is not None
 
     y_values = sorted(obj.estimate[0, 1] for obj in tracked)
     assert abs(y_values[0] - 50.0) < 5.0
