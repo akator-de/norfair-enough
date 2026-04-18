@@ -1,6 +1,32 @@
 import numpy as np
 
-from norfair.filter import NoFilter, NoFilterFactory
+from norfair.filter import NoFilter, NoFilterFactory, OptimizedKalmanFilterFactory
+
+
+def test_optimized_filter_vel_variance_stays_non_negative():
+    """``vel_variance`` must stay non-negative after an update.
+
+    A large ``pos_vel_covariance`` paired with a small ``vel_variance``
+    subtracts a large term from the running variance; numerical
+    cancellation would otherwise drive it below zero.
+    """
+    factory = OptimizedKalmanFilterFactory(
+        R=0.01,
+        Q=0.001,
+        pos_variance=0.1,
+        pos_vel_covariance=50.0,
+        vel_variance=0.01,
+    )
+    initial_detection = np.array([[0.0, 0.0]])
+    f = factory.create_filter(initial_detection)
+
+    f.predict()
+    measurement = np.array([[1.0], [1.0]])
+    f.update(measurement)
+
+    assert np.all(f.vel_variance >= 1e-12), (
+        f"vel_variance dropped below the 1e-12 floor: {f.vel_variance.flatten()}"
+    )
 
 
 class TestNoFilterFactory:
