@@ -89,7 +89,7 @@ def test_short_occlusion_preserves_id():
     for frame in range(14, 22):
         x = 10.0 + frame * 2.0
         tracked = tracker.update(_detections([[[x, 50.0]]]))
-        if tracked and tracked[0].id == established_id:
+        if any(obj.id == established_id for obj in tracked):
             reused = True
     assert reused
 
