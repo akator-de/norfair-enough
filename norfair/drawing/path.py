@@ -125,7 +125,9 @@ class Paths:
 
             self.mask = np.zeros(frame.shape, np.uint8)
 
-        mask = (self.mask * self.attenuation_factor).astype("uint8")
+        # Saturate values before the uint8 cast: ``attenuation_factor`` can be
+        # >= 1 (e.g. ``attenuation == 0``), and an unclipped cast wraps.
+        mask = np.clip(self.mask * self.attenuation_factor, 0, 255).astype("uint8")
 
         for obj in tracked_objects:
             if obj.abs_to_rel is not None:
