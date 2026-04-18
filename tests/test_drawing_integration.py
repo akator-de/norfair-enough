@@ -462,6 +462,19 @@ class TestAbsolutePaths:
         # No live points => nothing drawn, frame should be unchanged
         np.testing.assert_array_equal(result, original)
 
+    def test_past_points_capped_at_max_history(self):
+        """``past_points`` must never exceed ``max_history`` entries."""
+        abs_paths = AbsolutePaths(max_history=3)
+        transform = MockCoordTransform()
+        for i in range(10):
+            frame = _black_frame()
+            obj = MockTrackedObject(
+                estimate=np.array([[30 + i, 30 + i], [60 + i, 60 + i]]),
+                obj_id=1,
+            )
+            abs_paths.draw(frame, [obj], coord_transform=transform)
+        assert len(abs_paths.past_points[1]) == 3
+
     def test_cleanup_dead_object_ids(self):
         """Past points for objects no longer tracked should be cleaned up."""
         abs_paths = AbsolutePaths()
@@ -630,6 +643,32 @@ class TestFixedCamera:
         camera = FixedCamera(scale=2)
         result = camera.adjust_frame(frame, transform)
         assert _frame_has_nonzero(result)
+
+    def test_attenuation_no_uint8_wraparound(self):
+        """Attenuation factors >= 1 saturate bright pixels at the uint8 maximum.
+
+        ``attenuation=-1.0`` yields an attenuation factor of ``2.0``. A
+        background value of 200 scales to 400; an unclipped cast to uint8
+        would wrap it to ``400 % 256 == 144``.
+        """
+        from norfair.camera_motion import TranslationTransformation
+
+        camera = FixedCamera(scale=2, attenuation=-1.0)
+
+        # Uniform bright background so the attenuation branch is exercised.
+        camera._background = np.full((400, 400, 3), 200, dtype=np.uint8)
+
+        # Offset the frame so the paste region leaves attenuated border area
+        # visible in the output.
+        frame = _black_frame()
+        transform = TranslationTransformation(movement_vector=np.array([50, 50]))
+        result = camera.adjust_frame(frame, transform)
+
+        assert result.dtype == np.uint8
+        # Expected: 200 * 2.0 saturates to 255; without clipping it wraps to 144.
+        assert result.max() >= 255, (
+            f"attenuation wrapped around: max={result.max()} (expected >= 255)"
+        )
 
 
 # ---------------------------------------------------------------------------
