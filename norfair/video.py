@@ -220,7 +220,7 @@ class Video:
             raise RuntimeError("Cannot iterate over a closed Video")
         try:
             with self.progress_bar as progress_bar:
-                start = time.time()
+                start = time.monotonic()
                 # Cap the progress-bar refresh rate at ~20 Hz; Rich rendering
                 # is a meaningful share of frame time on fast pipelines.
                 refresh_interval = 0.05
@@ -232,7 +232,7 @@ class Video:
                     if ret is False or frame is None:
                         break
                     self.frame_counter += 1
-                    now = time.time()
+                    now = time.monotonic()
                     elapsed = now - start
                     process_fps = self.frame_counter / elapsed if elapsed > 0 else 0.0
                     refresh_now = now >= next_refresh_at
