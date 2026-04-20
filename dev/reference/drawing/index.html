@@ -6516,7 +6516,24 @@ for camera motion::</p>
 <span class="normal">349</span>
 <span class="normal">350</span>
 <span class="normal">351</span>
-<span class="normal">352</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AbsolutePaths</span><span class="p">:</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AbsolutePaths</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Draw tracked-object trajectories in absolute (world) coordinates.</span>
 
 <span class="sd">    Behaves like [`Paths`][norfair.drawing.Paths], but takes camera</span>
@@ -6612,6 +6629,9 @@ for camera motion::</p>
             <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_history</span><span class="p">))</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">max_history</span><span class="p">)</span>
+        <span class="c1"># Scratch buffer reused across draw iterations. Lazy-allocated in</span>
+        <span class="c1"># ``draw`` to match the incoming frame&#39;s shape/dtype.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">tracked_objects</span><span class="p">,</span> <span class="n">coord_transform</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Render accumulated absolute paths onto ``frame``.</span>
@@ -6640,6 +6660,16 @@ for camera motion::</p>
             <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">frame_scale</span> <span class="o">*</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thickness</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">thickness</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">frame_scale</span> <span class="o">/</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="c1"># (Re-)allocate the scratch buffer when the frame&#39;s shape or dtype</span>
+        <span class="c1"># changes; otherwise the existing buffer is reused as-is.</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">frame</span><span class="o">.</span><span class="n">shape</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">frame</span><span class="o">.</span><span class="n">dtype</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
         <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">tracked_objects</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">obj</span><span class="o">.</span><span class="n">live_points</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
                 <span class="k">continue</span>
@@ -6671,8 +6701,12 @@ for camera motion::</p>
                 <span class="p">)</span>
 
             <span class="n">last</span> <span class="o">=</span> <span class="n">points_to_draw</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">overlay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">past_points</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">]):</span>
-                <span class="n">overlay</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="c1"># Refill the scratch buffer with the current frame before</span>
+                <span class="c1"># drawing the segment that will be blended back onto it.</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">copyto</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
                 <span class="n">last_rel</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">coord_transform</span><span class="o">.</span><span class="n">abs_to_rel</span><span class="p">(</span><span class="n">last</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">coord_transform</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -6783,7 +6817,10 @@ for camera motion::</p>
 <span class="normal">253</span>
 <span class="normal">254</span>
 <span class="normal">255</span>
-<span class="normal">256</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">get_points_to_draw</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>
     <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -6827,6 +6864,9 @@ for camera motion::</p>
         <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_history</span><span class="p">))</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.99</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">max_history</span><span class="p">)</span>
+    <span class="c1"># Scratch buffer reused across draw iterations. Lazy-allocated in</span>
+    <span class="c1"># ``draw`` to match the incoming frame&#39;s shape/dtype.</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -6938,10 +6978,7 @@ to already be in the frame's pixel coordinates.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>norfair/drawing/path.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">258</span>
-<span class="normal">259</span>
-<span class="normal">260</span>
-<span class="normal">261</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">261</span>
 <span class="normal">262</span>
 <span class="normal">263</span>
 <span class="normal">264</span>
@@ -7032,7 +7069,24 @@ to already be in the frame's pixel coordinates.</p>
 <span class="normal">349</span>
 <span class="normal">350</span>
 <span class="normal">351</span>
-<span class="normal">352</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">tracked_objects</span><span class="p">,</span> <span class="n">coord_transform</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">tracked_objects</span><span class="p">,</span> <span class="n">coord_transform</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Render accumulated absolute paths onto ``frame``.</span>
 
 <span class="sd">    Parameters</span>
@@ -7059,6 +7113,16 @@ to already be in the frame's pixel coordinates.</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">frame_scale</span> <span class="o">*</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thickness</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">thickness</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">frame_scale</span> <span class="o">/</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># (Re-)allocate the scratch buffer when the frame&#39;s shape or dtype</span>
+    <span class="c1"># changes; otherwise the existing buffer is reused as-is.</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">frame</span><span class="o">.</span><span class="n">shape</span>
+        <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">frame</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
     <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">tracked_objects</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">obj</span><span class="o">.</span><span class="n">live_points</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
             <span class="k">continue</span>
@@ -7090,8 +7154,12 @@ to already be in the frame's pixel coordinates.</p>
             <span class="p">)</span>
 
         <span class="n">last</span> <span class="o">=</span> <span class="n">points_to_draw</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">overlay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overlay_scratch</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">past_points</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">past_points</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">id</span><span class="p">]):</span>
-            <span class="n">overlay</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="c1"># Refill the scratch buffer with the current frame before</span>
+            <span class="c1"># drawing the segment that will be blended back onto it.</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">copyto</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="n">frame</span><span class="p">)</span>
             <span class="n">last_rel</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">coord_transform</span><span class="o">.</span><span class="n">abs_to_rel</span><span class="p">(</span><span class="n">last</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">coord_transform</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
