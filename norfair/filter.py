@@ -170,7 +170,7 @@ class FilterPyKalmanFilterFactory(FilterFactory):
         filter.Q[dim_z:, dim_z:] *= self.Q
 
         # Initial state: numpy.array(dim_x, 1)
-        filter.x[:dim_z] = np.expand_dims(initial_detection.flatten(), 0).T
+        filter.x[:dim_z] = initial_detection.reshape(-1, 1)
         filter.x[dim_z:] = 0
 
         # Estimation uncertainty: numpy.array(dim_x, dim_x)
@@ -282,13 +282,13 @@ class OptimizedKalmanFilter:
         self.x = np.zeros((dim_x, 1))
 
         # matrix P from Kalman
-        self.pos_variance = np.zeros((dim_z, 1)) + pos_variance
-        self.pos_vel_covariance = np.zeros((dim_z, 1)) + pos_vel_covariance
-        self.vel_variance = np.zeros((dim_z, 1)) + vel_variance
+        self.pos_variance = np.full((dim_z, 1), pos_variance, dtype=float)
+        self.pos_vel_covariance = np.full((dim_z, 1), pos_vel_covariance, dtype=float)
+        self.vel_variance = np.full((dim_z, 1), vel_variance, dtype=float)
 
         self.q_Q = q
 
-        self.default_r = r * np.ones((dim_z, 1))
+        self.default_r = np.full((dim_z, 1), r, dtype=float)
 
     def predict(self):
         """Advance positions by the current velocity estimate."""
@@ -321,7 +321,7 @@ class OptimizedKalmanFilter:
         else:
             kalman_r = self.default_r
 
-        error = np.multiply(detection_points_flatten - self.x[: self.dim_z], diagonal)
+        error = (detection_points_flatten - self.x[: self.dim_z]) * diagonal
 
         vel_var_plus_pos_vel_cov = self.pos_vel_covariance + self.vel_variance
         added_variances = (
@@ -334,35 +334,34 @@ class OptimizedKalmanFilter:
         # Guard against zero-variance division (see issue #46).
         added_variances = np.maximum(added_variances, 1e-12)
 
-        kalman_r_over_added_variances = np.divide(kalman_r, added_variances)
-        vel_var_plus_pos_vel_cov_over_added_variances = np.divide(
-            vel_var_plus_pos_vel_cov, added_variances
+        inv_added_variances = 1.0 / added_variances
+        kalman_r_over_added_variances = kalman_r * inv_added_variances
+        vel_var_plus_pos_vel_cov_over_added_variances = (
+            vel_var_plus_pos_vel_cov * inv_added_variances
+        )
+        one_minus_k_over_av = 1 - kalman_r_over_added_variances
+
+        added_variances_or_kalman_r = (
+            added_variances * one_minus_diagonal + kalman_r * diagonal
         )
 
-        added_variances_or_kalman_r = np.multiply(
-            added_variances, one_minus_diagonal
-        ) + np.multiply(kalman_r, diagonal)
-
-        self.x[: self.dim_z] += np.multiply(
-            diagonal, np.multiply(1 - kalman_r_over_added_variances, error)
-        )
-        self.x[self.dim_z :] += np.multiply(
-            diagonal, np.multiply(vel_var_plus_pos_vel_cov_over_added_variances, error)
+        self.x[: self.dim_z] += diagonal * (one_minus_k_over_av * error)
+        self.x[self.dim_z :] += diagonal * (
+            vel_var_plus_pos_vel_cov_over_added_variances * error
         )
 
-        self.pos_variance = np.multiply(
-            1 - kalman_r_over_added_variances, added_variances_or_kalman_r
+        self.pos_variance = one_minus_k_over_av * added_variances_or_kalman_r
+        self.pos_vel_covariance = (
+            vel_var_plus_pos_vel_cov_over_added_variances * added_variances_or_kalman_r
         )
-        self.pos_vel_covariance = np.multiply(
-            vel_var_plus_pos_vel_cov_over_added_variances, added_variances_or_kalman_r
+        self.vel_variance += self.q_Q - diagonal * (
+            vel_var_plus_pos_vel_cov_over_added_variances
+            * vel_var_plus_pos_vel_cov_over_added_variances
+            * added_variances
         )
-        self.vel_variance += self.q_Q - np.multiply(
-            diagonal,
-            np.multiply(
-                np.square(vel_var_plus_pos_vel_cov_over_added_variances),
-                added_variances,
-            ),
-        )
+        # Numerical cancellation in the subtraction above can produce
+        # negative variances; clamp to the same floor as ``added_variances``.
+        self.vel_variance = np.maximum(self.vel_variance, 1e-12)
 
 
 class OptimizedKalmanFilterFactory(FilterFactory):
