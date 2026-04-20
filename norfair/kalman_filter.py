@@ -711,6 +711,9 @@ class KalmanFilter:
         try:
             if np.linalg.cond(self.S) > 1e12:
                 raise np.linalg.LinAlgError("ill-conditioned")
+            # K = PH' @ inv(S), obtained via ``solve`` for numerical stability.
+            self.K = np.linalg.solve(self.S, PHT.T).T
+            # SI is exposed for ``mahalanobis`` and ``__repr__``.
             self.SI = self.inv(self.S)
         except np.linalg.LinAlgError:
             _logger.warning(
@@ -718,9 +721,7 @@ class KalmanFilter:
                 "KalmanFilter.update; falling back to pseudo-inverse."
             )
             self.SI = np.linalg.pinv(self.S)
-        # K = PH'inv(S)
-        # map system uncertainty into kalman gain
-        self.K = dot(PHT, self.SI)
+            self.K = dot(PHT, self.SI)
 
         # x = x + Ky
         # predict new x with residual scaled by the kalman gain
@@ -916,9 +917,13 @@ class KalmanFilter:
 
         # project system uncertainty into measurement space
         self.S = dot(H, PHT) + dot(H, self.M) + dot(self.M.T, H.T) + R
+        PHT_M = PHT + self.M
         try:
             if np.linalg.cond(self.S) > 1e12:
                 raise np.linalg.LinAlgError("ill-conditioned")
+            # K = (PH' + M) @ inv(S), obtained via ``solve`` for numerical
+            # stability.
+            self.K = np.linalg.solve(self.S, PHT_M.T).T
             self.SI = self.inv(self.S)
         except np.linalg.LinAlgError:
             _logger.warning(
@@ -927,10 +932,7 @@ class KalmanFilter:
                 "falling back to pseudo-inverse."
             )
             self.SI = np.linalg.pinv(self.S)
-
-        # K = PH'inv(S)
-        # map system uncertainty into kalman gain
-        self.K = dot(PHT + self.M, self.SI)
+            self.K = dot(PHT_M, self.SI)
 
         # x = x + Ky
         # predict new x with residual scaled by the kalman gain
