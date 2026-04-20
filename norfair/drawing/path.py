@@ -1,6 +1,6 @@
 """Drawers that trace the trajectories of tracked points across frames."""
 
-from collections import defaultdict
+from collections import defaultdict, deque
 from collections.abc import Callable, Sequence
 
 import numpy as np
@@ -125,7 +125,9 @@ class Paths:
 
             self.mask = np.zeros(frame.shape, np.uint8)
 
-        mask = (self.mask * self.attenuation_factor).astype("uint8")
+        # Saturate values before the uint8 cast: ``attenuation_factor`` can be
+        # >= 1 (e.g. ``attenuation == 0``), and an unclipped cast wraps.
+        mask = np.clip(self.mask * self.attenuation_factor, 0, 255).astype("uint8")
 
         for obj in tracked_objects:
             if obj.abs_to_rel is not None:
@@ -246,10 +248,11 @@ class AbsolutePaths:
         self.radius = radius
         self.thickness = thickness
         self.color = color
-        self.past_points: defaultdict[int | None, list[NDArray[np.float64]]] = (
-            defaultdict(list)
-        )
         self.max_history = max_history
+        # Bounded history per object; most recent sample lives at index 0.
+        self.past_points: defaultdict[int | None, deque[NDArray[np.float64]]] = (
+            defaultdict(lambda: deque(maxlen=self.max_history))
+        )
         self.alphas = np.linspace(0.99, 0.01, max_history)
         # Scratch buffer reused across draw iterations. Lazy-allocated in
         # ``draw`` to match the incoming frame's shape/dtype.
@@ -355,8 +358,7 @@ class AbsolutePaths:
 
                 alpha = self.alphas[i]
                 frame = Drawer.alpha_blend(overlay, frame, alpha=alpha)
-            self.past_points[obj.id].insert(0, points_to_draw)
-            self.past_points[obj.id] = self.past_points[obj.id][: self.max_history]
+            self.past_points[obj.id].appendleft(points_to_draw)
 
         # Clean up dead objects to prevent memory leak
         active_ids = {obj.id for obj in tracked_objects}

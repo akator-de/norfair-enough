@@ -1,3 +1,12 @@
+"""Shared pytest fixtures.
+
+The autouse ``reset_global_count`` fixture mutates a class-level counter
+on :class:`norfair.tracker._TrackedObjectFactory`. It is safe under
+process-level parallelism (``pytest-xdist``) because each worker owns
+its own Python process and therefore its own counter; in-process thread
+parallelism is not supported.
+"""
+
 import numpy as np
 import pytest
 
@@ -7,7 +16,11 @@ from norfair.utils import validate_points
 
 @pytest.fixture(autouse=True)
 def reset_global_count():
-    """Reset TrackedObject global count before each test for isolation."""
+    """Reset TrackedObject global count before each test for isolation.
+
+    The reset is process-local; see the module docstring for parallel
+    execution caveats.
+    """
     _TrackedObjectFactory.global_count = 0
     try:
         yield
