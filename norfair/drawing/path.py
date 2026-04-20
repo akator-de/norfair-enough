@@ -254,6 +254,9 @@ class AbsolutePaths:
             defaultdict(lambda: deque(maxlen=self.max_history))
         )
         self.alphas = np.linspace(0.99, 0.01, max_history)
+        # Scratch buffer reused across draw iterations. Lazy-allocated in
+        # ``draw`` to match the incoming frame's shape/dtype.
+        self._overlay_scratch: np.ndarray | None = None
 
     def draw(self, frame, tracked_objects, coord_transform=None):
         """Render accumulated absolute paths onto ``frame``.
@@ -282,6 +285,16 @@ class AbsolutePaths:
             self.radius = int(max(frame_scale * 0.7, 1))
         if self.thickness is None:
             self.thickness = int(max(frame_scale / 7, 1))
+
+        # (Re-)allocate the scratch buffer when the frame's shape or dtype
+        # changes; otherwise the existing buffer is reused as-is.
+        if (
+            self._overlay_scratch is None
+            or self._overlay_scratch.shape != frame.shape
+            or self._overlay_scratch.dtype != frame.dtype
+        ):
+            self._overlay_scratch = np.empty_like(frame)
+
         for obj in tracked_objects:
             if not obj.live_points.any():
                 continue
@@ -313,8 +326,12 @@ class AbsolutePaths:
                 )
 
             last = points_to_draw
+            assert self._overlay_scratch is not None
+            overlay = self._overlay_scratch
             for i, past_points in enumerate(self.past_points[obj.id]):
-                overlay = frame.copy()
+                # Refill the scratch buffer with the current frame before
+                # drawing the segment that will be blended back onto it.
+                np.copyto(overlay, frame)
                 last_rel = (
                     coord_transform.abs_to_rel(last)
                     if coord_transform is not None
