@@ -45,8 +45,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# motmetrics 1.4.0 is incompatible with NumPy 2.x; pinning avoids pulling in
+# a release that constrains the project back to NumPy<2.
 metrics = ["motmetrics==1.4.0"]
-video = ["opencv-python>=4.2.0,<5.0.0"]
+# opencv-python <4.8 has API drifts (e.g. findHomography parameter order)
+# that are not covered by the test suite.
+video = ["opencv-python>=4.8.0,<5.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/akator-de/norfair-enough"
