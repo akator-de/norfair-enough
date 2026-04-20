@@ -299,7 +299,8 @@ class Accumulators:
     def __init__(self):
         """Initialize the per-sequence prediction buffers."""
         self.matrixes_predictions = []
-        self.paths: np.ndarray = np.array([], dtype=str)
+        # One entry per registered sequence.
+        self.paths: list[str] = []
 
     def create_accumulator(self, input_path, information_file=None):
         """Start collecting predictions for the sequence at ``input_path``.
@@ -321,7 +322,7 @@ class Accumulators:
 
         self.frame_number = 1
         # Save the path of this video
-        self.paths = np.hstack((self.paths, input_path))
+        self.paths.append(input_path)
         # Initialize a matrix where we will save our predictions for this video (in the MOTChallenge format)
         self.matrix_predictions = []
 
