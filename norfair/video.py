@@ -31,6 +31,11 @@ def _get_fourcc(codec: str) -> int:
     return cv2.VideoWriter_fourcc(*codec)  # type: ignore[attr-defined]
 
 
+# Cap the progress-bar refresh rate at ~20 Hz: Rich rendering is a
+# meaningful share of per-frame cost on fast pipelines.
+_PROGRESS_REFRESH_INTERVAL_S = 0.05
+
+
 class Video:
     """Simple pythonic wrapper around an OpenCV video source and sink.
 
@@ -220,7 +225,8 @@ class Video:
             raise RuntimeError("Cannot iterate over a closed Video")
         try:
             with self.progress_bar as progress_bar:
-                start = time.time()
+                start = time.monotonic()
+                next_refresh_at = start
 
                 # Iterate over video
                 while True:
@@ -228,12 +234,21 @@ class Video:
                     if ret is False or frame is None:
                         break
                     self.frame_counter += 1
-                    elapsed = time.time() - start
+                    now = time.monotonic()
+                    elapsed = now - start
                     process_fps = self.frame_counter / elapsed if elapsed > 0 else 0.0
+                    refresh_now = now >= next_refresh_at
                     progress_bar.update(
-                        self.task, advance=1, refresh=True, process_fps=process_fps
+                        self.task,
+                        advance=1,
+                        refresh=refresh_now,
+                        process_fps=process_fps,
                     )
+                    if refresh_now:
+                        next_refresh_at = now + _PROGRESS_REFRESH_INTERVAL_S
                     yield frame
+                # Flush any throttled update so the bar ends at 100%.
+                progress_bar.refresh()
         finally:
             self.close()
 
