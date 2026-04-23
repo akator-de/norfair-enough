@@ -77,7 +77,7 @@ test = [
     "pyrefly>=0.50.0",
     "pytest>=9.0.0",
     "pytest-cov>=7.0.0",
-    "ruff==0.15.10",
+    "ruff==0.15.11",
 ]
 
 [build-system]
