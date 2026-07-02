@@ -50,7 +50,7 @@ dependencies = [
 metrics = ["motmetrics==1.4.0"]
 # opencv-python <4.8 has API drifts (e.g. findHomography parameter order)
 # that are not covered by the test suite.
-video = ["opencv-python>=4.8.0,<5.0.0"]
+video = ["opencv-python>=4.8.0,<6.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/akator-de/norfair-enough"
@@ -77,7 +77,7 @@ test = [
     "pyrefly>=0.50.0",
     "pytest>=9.0.0",
     "pytest-cov>=7.0.0",
-    "ruff==0.15.10",
+    "ruff==0.15.20",
 ]
 
 [build-system]
