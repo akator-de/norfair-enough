@@ -1092,8 +1092,19 @@
 <a href="https://pypi.org/project/norfair-enough/"><img alt="Python" src="https://img.shields.io/pypi/pyversions/norfair-enough" /></a>
 <a href="https://akator-de.github.io/norfair-enough/"><img alt="Docs" src="https://img.shields.io/badge/docs-dev-blue" /></a>
 <a href="https://github.com/akator-de/norfair-enough/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/akator-de/norfair-enough" /></a></p>
-<p><strong>A maintained fork of <a href="https://github.com/tryolabs/norfair">tryolabs/norfair</a></strong> — lightweight Python library for real-time multi-object tracking.</p>
-<p>The upstream Norfair repository is no longer actively maintained. This fork keeps the library alive for production use. There is no claim to be the official successor — just a pragmatic continuation. New maintainers are welcome.</p>
+<p><strong>A fork of <a href="https://github.com/tryolabs/norfair">tryolabs/norfair</a></strong> — lightweight Python library for real-time multi-object tracking.</p>
+<blockquote>
+<p>[!IMPORTANT]
+<strong>This fork is no longer maintained. <a href="https://github.com/akator-de/norfair-enough/releases/tag/v2.4.3">v2.4.3</a> (August 2026) is the final release, and this repository is archived and read-only.</strong></p>
+<p>It was created and kept current for a production project that has since ended, so there is no longer anything driving its maintenance.</p>
+<ul>
+<li><strong>The package still works.</strong> <code>pip install norfair-enough</code> continues to work. v2.4.3 declares Python 3.10+ and was tested through 3.13; it supports NumPy 2.x and OpenCV from 4.10.0.84 through 5.x. Newer Python releases will install but were never covered by CI.</li>
+<li><strong>Nothing further will be released</strong> — no fixes, no dependency updates, no issue or pull request review.</li>
+<li><strong>Forking is welcome.</strong> The code is BSD-3-Clause with no copyleft restrictions. If you want to carry it forward, fork it and publish under your own name; nothing beyond the license terms is expected.</li>
+</ul>
+<p>Upstream <a href="https://github.com/tryolabs/norfair">tryolabs/norfair</a> has had no commits since April 2025, so it is not an actively maintained alternative either. See <a href="#comparison-to-other-trackers">Comparison to other trackers</a> for options that are.</p>
+</blockquote>
+<p>This fork existed to keep the library usable in production while upstream was dormant. It never claimed to be the official successor — it was a pragmatic continuation.</p>
 <table>
 <thead>
 <tr>
@@ -1229,7 +1240,7 @@ pip<span class="w"> </span>install<span class="w"> </span>norfair-enough<span cl
 </ul>
 <p>Norfair Enough stands out by being <strong>detector-agnostic</strong>, supporting <strong>any point geometry</strong> (centroids, bounding boxes, keypoints, 3D points), and offering a <strong>BSD-3 license</strong> with no copyleft restrictions.</p>
 <h2 id="benchmarks">Benchmarks<a class="headerlink" href="#benchmarks" title="Permanent link">#</a></h2>
-<p>These benchmarks were produced using the <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair">motmetrics4norfair</a> demo script. Our CI runs MOT metrics regression tests on every pull request to prevent tracking quality regressions.</p>
+<p>These benchmarks were produced using the <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair">motmetrics4norfair</a> demo script, which is still included if you want to reproduce them.</p>
 <p><a href="https://motchallenge.net/data/MOT17/">MOT17</a> and <a href="https://motchallenge.net/data/MOT20/">MOT20</a> results obtained using <a href="https://github.com/akator-de/norfair-enough/tree/main/demos/motmetrics4norfair">motmetrics4norfair</a> demo script on the <code>train</code> split. We used detections obtained with <a href="https://github.com/ifzhang/ByteTrack">ByteTrack's</a> YOLOX object detection model.</p>
 <table>
 <thead>
