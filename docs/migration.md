@@ -1,8 +1,14 @@
 # Migration Guide: tryolabs/norfair → norfair-enough
 
-`norfair-enough` is a maintained fork of [`tryolabs/norfair`](https://github.com/tryolabs/norfair),
+`norfair-enough` is a fork of [`tryolabs/norfair`](https://github.com/tryolabs/norfair),
 based on upstream v2.3.0. This guide describes what you need to change when moving an existing
 project from the upstream package to `norfair-enough`.
+
+!!! warning "This fork is no longer maintained"
+
+    v2.4.3 (August 2026) is the final release and the repository is archived. The package
+    remains installable and working, but nothing further will be released. This guide is kept
+    for anyone migrating onto that final version, or forking it to carry it forward.
 
 ## TL;DR
 
@@ -153,8 +159,13 @@ Old imports continue to work.
 
 ## Staying on upstream `tryolabs/norfair`
 
-Upstream `tryolabs/norfair` is no longer actively maintained. If you prefer to stay on it,
+Upstream `tryolabs/norfair` has had no commits since April 2025. If you prefer to stay on it,
 you can continue to install it from
 [its repository](https://github.com/tryolabs/norfair) or PyPI — but be aware that bug fixes
-and new Python/NumPy compatibility work will not flow back. `norfair-enough` exists precisely
-to keep this codebase alive for users who need it.
+and new Python/NumPy compatibility work will not flow back.
+
+Both projects are now dormant. `norfair-enough` v2.4.3 carries the fixes listed above and
+supports current Python, NumPy 2.x and OpenCV 5, so it is the further-along of the two — but
+if you need something under active development, the alternatives listed in the
+[README](https://github.com/akator-de/norfair-enough#comparison-to-other-trackers) are the
+better starting point.
