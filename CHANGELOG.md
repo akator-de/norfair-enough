@@ -6,6 +6,40 @@ This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2
 
 ## [Unreleased]
 
+## [2.4.3] - 2026-08-02
+
+### Added
+- Synthetic end-to-end scenario tests for the tracking pipeline (#124)
+- Docstrings for the full public API (#84)
+- `numpy.typing.NDArray` annotations for differentiated array types (#85)
+
+### Fixed
+- `camera_motion`: raise `ValueError` on a singular homography instead of propagating an unusable matrix (#105)
+- `camera_motion`: prevent view aliasing in `TranslationTransformationGetter` (#106)
+- `filter`: clamp `vel_variance` to non-negative after update (#107)
+- `fixed_camera`: clip before casting the attenuated background to `uint8`, avoiding overflow (#108)
+- `distances`: group `VectorizedDistance` labels by identity instead of `str()`, so a `None` label no longer collides with the literal string `"None"` (#109)
+- Correct the indentation of the tracking-loop example in the Getting Started guide
+
+### Performance
+- `drawing`: reuse the overlay scratch buffer in `AbsolutePaths.draw` (#122)
+- `drawing`: `deque(maxlen=...)` for `AbsolutePaths` history instead of `list.insert(0, ...)` (#110)
+- `kalman_filter`: compute the Kalman gain via `np.linalg.solve` instead of `np.linalg.inv` (#121)
+- `filter`: `np.full` for `OptimizedKalmanFilter` variance buffers (#112)
+- `filter`: operator form instead of `np.multiply`/`np.divide` in `update` (#113)
+- `metrics`: build `Accumulators.paths` as a list instead of an O(n²) `np.hstack` loop (#111)
+- `tracker`: identity set for `TrackedObject` removal (#116)
+- `video`: throttle progress-bar refresh to ~20 Hz (#119)
+
+### Changed
+- **`opencv-python` is now required as `>=4.10.0.84,<6.0.0`, adding support for OpenCV 5.0.** The floor moved up because opencv-python releases before 4.10.0.84 are built against the NumPy 1.x C ABI and fail to import under NumPy 2.x, which this package permits (#118)
+- Dependencies and tooling refreshed: ruff 0.16.1, pyrefly 1.2.0, pytest 9.1.1, and all locked versions updated
+- GitHub Actions updated: checkout v7, setup-python v7, setup-uv v9, codecov-action v7, labeler v7
+- `drawer`: explicit int conversion for rectangle corners (#115)
+- `filter`: drop redundant `expand_dims().T` in favour of `reshape(-1, 1)` (#114)
+- `utils`: drop the `rich.print` import that shadowed the built-in (#117)
+- Remove the MOT17 integration test and make the MOT metrics CI job non-blocking (#123)
+
 ## [2.4.2] - 2026-04-16
 
 ### Fixed
