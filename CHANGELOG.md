@@ -32,7 +32,7 @@ This fork is based on [tryolabs/norfair](https://github.com/tryolabs/norfair) v2
 - `video`: throttle progress-bar refresh to ~20 Hz (#119)
 
 ### Changed
-- **`opencv-python` is now required as `>=4.10.0.84,<6.0.0`, adding support for OpenCV 5.0.** The floor moved up because opencv-python releases before 4.10.0.84 are built against the NumPy 1.x C ABI and fail to import under NumPy 2.x, which this package permits (#118)
+- **The `video` extra now requires `opencv-python>=4.10.0.84,<6.0.0`, adding support for OpenCV 5.0.** The floor moved up because opencv-python releases before 4.10.0.84 are built against the NumPy 1.x C ABI and fail to import under NumPy 2.x, which this package permits (#118)
 - Dependencies and tooling refreshed: ruff 0.16.1, pyrefly 1.2.0, pytest 9.1.1, and all locked versions updated
 - GitHub Actions updated: checkout v7, setup-python v7, codecov-action v7, labeler v7, and setup-uv v9.0.0 — pinned to the exact tag because setup-uv stopped publishing floating major tags after v7 as a supply-chain hardening measure
 - `drawer`: explicit int conversion for rectangle corners (#115)
