@@ -17,7 +17,7 @@
 >
 > It was created and kept current for a production project that has since ended, so there is no longer anything driving its maintenance.
 >
-> - **The package still works.** `pip install norfair-enough` continues to work. v2.4.3 supports Python 3.10–3.13, NumPy 2.x, and OpenCV from 4.10.0.84 through 5.x.
+> - **The package still works.** `pip install norfair-enough` continues to work. v2.4.3 declares Python 3.10+ and was tested through 3.13; it supports NumPy 2.x and OpenCV from 4.10.0.84 through 5.x. Newer Python releases will install but were never covered by CI.
 > - **Nothing further will be released** — no fixes, no dependency updates, no issue or pull request review.
 > - **Forking is welcome.** The code is BSD-3-Clause with no copyleft restrictions. If you want to carry it forward, fork it and publish under your own name; nothing beyond the license terms is expected.
 >

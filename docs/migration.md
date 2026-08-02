@@ -165,7 +165,8 @@ you can continue to install it from
 and new Python/NumPy compatibility work will not flow back.
 
 Both projects are now dormant. `norfair-enough` v2.4.3 carries the fixes listed above and
-supports current Python, NumPy 2.x and OpenCV 5, so it is the further-along of the two — but
-if you need something under active development, the alternatives listed in the
+requires Python 3.10+ (tested through 3.13), NumPy 2.x and OpenCV 5, so it is the
+further-along of the two — but if you need something under active development, the
+alternatives listed in the
 [README](https://github.com/akator-de/norfair-enough#comparison-to-other-trackers) are the
 better starting point.
