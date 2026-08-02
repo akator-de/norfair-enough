@@ -45,11 +45,11 @@ video = Video(input_path="video.mp4")
 tracker = Tracker(distance_function="euclidean", distance_threshold=100)
 
 for frame in video:
-   detections = detector(frame)
-   norfair_detections = [Detection(points) for points in detections]
-   tracked_objects = tracker.update(detections=norfair_detections)
-   draw_points(frame, drawables=tracked_objects)
-   video.write(frame)
+    detections = detector(frame)
+    norfair_detections = [Detection(points) for points in detections]
+    tracked_objects = tracker.update(detections=norfair_detections)
+    draw_points(frame, drawables=tracked_objects)
+    video.write(frame)
 ```
 
 The tracker is created and then the detections are fed to it one frame at a time in order. This method is called _online tracking_ and allows the tracker to be used in live feeds and real-time scenarios where future frames are not available.

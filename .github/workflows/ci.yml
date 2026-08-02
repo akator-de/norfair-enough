@@ -30,17 +30,17 @@ jobs:
             os: windows-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v9.0.0
         with:
-          enable-cache: true
+          enable-cache: ${{ github.event_name != 'release' }}
 
       - name: Install tox
         run: uv tool install tox --with tox-uv
@@ -51,17 +51,17 @@ jobs:
   coverage:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.13"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v9.0.0
         with:
-          enable-cache: true
+          enable-cache: ${{ github.event_name != 'release' }}
 
       - name: Install dependencies
         run: uv sync --locked --all-extras --group test
@@ -70,7 +70,7 @@ jobs:
         run: uv run pytest tests/ --cov=norfair --cov-report=term-missing --cov-report=xml
 
       - name: Upload to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           files: coverage.xml
           fail_ci_if_error: false
@@ -78,17 +78,17 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v9.0.0
         with:
-          enable-cache: true
+          enable-cache: ${{ github.event_name != 'release' }}
 
       - name: Build package
         run: uv build --sdist
@@ -114,7 +114,7 @@ jobs:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -142,17 +142,17 @@ jobs:
     env:
       PYTHON_VERSION: "3.12"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v9.0.0
         with:
-          enable-cache: true
+          enable-cache: ${{ github.event_name != 'release' }}
 
       - name: Release to PyPI
         env:
@@ -171,19 +171,19 @@ jobs:
     env:
       PYTHON_VERSION: "3.12"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "${{ env.PYTHON_VERSION }}"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v9.0.0
         with:
-          enable-cache: true
+          enable-cache: ${{ github.event_name != 'release' }}
 
       - name: Setup git user for mike
         run: |

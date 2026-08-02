@@ -1,6 +1,6 @@
 [project]
 name = "norfair-enough"
-version = "2.4.2"
+version = "2.4.3"
 description = "Lightweight Python library for adding real-time multi-object tracking to any detector. Maintained fork of tryolabs/norfair."
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
@@ -48,9 +48,12 @@ dependencies = [
 # motmetrics 1.4.0 is incompatible with NumPy 2.x; pinning avoids pulling in
 # a release that constrains the project back to NumPy<2.
 metrics = ["motmetrics==1.4.0"]
-# opencv-python <4.8 has API drifts (e.g. findHomography parameter order)
-# that are not covered by the test suite.
-video = ["opencv-python>=4.8.0,<5.0.0"]
+# opencv-python <4.10.0.84 is built against the NumPy 1.x C ABI and fails to
+# import as soon as NumPy 2.x is installed, which this package allows. Older
+# releases also have API drifts (e.g. findHomography parameter order) that the
+# test suite does not cover. OpenCV 5.0 keeps every cv2 API used here, so the
+# upper bound only guards against the next major.
+video = ["opencv-python>=4.10.0.84,<6.0.0"]
 
 [project.urls]
 Homepage = "https://github.com/akator-de/norfair-enough"
@@ -74,10 +77,10 @@ docs = [
     "mike>=2.1.0",
 ]
 test = [
-    "pyrefly>=0.50.0",
+    "pyrefly>=1.2.0",
     "pytest>=9.0.0",
     "pytest-cov>=7.0.0",
-    "ruff==0.15.10",
+    "ruff==0.16.1",
 ]
 
 [build-system]
